@@ -1,0 +1,225 @@
+[{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a916"
+  },
+  "idChiTiet": 3,
+  "idDonHang": 2,
+  "idNV": 2,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 15000,
+    "thanhTien": 15000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a917"
+  },
+  "idChiTiet": 4,
+  "idDonHang": 2,
+  "idNV": 2,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 55000,
+    "thanhTien": 55000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a918"
+  },
+  "idChiTiet": 5,
+  "idDonHang": 3,
+  "idNV": 3,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 85000,
+    "thanhTien": 85000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a919"
+  },
+  "idChiTiet": 6,
+  "idDonHang": 3,
+  "idNV": 3,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 5000,
+    "thanhTien": 5000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a91a"
+  },
+  "idChiTiet": 7,
+  "idDonHang": 4,
+  "idNV": 4,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 35000,
+    "thanhTien": 35000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a91b"
+  },
+  "idChiTiet": 8,
+  "idDonHang": 4,
+  "idNV": 4,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 20000,
+    "thanhTien": 20000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a91c"
+  },
+  "idChiTiet": 9,
+  "idDonHang": 5,
+  "idNV": 5,
+  "soLuong": 3,
+  "donGiaThanhTien": {
+    "donGia": 20000,
+    "thanhTien": 60000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a91d"
+  },
+  "idChiTiet": 10,
+  "idDonHang": 6,
+  "idNV": 6,
+  "soLuong": 2,
+  "donGiaThanhTien": {
+    "donGia": 25000,
+    "thanhTien": 50000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a91e"
+  },
+  "idChiTiet": 11,
+  "idDonHang": 6,
+  "idNV": 6,
+  "soLuong": 2,
+  "donGiaThanhTien": {
+    "donGia": 30000,
+    "thanhTien": 60000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a91f"
+  },
+  "idChiTiet": 12,
+  "idDonHang": 6,
+  "idNV": 6,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 10000,
+    "thanhTien": 10000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a920"
+  },
+  "idChiTiet": 15,
+  "idDonHang": 8,
+  "idNV": 3,
+  "soLuong": 2,
+  "donGiaThanhTien": {
+    "donGia": 30000,
+    "thanhTien": 60000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a921"
+  },
+  "idChiTiet": 16,
+  "idDonHang": 8,
+  "idNV": 3,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 35000,
+    "thanhTien": 35000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a922"
+  },
+  "idChiTiet": 27,
+  "idDonHang": 14,
+  "idNV": 1,
+  "soLuong": 4,
+  "donGiaThanhTien": {
+    "donGia": 25000,
+    "thanhTien": 100000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a923"
+  },
+  "idChiTiet": 28,
+  "idDonHang": 14,
+  "idNV": 1,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 20000,
+    "thanhTien": 20000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+},
+{
+  "_id": {
+    "$oid": "69761c6d95556ad7af33a924"
+  },
+  "idChiTiet": 29,
+  "idDonHang": 14,
+  "idNV": 1,
+  "soLuong": 1,
+  "donGiaThanhTien": {
+    "donGia": 30000,
+    "thanhTien": 30000
+  },
+  "ghiChu": null,
+  "trangThai": 1
+}]

@@ -1,0 +1,30 @@
+[{
+  "_id": {
+    "$oid": "6976edcbbc36e088a3d97ed8"
+  },
+  "idAdmin": "Ad001",
+  "username": "ghann",
+  "matKhau": "88888",
+  "thoiGianDangNhap": null,
+  "thoiGianDangXuat": null
+},
+{
+  "_id": {
+    "$oid": "6976edebbc36e088a3d97eda"
+  },
+  "idAdmin": "Ad002",
+  "username": "lhao",
+  "matKhau": "12345",
+  "thoiGianDangNhap": null,
+  "thoiGianDangXuat": null
+},
+{
+  "_id": {
+    "$oid": "6976ee55bc36e088a3d97edc"
+  },
+  "idAdmin": "Ad003",
+  "username": "mdung",
+  "matKhau": "11223",
+  "thoiGianDangNhap": null,
+  "thoiGianDangXuat": null
+}]

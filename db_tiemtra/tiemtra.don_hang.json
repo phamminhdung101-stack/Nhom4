@@ -1,0 +1,252 @@
+[{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f1a"
+  },
+  "idDonHang": 2,
+  "idGioHang": 2,
+  "idKhuyenMai": null,
+  "ghiChu": "Mình xin 2 cây tăm",
+  "tongTien": 70000,
+  "trangThai": 0,
+  "thoiGian": {
+    "$date": "2026-01-16T08:45:36.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f1b"
+  },
+  "idDonHang": 3,
+  "idGioHang": 3,
+  "idKhuyenMai": 1,
+  "ghiChu": null,
+  "tongTien": 90000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T11:50:20.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f1c"
+  },
+  "idDonHang": 4,
+  "idGioHang": 4,
+  "idKhuyenMai": null,
+  "ghiChu": "Cà phê ít ngọt",
+  "tongTien": 55000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T13:10:22.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f1d"
+  },
+  "idDonHang": 5,
+  "idGioHang": 5,
+  "idKhuyenMai": 2,
+  "ghiChu": "Thêm đá",
+  "tongTien": 60000,
+  "trangThai": 0,
+  "thoiGian": {
+    "$date": "2026-01-16T13:50:21.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f1e"
+  },
+  "idDonHang": 6,
+  "idGioHang": 6,
+  "idKhuyenMai": null,
+  "ghiChu": "Khách đặt trước 2 phần ăn sáng",
+  "tongTien": 120000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T14:12:29.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f1f"
+  },
+  "idDonHang": 7,
+  "idGioHang": 7,
+  "idKhuyenMai": null,
+  "ghiChu": null,
+  "tongTien": 110000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T14:53:43.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f20"
+  },
+  "idDonHang": 8,
+  "idGioHang": 8,
+  "idKhuyenMai": 1,
+  "ghiChu": "Thanh toán bằng tiền mặt",
+  "tongTien": 95000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T15:23:17.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f21"
+  },
+  "idDonHang": 9,
+  "idGioHang": 9,
+  "idKhuyenMai": null,
+  "ghiChu": "Mang về",
+  "tongTien": 80000,
+  "trangThai": 0,
+  "thoiGian": {
+    "$date": "2025-10-12T15:54:23.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f22"
+  },
+  "idDonHang": 10,
+  "idGioHang": 10,
+  "idKhuyenMai": null,
+  "ghiChu": "Mình xin trà đá",
+  "tongTien": 15000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T16:26:08.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f23"
+  },
+  "idDonHang": 11,
+  "idGioHang": 11,
+  "idKhuyenMai": 1,
+  "ghiChu": null,
+  "tongTien": 115000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T16:56:27.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f24"
+  },
+  "idDonHang": 12,
+  "idGioHang": 12,
+  "idKhuyenMai": null,
+  "ghiChu": null,
+  "tongTien": 123000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2025-10-16T17:00:53.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f25"
+  },
+  "idDonHang": 13,
+  "idGioHang": 13,
+  "idKhuyenMai": 2,
+  "ghiChu": "Xin thêm 2 cái ống hút",
+  "tongTien": 178000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T17:19:53.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f26"
+  },
+  "idDonHang": 14,
+  "idGioHang": 14,
+  "idKhuyenMai": null,
+  "ghiChu": null,
+  "tongTien": 150000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T17:46:20.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f27"
+  },
+  "idDonHang": 16,
+  "idGioHang": 16,
+  "idKhuyenMai": 3,
+  "ghiChu": "Xin thêm tương",
+  "tongTien": 56000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T17:58:32.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f28"
+  },
+  "idDonHang": 17,
+  "idGioHang": 17,
+  "idKhuyenMai": null,
+  "ghiChu": null,
+  "tongTien": 115000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T18:23:48.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f29"
+  },
+  "idDonHang": 18,
+  "idGioHang": 18,
+  "idKhuyenMai": 1,
+  "ghiChu": null,
+  "tongTien": 181000,
+  "trangThai": 1,
+  "thoiGian": {
+    "$date": "2026-01-16T18:54:14.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f2a"
+  },
+  "idDonHang": 22,
+  "idGioHang": 22,
+  "idKhuyenMai": null,
+  "ghiChu": "Khách bàn 1 gọi món",
+  "tongTien": 40000,
+  "trangThai": 0,
+  "thoiGian": {
+    "$date": "2026-01-16T19:35:01.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976fd8bbc36e088a3d97f2b"
+  },
+  "idDonHang": 23,
+  "idGioHang": 23,
+  "idKhuyenMai": null,
+  "ghiChu": "Khách bàn 1 gọi món",
+  "tongTien": 40000,
+  "trangThai": 0,
+  "thoiGian": {
+    "$date": "2026-01-16T20:41:57.000Z"
+  }
+}]

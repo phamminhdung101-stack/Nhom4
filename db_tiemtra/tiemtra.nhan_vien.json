@@ -1,0 +1,84 @@
+[{
+  "_id": {
+    "$oid": "69761d0095556ad7af33a96b"
+  },
+  "idNV": 1,
+  "HoVaten": "Nguyễn Ngọc Gia Hân",
+  "Username": "nnghan",
+  "ChucVu": "Phục vụ",
+  "HinhThuc": "PARTTIME",
+  "SoDienThoai": "0902509143",
+  "MatKhau": "85673"
+},
+{
+  "_id": {
+    "$oid": "69761d0095556ad7af33a96c"
+  },
+  "idNV": 2,
+  "HoVaten": "Hồ Lê Hào",
+  "Username": "hlhao",
+  "ChucVu": "Thu Ngân",
+  "HinhThuc": "FULLTIME",
+  "SoDienThoai": "0854691230",
+  "MatKhau": "56789"
+},
+{
+  "_id": {
+    "$oid": "69761d0095556ad7af33a96d"
+  },
+  "idNV": 3,
+  "HoVaten": "Phạm Minh Dũng",
+  "Username": "pmdung",
+  "ChucVu": "Phục vụ",
+  "HinhThuc": "FULLTIME",
+  "SoDienThoai": "0853240690",
+  "MatKhau": "12345"
+},
+{
+  "_id": {
+    "$oid": "69761d0095556ad7af33a96e"
+  },
+  "idNV": 4,
+  "HoVaten": "Võ Thành Danh",
+  "Username": "vtdanh",
+  "ChucVu": "Phục vụ",
+  "HinhThuc": "PARTTIME",
+  "SoDienThoai": "0906512384",
+  "MatKhau": "23456"
+},
+{
+  "_id": {
+    "$oid": "69761d0095556ad7af33a96f"
+  },
+  "idNV": 5,
+  "HoVaten": "Nguyễn Cao Vạn Hưng",
+  "Username": "ncvhung",
+  "ChucVu": "Phục vụ",
+  "HinhThuc": "FULLTIME",
+  "SoDienThoai": "0948612398",
+  "MatKhau": "34567"
+},
+{
+  "_id": {
+    "$oid": "69761d0095556ad7af33a970"
+  },
+  "idNV": 6,
+  "HoVaten": "Nguyễn Ngọc Như Quỳnh",
+  "Username": "nnnquynh",
+  "ChucVu": "Thu ngân",
+  "HinhThuc": "PARTTIME",
+  "SoDienThoai": "0906458975",
+  "MatKhau": "45678"
+},
+{
+  "_id": {
+    "$oid": "69761d0095556ad7af33a971"
+  },
+  "idNV": 7,
+  "HoVaten": "Nguyễn Quỳnh Trang",
+  "Username": "nqtrang",
+  "ChucVu": "Thu ngân",
+  "HinhThuc": "FULLTIME",
+  "SoDienThoai": "0902897564",
+  "MatKhau": "98765"
+}]

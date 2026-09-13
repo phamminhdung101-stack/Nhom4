@@ -1,0 +1,670 @@
+[{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d486fc"
+  },
+  "idMon": 1,
+  "TenMon": "Trà Sữa Truyền Thống",
+  "idLoai": 1,
+  "Gia": 45000,
+  "image": "/uploads/1.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d486fd"
+  },
+  "idMon": 2,
+  "TenMon": "Trà Sữa Olong",
+  "idLoai": 1,
+  "Gia": 47000,
+  "image": "/uploads/2.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d486fe"
+  },
+  "idMon": 3,
+  "TenMon": "Trà Sữa Matcha",
+  "idLoai": 1,
+  "Gia": 52000,
+  "image": "/uploads/3.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d486ff"
+  },
+  "idMon": 4,
+  "TenMon": "Trà Sữa Khoai Môn",
+  "idLoai": 1,
+  "Gia": 50000,
+  "image": "/uploads/4.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48700"
+  },
+  "idMon": 5,
+  "TenMon": "Trà Sữa Socola",
+  "idLoai": 1,
+  "Gia": 48000,
+  "image": "/uploads/5.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48701"
+  },
+  "idMon": 6,
+  "TenMon": "Trà Sữa Trân Châu Đường Đen",
+  "idLoai": 1,
+  "Gia": 55000,
+  "image": "/uploads/6.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48702"
+  },
+  "idMon": 7,
+  "TenMon": "Trà Sữa Lài",
+  "idLoai": 1,
+  "Gia": 46000,
+  "image": "/uploads/7.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48703"
+  },
+  "idMon": 8,
+  "TenMon": "Trà Sữa Dâu",
+  "idLoai": 1,
+  "Gia": 49000,
+  "image": "/uploads/8.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48704"
+  },
+  "idMon": 9,
+  "TenMon": "Trà Sữa Hạnh Nhân",
+  "idLoai": 1,
+  "Gia": 52000,
+  "image": "/uploads/9.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48705"
+  },
+  "idMon": 10,
+  "TenMon": "Trà Sữa Kem Muối",
+  "idLoai": 1,
+  "Gia": 56000,
+  "image": "/uploads/10.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48706"
+  },
+  "idMon": 11,
+  "TenMon": "Hồng Trà",
+  "idLoai": 2,
+  "Gia": 45000,
+  "image": "/uploads11.jpg/"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48707"
+  },
+  "idMon": 12,
+  "TenMon": "Lục Trà",
+  "idLoai": 2,
+  "Gia": 45000,
+  "image": "/uploads/12.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48708"
+  },
+  "idMon": 13,
+  "TenMon": "Trà Lài",
+  "idLoai": 2,
+  "Gia": 46000,
+  "image": "/uploads/13.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48709"
+  },
+  "idMon": 14,
+  "TenMon": "Trà Olong",
+  "idLoai": 2,
+  "Gia": 48000,
+  "image": "/uploads/14.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4870a"
+  },
+  "idMon": 15,
+  "TenMon": "Trà Đen",
+  "idLoai": 2,
+  "Gia": 45000,
+  "image": "/uploads/15.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4870b"
+  },
+  "idMon": 16,
+  "TenMon": "Trà Sen",
+  "idLoai": 2,
+  "Gia": 50000,
+  "image": "/uploads/16.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4870c"
+  },
+  "idMon": 17,
+  "TenMon": "Trà Gừng",
+  "idLoai": 2,
+  "Gia": 47000,
+  "image": "/uploads/17.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4870d"
+  },
+  "idMon": 18,
+  "TenMon": "Trà Hoa Cúc",
+  "idLoai": 2,
+  "Gia": 48000,
+  "image": "/uploads/18.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4870e"
+  },
+  "idMon": 19,
+  "TenMon": "Trà Thảo Mộc",
+  "idLoai": 2,
+  "Gia": 49000,
+  "image": "/uploads/19.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4870f"
+  },
+  "idMon": 20,
+  "TenMon": "Trà Bạc Hà",
+  "idLoai": 2,
+  "Gia": 47000,
+  "image": "/uploads/20.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48710"
+  },
+  "idMon": 21,
+  "TenMon": "Trà Đào",
+  "idLoai": 3,
+  "Gia": 50000,
+  "image": "/uploads/21.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48711"
+  },
+  "idMon": 22,
+  "TenMon": "Trà Dâu",
+  "idLoai": 3,
+  "Gia": 48000,
+  "image": "/uploads/22.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48712"
+  },
+  "idMon": 23,
+  "TenMon": "Trà Vải",
+  "idLoai": 3,
+  "Gia": 50000,
+  "image": "/uploads/23.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48713"
+  },
+  "idMon": 24,
+  "TenMon": "Trà Chanh",
+  "idLoai": 3,
+  "Gia": 45000,
+  "image": "/uploads/24.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48714"
+  },
+  "idMon": 25,
+  "TenMon": "Trà Tắc",
+  "idLoai": 3,
+  "Gia": 45000,
+  "image": "/uploads/25.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48715"
+  },
+  "idMon": 26,
+  "TenMon": "Trà Xoài",
+  "idLoai": 3,
+  "Gia": 52000,
+  "image": "/uploads/26.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48716"
+  },
+  "idMon": 27,
+  "TenMon": "Trà Cam Sả",
+  "idLoai": 3,
+  "Gia": 50000,
+  "image": "/uploads/27.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48717"
+  },
+  "idMon": 28,
+  "TenMon": "Trà Dưa Lưới",
+  "idLoai": 3,
+  "Gia": 52000,
+  "image": "/uploads/28.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48718"
+  },
+  "idMon": 29,
+  "TenMon": "Trà Ổi Hồng",
+  "idLoai": 3,
+  "Gia": 49000,
+  "image": "/uploads/29.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48719"
+  },
+  "idMon": 30,
+  "TenMon": "Trà Nhiệt Đới",
+  "idLoai": 3,
+  "Gia": 55000,
+  "image": "/uploads/30.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4871a"
+  },
+  "idMon": 31,
+  "TenMon": "Túi Trà Lài",
+  "idLoai": 6,
+  "Gia": 50000,
+  "image": "/uploads/31.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4871b"
+  },
+  "idMon": 32,
+  "TenMon": "Túi Trà Olong",
+  "idLoai": 6,
+  "Gia": 52000,
+  "image": "/uploads/32.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4871c"
+  },
+  "idMon": 33,
+  "TenMon": "Túi Trà Đen",
+  "idLoai": 6,
+  "Gia": 48000,
+  "image": "/uploads/33.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4871d"
+  },
+  "idMon": 34,
+  "TenMon": "Túi Trà Gừng",
+  "idLoai": 6,
+  "Gia": 50000,
+  "image": "/uploads/34.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4871e"
+  },
+  "idMon": 35,
+  "TenMon": "Túi Trà Hoa Cúc",
+  "idLoai": 6,
+  "Gia": 52000,
+  "image": "/uploads/35.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4871f"
+  },
+  "idMon": 41,
+  "TenMon": "Túi Trà Sữa Truyền Thống",
+  "idLoai": 6,
+  "Gia": 60000,
+  "image": "/uploads/41.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48720"
+  },
+  "idMon": 42,
+  "TenMon": "Túi Trà Sữa Matcha",
+  "idLoai": 6,
+  "Gia": 65000,
+  "image": "/uploads/42.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48721"
+  },
+  "idMon": 43,
+  "TenMon": "Túi Trà Sữa Olong",
+  "idLoai": 6,
+  "Gia": 62000,
+  "image": "/uploads/43.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48722"
+  },
+  "idMon": 44,
+  "TenMon": "Túi Trà Sữa Khoai Môn",
+  "idLoai": 6,
+  "Gia": 65000,
+  "image": "/uploads/44.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48723"
+  },
+  "idMon": 45,
+  "TenMon": "Túi Trà Sữa Kem Muối",
+  "idLoai": 6,
+  "Gia": 70000,
+  "image": "/uploads/45.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48724"
+  },
+  "idMon": 46,
+  "TenMon": "Túi Trà Thảo Mộc",
+  "idLoai": 6,
+  "Gia": 50000,
+  "image": "/uploads/46.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48725"
+  },
+  "idMon": 47,
+  "TenMon": "Túi Trà Sen",
+  "idLoai": 6,
+  "Gia": 52000,
+  "image": "/uploads/47.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48726"
+  },
+  "idMon": 48,
+  "TenMon": "Túi Trà Bạc Hà",
+  "idLoai": 6,
+  "Gia": 48000,
+  "image": "/uploads/48.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48727"
+  },
+  "idMon": 49,
+  "TenMon": "Túi Trà Táo",
+  "idLoai": 6,
+  "Gia": 50000,
+  "image": "/uploads/49.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48728"
+  },
+  "idMon": 50,
+  "TenMon": "Túi Trà Dưa Lưới",
+  "idLoai": 6,
+  "Gia": 52000,
+  "image": "/uploads/50.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48729"
+  },
+  "idMon": 51,
+  "TenMon": "Trân Châu Đen",
+  "idLoai": 7,
+  "Gia": 15000,
+  "image": "/uploads/51.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4872a"
+  },
+  "idMon": 52,
+  "TenMon": "Trân Châu Trắng",
+  "idLoai": 7,
+  "Gia": 15000,
+  "image": "/uploads/52.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4872b"
+  },
+  "idMon": 53,
+  "TenMon": "Phô Mai Mặn",
+  "idLoai": 7,
+  "Gia": 15000,
+  "image": "/uploads/53"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4872c"
+  },
+  "idMon": 54,
+  "TenMon": "Thạch Dừa",
+  "idLoai": 7,
+  "Gia": 7000,
+  "image": "/uploads/54.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4872d"
+  },
+  "idMon": 55,
+  "TenMon": "Kem Muối",
+  "idLoai": 7,
+  "Gia": 17000,
+  "image": "/uploads/55.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4872e"
+  },
+  "idMon": 56,
+  "TenMon": "Khoai Môn Nghiền",
+  "idLoai": 7,
+  "Gia": 12000,
+  "image": "/uploads/56.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4872f"
+  },
+  "idMon": 57,
+  "TenMon": "Phô Mai Ngọt",
+  "idLoai": 7,
+  "Gia": 16000,
+  "image": "/uploads/57.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48730"
+  },
+  "idMon": 58,
+  "TenMon": "Hồng Trà Cổ Thụ Shan Tuyết",
+  "idLoai": 4,
+  "Gia": 65000,
+  "image": "/uploads/58.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48731"
+  },
+  "idMon": 59,
+  "TenMon": "Thiết Quan Âm Thượng Hạng",
+  "idLoai": 4,
+  "Gia": 55000,
+  "image": "/uploads/59.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48732"
+  },
+  "idMon": 60,
+  "TenMon": "Bạch Trà Mẫu Đơn",
+  "idLoai": 4,
+  "Gia": 85000,
+  "image": "/uploads/60.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48733"
+  },
+  "idMon": 61,
+  "TenMon": "Trà Sen Tây Hồ (Ấm)",
+  "idLoai": 4,
+  "Gia": 120000,
+  "image": "/uploads/61.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48734"
+  },
+  "idMon": 62,
+  "TenMon": "Trà Vải Hoa Hồng Pháp",
+  "idLoai": 4,
+  "Gia": 55000,
+  "image": "/uploads/62.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48735"
+  },
+  "idMon": 63,
+  "TenMon": "Trà Ổi Hồng Hạt Chia",
+  "idLoai": 4,
+  "Gia": 45000,
+  "image": "/uploads/63.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48736"
+  },
+  "idMon": 64,
+  "TenMon": "Lục Trà Cam Sả Mật Ong",
+  "idLoai": 4,
+  "Gia": 45000,
+  "image": "/uploads/64.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48737"
+  },
+  "idMon": 65,
+  "TenMon": "Trà Dâu Tằm Pha Lê",
+  "idLoai": 4,
+  "Gia": 48000,
+  "image": "/uploads/65.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48738"
+  },
+  "idMon": 66,
+  "TenMon": "Trà Sữa Ô Long Nướng",
+  "idLoai": 1,
+  "Gia": 55000,
+  "image": "/uploads/66.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d48739"
+  },
+  "idMon": 67,
+  "TenMon": "Trà Sữa Nhài Hạnh Nhân",
+  "idLoai": 1,
+  "Gia": 52000,
+  "image": "/uploads/67.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4873a"
+  },
+  "idMon": 68,
+  "TenMon": "Trà Sữa Thiết Quan Âm",
+  "idLoai": 1,
+  "Gia": 60000,
+  "image": "/uploads/68.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4873b"
+  },
+  "idMon": 69,
+  "TenMon": "Túi Trà Ô Long Sữa (200gr)",
+  "idLoai": 6,
+  "Gia": 180000,
+  "image": "/uploads/69.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4873c"
+  },
+  "idMon": 70,
+  "TenMon": "Set Quà Tết: An Khang",
+  "idLoai": 5,
+  "Gia": 550000,
+  "image": "/uploads/70.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4873d"
+  },
+  "idMon": 71,
+  "TenMon": "Cà Phê Geisha - Túi 150gr",
+  "idLoai": 5,
+  "Gia": 350000,
+  "image": "/uploads/71.jpg"
+},
+{
+  "_id": {
+    "$oid": "6980914bfafcf8bdb8d4873e"
+  },
+  "idMon": 72,
+  "TenMon": "Trà Shan Tuyết - Hộp Thiếc",
+  "idLoai": 5,
+  "Gia": 450000,
+  "image": "/uploads/72.jpg"
+}]

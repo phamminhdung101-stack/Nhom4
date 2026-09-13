@@ -1,0 +1,105 @@
+[{
+  "_id": {
+    "$oid": "6976fb39bc36e088a3d97f10"
+  },
+  "idGioHang": 1,
+  "idBan": 1,
+  "idMon": 31,
+  "trangThai": 0,
+  "thoiGianTao": "2026-01-16T07:36:15Z",
+  "soLuong": 1,
+  "donGia": 15000,
+  "thanhTien": 15000,
+  "ghiChu": "",
+  "tongTienTamTinh": 40000
+},
+{
+  "_id": {
+    "$oid": "6976fb39bc36e088a3d97f11"
+  },
+  "idGioHang": 2,
+  "idBan": 2,
+  "idMon": 41,
+  "trangThai": 0,
+  "thoiGianTao": "2026-01-16T08:45:36Z",
+  "soLuong": 1,
+  "donGia": 25000,
+  "thanhTien": 25000,
+  "ghiChu": "",
+  "tongTienTamTinh": 40000
+},
+{
+  "_id": {
+    "$oid": "6976fb39bc36e088a3d97f12"
+  },
+  "idGioHang": 3,
+  "idBan": 3,
+  "idMon": 26,
+  "trangThai": 0,
+  "thoiGianTao": "2026-01-16T09:36:07Z",
+  "soLuong": 1,
+  "donGia": 35000,
+  "thanhTien": 35000,
+  "ghiChu": "Ít đá",
+  "tongTienTamTinh": 35000
+},
+{
+  "_id": {
+    "$oid": "6976fb39bc36e088a3d97f13"
+  },
+  "idGioHang": 4,
+  "idBan": 4,
+  "idMon": 42,
+  "trangThai": 0,
+  "thoiGianTao": "2026-01-16T10:06:35Z",
+  "soLuong": 2,
+  "donGia": 30000,
+  "thanhTien": 60000,
+  "ghiChu": "Ít đường",
+  "tongTienTamTinh": 85000
+},
+{
+  "_id": {
+    "$oid": "6976fb39bc36e088a3d97f14"
+  },
+  "idGioHang": 5,
+  "idBan": 5,
+  "idMon": 16,
+  "trangThai": 0,
+  "thoiGianTao": "2026-01-16T10:46:27Z",
+  "soLuong": 1,
+  "donGia": 25000,
+  "thanhTien": 25000,
+  "ghiChu": "",
+  "tongTienTamTinh": 85000
+},
+{
+  "_id": {
+    "$oid": "6976fb39bc36e088a3d97f15"
+  },
+  "idGioHang": 6,
+  "idBan": 6,
+  "idMon": 18,
+  "trangThai": 0,
+  "thoiGianTao": "2026-01-16T11:18:42Z",
+  "soLuong": 1,
+  "donGia": 20000,
+  "thanhTien": 20000,
+  "ghiChu": "",
+  "tongTienTamTinh": 45000
+},
+{
+  "_id": {
+    "$oid": "6976fb39bc36e088a3d97f16"
+  },
+  "idGioHang": 7,
+  "idBan": 7,
+  "idMon": 19,
+  "trangThai": 0,
+  "thoiGianTao": "2026-01-16T11:46:35Z",
+  "soLuong": 1,
+  "donGia": 25000,
+  "thanhTien": 25000,
+  "ghiChu": "Nhiều sữa",
+  "tongTienTamTinh": 45000
+}]

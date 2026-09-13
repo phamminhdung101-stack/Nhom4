@@ -1,0 +1,56 @@
+[{
+  "_id": {
+    "$oid": "6976fa85bc36e088a3d97ef6"
+  },
+  "idLoai": 1,
+  "tenLoai": "Trà Sữa",
+  "moTa": "Thơm ngon đậm vị"
+},
+{
+  "_id": {
+    "$oid": "6976fa85bc36e088a3d97ef7"
+  },
+  "idLoai": 2,
+  "tenLoai": "Trà Nguyên Vị",
+  "moTa": "Đậm vị trà"
+},
+{
+  "_id": {
+    "$oid": "6976fa85bc36e088a3d97ef8"
+  },
+  "idLoai": 3,
+  "tenLoai": "Trà Trái Cây",
+  "moTa": "Thơm vị trà ,trái cây tươi theo mùa"
+},
+{
+  "_id": {
+    "$oid": "6976fa85bc36e088a3d97ef9"
+  },
+  "idLoai": 4,
+  "tenLoai": "Cà Phê",
+  "moTa": "Thơm cà phê, đậm cà phê"
+},
+{
+  "_id": {
+    "$oid": "6976fa85bc36e088a3d97efa"
+  },
+  "idLoai": 5,
+  "tenLoai": "Matcha",
+  "moTa": "Thanh vị tươi nhẹ, béo béo"
+},
+{
+  "_id": {
+    "$oid": "6976fa85bc36e088a3d97efb"
+  },
+  "idLoai": 6,
+  "tenLoai": "Túi Trà",
+  "moTa": ""
+},
+{
+  "_id": {
+    "$oid": "6976fa85bc36e088a3d97efc"
+  },
+  "idLoai": 7,
+  "tenLoai": "Topping",
+  "moTa": ""
+}]

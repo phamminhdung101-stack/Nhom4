@@ -1,0 +1,195 @@
+[{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97eff"
+  },
+  "idKhuyenMai": 1,
+  "tenKM": "Giảm 10% hóa đơn",
+  "loaiKM": "PHAN_TRAM",
+  "giaTridonToiThieu": 50000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-01-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Áp dụng toàn bộ menu"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f00"
+  },
+  "idKhuyenMai": 2,
+  "tenKM": "Giảm 20.000 cho hóa đơn hơn 85k",
+  "loaiKM": "TIEN_MAT",
+  "giaTridonToiThieu": 120000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-04-10T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": null
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f01"
+  },
+  "idKhuyenMai": 3,
+  "tenKM": "Mua 2 Trà đào giảm 7k",
+  "loaiKM": "THEO_MON",
+  "giaTridonToiThieu": 0,
+  "ngayBatDau": "2026-01-12T00:00:00Z",
+  "ngayKetThuc": "2026-01-28T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Chỉ áp dụng size M"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f02"
+  },
+  "idKhuyenMai": 4,
+  "tenKM": "Lễ 30/4 - Mua 2 tặng 1 Trà sữa",
+  "loaiKM": "MUA_2_TANG_1",
+  "giaTridonToiThieu": 0,
+  "ngayBatDau": "2026-04-29T00:00:00Z",
+  "ngayKetThuc": "2026-05-02T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Áp dụng dịp lễ"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f03"
+  },
+  "idKhuyenMai": 5,
+  "tenKM": "Quốc Khánh 2/9 - Bill 200k tặng món",
+  "loaiKM": "TANG_MON_THEO_DON",
+  "giaTridonToiThieu": 200000,
+  "ngayBatDau": "2026-09-01T00:00:00Z",
+  "ngayKetThuc": "2026-09-03T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Khách được chọn 1 món bất kỳ"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f04"
+  },
+  "idKhuyenMai": 6,
+  "tenKM": "Voucher chào khách mới",
+  "loaiKM": "PHAN_TRAM",
+  "giaTridonToiThieu": 30000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-12-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Mỗi khách dùng 1 lần"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f05"
+  },
+  "idKhuyenMai": 7,
+  "tenKM": "Giảm 5.000đ",
+  "loaiKM": "TIEN_MAT",
+  "giaTridonToiThieu": 25000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-12-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": null
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f06"
+  },
+  "idKhuyenMai": 8,
+  "tenKM": "Giảm 10.000đ",
+  "loaiKM": "TIEN_MAT",
+  "giaTridonToiThieu": 50000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-12-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Khi mua 2 loại túi trà khác nhau"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f07"
+  },
+  "idKhuyenMai": 9,
+  "tenKM": "Giảm 15% hóa đơn",
+  "loaiKM": "PHAN_TRAM",
+  "giaTridonToiThieu": 80000,
+  "ngayBatDau": "2026-03-01T00:00:00Z",
+  "ngayKetThuc": "2026-03-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Không áp dụng chung KM khác"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f08"
+  },
+  "idKhuyenMai": 10,
+  "tenKM": "Giảm 20.000đ cho đơn trà",
+  "loaiKM": "TIEN_MAT",
+  "giaTridonToiThieu": 120000,
+  "ngayBatDau": "2026-04-01T00:00:00Z",
+  "ngayKetThuc": "2026-04-30T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Áp dụng toàn menu"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f09"
+  },
+  "idKhuyenMai": 11,
+  "tenKM": "Cuối tuần giảm 10%",
+  "loaiKM": "PHAN_TRAM",
+  "giaTridonToiThieu": 60000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-14-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Chỉ áp dụng T7, CN"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f0a"
+  },
+  "idKhuyenMai": 12,
+  "tenKM": "Ưu đãi sinh viên",
+  "loaiKM": "TIEN_MAT",
+  "giaTridonToiThieu": 30000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-03-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Xuất trình thẻ sinh viên"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f0b"
+  },
+  "idKhuyenMai": 13,
+  "tenKM": "Miễn phí giao hàng",
+  "loaiKM": "TIEN_MAT",
+  "giaTridonToiThieu": 50000,
+  "ngayBatDau": "2026-06-01T00:00:00Z",
+  "ngayKetThuc": "2026-06-30T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Tối đa 15k phí ship"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f0c"
+  },
+  "idKhuyenMai": 14,
+  "tenKM": "Khuyến mãi hè",
+  "loaiKM": "PHAN_TRAM",
+  "giaTridonToiThieu": 100000,
+  "ngayBatDau": "2026-07-01T00:00:00Z",
+  "ngayKetThuc": "2026-07-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Giảm tối đa 30k, áp dụng cho trà trái cây"
+},
+{
+  "_id": {
+    "$oid": "6976fb0abc36e088a3d97f0d"
+  },
+  "idKhuyenMai": 15,
+  "tenKM": "Khách thân thiết",
+  "loaiKM": "TIEN_MAT",
+  "giaTridonToiThieu": 150000,
+  "ngayBatDau": "2026-01-01T00:00:00Z",
+  "ngayKetThuc": "2026-12-31T23:59:59Z",
+  "trangThai": 1,
+  "ghiChu": "Chỉ áp dụng khách VIP"
+}]

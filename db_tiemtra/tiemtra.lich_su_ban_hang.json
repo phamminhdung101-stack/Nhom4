@@ -1,0 +1,50 @@
+[{
+  "_id": {
+    "$oid": "69761d5595556ad7af33a98e"
+  },
+  "idLichSu": 1,
+  "idChiTiet": 15,
+  "tongTienGoc": 60000,
+  "tienGiam": 6000,
+  "tongTienThanhToan": 54000
+},
+{
+  "_id": {
+    "$oid": "69761d5595556ad7af33a98f"
+  },
+  "idLichSu": 2,
+  "idChiTiet": 16,
+  "tongTienGoc": 35000,
+  "tienGiam": 3500,
+  "tongTienThanhToan": 31500
+},
+{
+  "_id": {
+    "$oid": "69761d5595556ad7af33a990"
+  },
+  "idLichSu": 3,
+  "idChiTiet": 27,
+  "tongTienGoc": 100000,
+  "tienGiam": 13333,
+  "tongTienThanhToan": 86667
+},
+{
+  "_id": {
+    "$oid": "69761d5595556ad7af33a991"
+  },
+  "idLichSu": 4,
+  "idChiTiet": 28,
+  "tongTienGoc": 20000,
+  "tienGiam": 2667,
+  "tongTienThanhToan": 17333
+},
+{
+  "_id": {
+    "$oid": "69761d5595556ad7af33a992"
+  },
+  "idLichSu": 5,
+  "idChiTiet": 29,
+  "tongTienGoc": 30000,
+  "tienGiam": 4000,
+  "tongTienThanhToan": 26000
+}]
