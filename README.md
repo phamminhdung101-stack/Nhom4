@@ -11,7 +11,6 @@ Nhóm công nghệ chính:
 -Wireshark
 
 1. Mục tiêu
-
 -Phát triển hệ thống Order món ăn qua mã QR từ hệ thống hiện có, đồng thời ứng dụng kỹ thuật lập trình mạng WebSocket để xây dựng khả năng giao tiếp và cập nhật dữ liệu theo thời gian thực giữa khách hàng, bếp và thu ngân.
 
 2. Nội dung chính
