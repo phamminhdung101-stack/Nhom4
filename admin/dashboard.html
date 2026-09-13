@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Tổng Quan</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        --admin-primary: #4e342e;
+        --admin-bg: #f5f5f5;
+      }
+      body {
+        font-family: "Be Vietnam Pro", sans-serif;
+        background: var(--admin-bg);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* SIDEBAR Responsive */
+      .sidebar {
+        width: 260px;
+        background: var(--admin-primary);
+        color: #efebe9;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        transition: all 0.3s;
+        z-index: 1000;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.7);
+        padding: 12px;
+        margin-bottom: 5px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: 0.2s;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+      }
+
+      .main-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px;
+        width: 100%;
+      }
+      .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Mobile Adjustments */
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100%;
+          transform: translateX(-100%); /* Ẩn sidebar */
+        }
+        .sidebar.show {
+          transform: translateX(0);
+        } /* Hiện sidebar */
+
+        .main-content {
+          padding: 15px;
+          padding-top: 70px;
+        } /* Chừa chỗ cho nút menu */
+
+        /* Overlay khi mở menu */
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+        .sidebar-overlay.show {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="adminSidebar">
+      <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <h4 class="fw-bold text-uppercase m-0">
+          <i class="bi bi-cup-hot-fill me-2"></i>Tiệm Trà
+        </h4>
+        <i
+          class="bi bi-x-lg d-md-none fs-4 cursor-pointer"
+          onclick="toggleSidebar()"
+        ></i>
+      </div>
+
+      <nav>
+        <a href="dashboard.html" class="nav-link active"
+          ><i class="bi bi-grid-fill"></i> Tổng quan</a
+        >
+        <a href="orders.html" class="nav-link"
+          ><i class="bi bi-receipt"></i> Đơn hàng (KDS)</a
+        >
+        <a href="tables.html" class="nav-link"
+          ><i class="bi bi-map"></i> Sơ đồ bàn</a
+        >
+        <a href="qr_maker.html" class="nav-link"
+          ><i class="bi bi-qr-code"></i> Tạo mã QR</a
+        >
+        <hr class="border-secondary opacity-50" />
+        <a href="../index.html" class="nav-link text-warning"
+          ><i class="bi bi-box-arrow-right"></i> Xem Website</a
+        >
+      </nav>
+    </div>
+
+    <div class="main-content">
+      <div
+        class="d-md-none fixed-top bg-white p-3 shadow-sm d-flex align-items-center"
+      >
+        <button class="btn btn-light me-3" onclick="toggleSidebar()">
+          <i class="bi bi-list fs-3"></i>
+        </button>
+        <h5 class="m-0 fw-bold text-dark">Tổng Quan</h5>
+      </div>
+
+      <div
+        class="d-flex justify-content-between align-items-center mb-4 d-none d-md-flex"
+      >
+        <div>
+          <h3 class="fw-bold text-dark">Xin chào, Admin 👋</h3>
+          <p class="text-muted">Báo cáo kinh doanh hôm nay.</p>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <h6 class="text-muted small">DOANH THU</h6>
+            <h4 class="fw-bold mb-0 text-success">12tr</h4>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <h6 class="text-muted small">ĐƠN HÀNG</h6>
+            <h4 class="fw-bold mb-0 text-primary">45</h4>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <h6 class="text-muted small">ĐÃ BÁN</h6>
+            <h4 class="fw-bold mb-0 text-info">128</h4>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <h6 class="text-muted small">KHÁCH</h6>
+            <h4 class="fw-bold mb-0 text-warning">89</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="stat-card h-100">
+            <h6 class="fw-bold mb-4">Biểu Đồ Doanh Thu</h6>
+            <canvas id="revenueChart" style="height: 300px"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="stat-card h-100">
+            <h6 class="fw-bold mb-4">Top Món</h6>
+            <ul class="list-group list-group-flush">
+              <li
+                class="list-group-item border-0 px-0 d-flex justify-content-between"
+              >
+                <span>Hồng Trà Shan Tuyết</span>
+                <span class="badge bg-light text-dark">50 ly</span>
+              </li>
+              <li
+                class="list-group-item border-0 px-0 d-flex justify-content-between"
+              >
+                <span>Trà Sen Tây Hồ</span>
+                <span class="badge bg-light text-dark">35 ly</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Toggle Sidebar Script
+      function toggleSidebar() {
+        document.getElementById("adminSidebar").classList.toggle("show");
+        document.querySelector(".sidebar-overlay").classList.toggle("show");
+      }
+
+      const ctx = document.getElementById("revenueChart").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"],
+          datasets: [
+            {
+              label: "Doanh thu (triệu VNĐ)",
+              data: [8.5, 9.2, 7.8, 11.5, 10.2, 15.5, 12.8],
+              borderColor: "#8D6E63",
+              tension: 0.4,
+              fill: true,
+              backgroundColor: "rgba(141, 110, 99, 0.1)",
+            },
+          ],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } },
+      });
+    </script>
+  </body>
+</html>

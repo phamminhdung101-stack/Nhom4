@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Bếp (KDS)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+    <style>
+      :root { --primary:#8d6e63; --bg-admin:#f2f4f8; }
+      body { font-family:"Be Vietnam Pro",sans-serif; background:var(--bg-admin); display:flex; height:100vh; overflow:hidden }
+      .sidebar { width:260px; background:#4e342e; color:#fff; padding:20px }
+      .nav-link { color:rgba(255,255,255,.7); padding:12px; border-radius:10px; margin-bottom:5px; display:flex; gap:10px; text-decoration:none }
+      .nav-link:hover,.nav-link.active { background:rgba(255,255,255,.15); color:#fff }
+      .content { flex:1; padding:30px; overflow-y:auto }
+      .order-card { background:#fff; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 4px 10px rgba(0,0,0,.05); border-left:6px solid #ddd }
+      .status-pending{border-left-color:#ffc107}
+      .status-cooking{border-left-color:#2196f3}
+      .status-completed{border-left-color:#4caf50;opacity:.6}
+      .filter-btn{border:1px solid #ddd;background:#fff;padding:8px 20px;border-radius:30px;font-weight:600;color:#666;margin-right:8px}
+      .filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+      /* ===== CSS THÊM CHO NÚT ĐỔI TRẠNG THÁI ===== */
+      .status-btn{
+        border:none;
+        padding:8px 14px;
+        border-radius:20px;
+        font-weight:600;
+        font-size:14px;
+        cursor:pointer;
+        transition:.2s;
+      }
+      .status-btn.pending{background:#fff3cd;color:#856404}
+      .status-btn.cooking{background:#e3f2fd;color:#0d6efd}
+      .status-btn.completed{background:#e8f5e9;color:#2e7d32}
+      .status-btn:hover{transform:scale(1.05)}
+    </style>
+  </head>
+
+  <body>
+    <div class="sidebar">
+      <h4 class="fw-bold mb-4 px-2 text-uppercase">
+        <i class="bi bi-cup-hot-fill me-2"></i>Tiệm Trà
+      </h4>
+      <nav>
+        <a href="dashboard.html" class="nav-link"><i class="bi bi-grid-fill"></i> Tổng quan</a>
+        <a href="orders.html" class="nav-link active"><i class="bi bi-receipt"></i> Đơn hàng (KDS)</a>
+        <a href="tables.html" class="nav-link"><i class="bi bi-map"></i> Sơ đồ bàn</a>
+        <a href="qr_maker.html" class="nav-link"><i class="bi bi-qr-code"></i> Tạo mã QR</a>
+      </nav>
+    </div>
+
+    <div class="content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark m-0">Màn Hình Bếp & Điều Phối</h3>
+      </div>
+
+      <div class="mb-4">
+        <button class="filter-btn active" onclick="filterOrders('all')">Tất cả</button>
+        <button class="filter-btn" onclick="filterOrders('Chờ xác nhận')">⏳ Chờ xác nhận</button>
+        <button class="filter-btn" onclick="filterOrders('Đang pha chế')">🔥 Đang pha chế</button>
+        <button class="filter-btn" onclick="filterOrders('Hoàn thành')">✅ Hoàn thành</button>
+      </div>
+
+      <div class="row" id="orders-container"></div>
+    </div>
+
+    <script>
+      let ordersCache = [];
+
+      function mapStatus(trangThai) {
+        if (trangThai === 1) return "Chờ xác nhận";
+        if (trangThai === 2) return "Đang pha chế";
+        if (trangThai === 3) return "Hoàn thành";
+        return "Hoàn thành";
+      }
+
+      function mapStatusClass(status) {
+        if (status === "Chờ xác nhận") return "pending";
+        if (status === "Đang pha chế") return "cooking";
+        return "completed";
+      }
+
+      function nextTrangThai(current) {
+        if (current === 1) return 2;
+        if (current === 2) return 3;
+        return 3;
+      }
+
+      function loadOrders() {
+        fetch("http://localhost:8080/api/chi-tiet-don")
+          .then(res => res.json())
+          .then(data => {
+            ordersCache = data;
+            renderOrders("all");
+          });
+      }
+
+      function updateTrangThai(order) {
+        if (order.trangThai === 3) {
+          fetch(`http://localhost:8080/api/chi-tiet-don/hoan-thanh/${order._id}`, {
+            method: "POST"
+          }).then(() => loadOrders());
+          return;
+        }
+
+        const newTrangThai = nextTrangThai(order.trangThai);
+
+        fetch(`http://localhost:8080/api/chi-tiet-don/${order._id}/trang-thai`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trangThai: newTrangThai })
+        }).then(() => loadOrders());
+      }
+
+      function renderOrders(filter="all") {
+        const container = document.getElementById("orders-container");
+        container.innerHTML = "";
+
+        document.querySelectorAll(".filter-btn").forEach(btn=>{
+          btn.classList.remove("active");
+          if(btn.innerText.includes(filter==="all"?"Tất cả":filter)) btn.classList.add("active");
+        });
+
+        ordersCache.forEach(o=>{
+          const statusText = mapStatus(o.trangThai);
+          const statusClass = mapStatusClass(statusText);
+          if(filter!=="all" && statusText!==filter) return;
+
+          container.innerHTML += `
+            <div class="col-md-6 col-lg-4">
+              <div class="order-card status-${statusClass}">
+                <div class="d-flex justify-content-between mb-2">
+                  <h5 class="fw-bold m-0 text-primary">CT#${o.idChiTiet}</h5>
+                </div>
+                <h6 class="fw-bold mb-3">Đơn hàng #${o.idDonHang}</h6>
+
+                <div class="bg-light p-2 rounded mb-2 small text-muted">
+                  <div>• Số lượng: ${o.soLuong}</div>
+                  <div>• Đơn giá: ${o.donGiaThanhTien.donGia.toLocaleString()} ₫</div>
+                </div>
+
+                ${o.ghiChu ? `
+                <div class="alert alert-warning py-1 px-2 mb-3 small">
+                  📝 Ghi chú: ${o.ghiChu}
+                </div>` : ``}
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bold fs-5">${o.donGiaThanhTien.thanhTien.toLocaleString()} ₫</span>
+                  <button class="status-btn ${statusClass}"
+                    onclick='updateTrangThai(${JSON.stringify(o)})'>
+                    ${statusText}
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      function filterOrders(status) {
+        renderOrders(status);
+      }
+
+      loadOrders();
+      setInterval(loadOrders, 5000);
+    </script>
+  </body>
+</html>

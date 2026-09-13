@@ -1,0 +1,23 @@
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #8d6e63;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.qty-btn:active {
+  background-color: #8d6e63;
+  color: #fff;
+}
+
+.hidden-section {
+  display: none !important;
+}

@@ -1,0 +1,148 @@
+.sidebar-menu {
+  position: sticky;
+  top: 100px;
+  padding-right: 20px;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 12px 0;
+  color: var(--text-dark);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  border-bottom: 1px solid rgba(141, 110, 99, 0.1);
+}
+
+.sidebar-link:hover {
+  color: var(--primary-color);
+  padding-left: 5px;
+}
+
+.sidebar-link.active {
+  color: var(--primary-color);
+  font-weight: 700;
+  border-left: 3px solid var(--primary-color);
+  padding-left: 10px;
+}
+
+.product-card {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+.product-card .card-img-wrapper {
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.product-card img {
+  transition: transform 0.3s ease;
+}
+
+.product-name {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  margin-top: 10px;
+  color: var(--text-dark);
+}
+
+.btn-magic {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+}
+
+.btn-magic:active {
+  transform: scale(0.9);
+}
+
+.mood-card {
+  border: 2px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.mood-card:hover {
+  border-color: #8d6e63;
+  background-color: #fdfbf7;
+  transform: translateY(-3px);
+}
+
+.mood-icon {
+  font-size: 2rem;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.carousel-item img {
+  height: 250px;
+  object-fit: cover;
+  filter: brightness(0.9);
+}
+
+.carousel-indicators [data-bs-target] {
+  background-color: #fff;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+.carousel-indicators .active {
+  background-color: var(--primary-color);
+}
+
+.header-logo {
+  width: 45px;
+  height: 45px;
+  background: #4e342e;
+  color: #d4af37;
+  border: 1px solid #d4af37;
+}
+
+.header-title {
+  font-family: "Playfair Display", serif;
+  color: #4e342e;
+  line-height: 1.1;
+  font-size: 1.2rem;
+}
+
+.header-table {
+  font-size: 0.75rem;
+}
+
+.main-container {
+  padding-top: 130px;
+  padding-bottom: 90px;
+  max-width: 1400px;
+}
+
+@media (min-width: 768px) {
+  .mobile-category-nav {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+  .carousel-item img {
+    height: 180px;
+  }
+}

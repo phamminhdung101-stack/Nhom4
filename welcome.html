@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Trang Chủ - Tiệm Trà Thượng Hạng</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Be+Vietnam+Pro:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --main-color: #8d6e63;
+        --dark-brown: #4e342e;
+        --porcelain-bg: #fdfbf7;
+        --white: #ffffff;
+      }
+
+      body {
+        font-family: "Be Vietnam Pro", sans-serif;
+        background-color: var(--porcelain-bg);
+        color: var(--dark-brown);
+        overflow-x: hidden;
+      }
+
+      /* NAVBAR SANG TRỌNG */
+      .navbar {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        padding-top: 12px;
+        padding-bottom: 12px;
+      }
+
+      /* Logo Styles */
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo-icon {
+        width: 50px;
+        height: 50px;
+        background: #4e342e;
+        color: #d4af37;
+        border: 2px solid #d4af37;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+      }
+      .navbar-brand:hover .logo-icon {
+        transform: rotate(-10deg);
+      }
+      .logo-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .brand-title {
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        color: #4e342e;
+        font-size: 1.5rem;
+        line-height: 1.2;
+        margin-bottom: 2px;
+      }
+      .brand-subtitle {
+        font-family: "Be Vietnam Pro", sans-serif;
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        color: #8d6e63;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .nav-link {
+        font-weight: 500;
+        color: var(--dark-brown) !important;
+        margin: 0 10px;
+        transition: 0.3s;
+      }
+      .nav-link:hover {
+        color: var(--main-color) !important;
+      }
+
+      /* Nút Đăng nhập/Tài khoản */
+      .btn-account {
+        border: 1px solid var(--main-color);
+        color: var(--main-color);
+        border-radius: 20px;
+        padding: 6px 20px;
+        font-weight: 600;
+        transition: 0.3s;
+        background: transparent;
+      }
+      .btn-account:hover {
+        background: var(--main-color);
+        color: white;
+      }
+
+      /* BANNER */
+      .banner-img {
+        height: 550px;
+        object-fit: cover;
+        width: 100%;
+        filter: brightness(0.85);
+      }
+      @media (max-width: 768px) {
+        .banner-img {
+          height: 400px;
+        }
+      }
+      .carousel-caption {
+        bottom: 25%;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+      }
+      .hero-title {
+        font-family: "Playfair Display", serif;
+        font-size: 3rem;
+        color: #fff;
+      }
+
+      /* BUTTON CTA */
+      .btn-order-now {
+        background-color: var(--white);
+        color: var(--main-color);
+        border: none;
+        padding: 14px 35px;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .btn-order-now:hover {
+        transform: translateY(-3px);
+        background-color: var(--main-color);
+        color: white;
+      }
+
+      /* WELCOME CARD */
+      .welcome-section {
+        padding: 50px 30px;
+        text-align: center;
+        background: var(--porcelain-bg);
+        margin-top: -60px;
+        position: relative;
+        z-index: 10;
+        border-radius: 30px 30px 0 0;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+      <div class="container">
+        <a class="navbar-brand logo-container" href="#">
+          <div class="logo-icon">
+            <i class="bi bi-cup-hot-fill"></i>
+          </div>
+          <div class="logo-text">
+            <span class="brand-title">Tiệm Trà</span>
+            <span class="brand-subtitle">Thượng Hạng</span>
+          </div>
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item"><a class="nav-link" href="#">Trang chủ</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="goToMenu()">Thực đơn</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="goToGift()">Quà tặng</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#footer">Liên hệ</a>
+            </li>
+
+            <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+              <button
+                class="btn-account"
+                id="btnLogin"
+                data-bs-toggle="modal"
+                data-bs-target="#loginModal"
+              >
+                <i class="bi bi-person-circle"></i> Đăng nhập
+              </button>
+              <span
+                id="userDisplay"
+                class="fw-bold text-primary d-none pointer"
+                onclick="logout()"
+                title="Bấm để đăng xuất"
+              >
+                Chào, <span id="userNameSpan">...</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div
+      id="homeCarousel"
+      class="carousel slide"
+      data-bs-ride="carousel"
+      data-bs-interval="3000"
+    >
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="0"
+          class="active"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="1"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="2"
+        ></button>
+      </div>
+
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img
+            src="assets/img/banner1.jpg"
+            class="banner-img"
+            alt="Banner 1"
+            onerror="this.src = 'https://via.placeholder.com/1200x600'"
+          />
+          <div class="carousel-caption text-shadow">
+            <h2 class="hero-title">Tinh Hoa Trà Việt</h2>
+            <p class="d-none d-md-block fs-5">
+              Gửi trọn hương vị thượng hạng trong từng chén trà
+            </p>
+            <button class="btn btn-order-now mt-3" onclick="goToMenu()">
+              Thưởng Trà Ngay
+            </button>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <img
+            src="assets/img/banner2.jpg"
+            class="banner-img"
+            alt="Banner 2"
+            onerror="this.src = 'https://via.placeholder.com/1200x600'"
+          />
+          <div class="carousel-caption text-shadow">
+            <h2 class="hero-title">Quà Tặng Đẳng Cấp</h2>
+            <p class="d-none d-md-block fs-5">
+              Trao gửi tâm tình qua những set trà cao cấp
+            </p>
+            <button class="btn btn-order-now mt-3" onclick="goToGift()">
+              Xem Bộ Sưu Tập
+            </button>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <img
+            src="assets/img/banner3.jpg"
+            class="banner-img"
+            alt="Banner 3"
+            onerror="this.src = 'https://via.placeholder.com/1200x600'"
+          />
+          <div class="carousel-caption text-shadow">
+            <h2 class="hero-title">Không Gian An Yên</h2>
+            <p class="d-none d-md-block fs-5">
+              Nơi lắng đọng cảm xúc và tìm lại sự cân bằng
+            </p>
+            <button class="btn btn-order-now mt-3" onclick="goToMenu()">
+              Khám Phá
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#homeCarousel"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Trước</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#homeCarousel"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Sau</span>
+      </button>
+    </div>
+
+    <div class="container">
+      <div class="welcome-section">
+        <h5
+          class="fw-bold text-uppercase"
+          style="color: var(--main-color); letter-spacing: 1px"
+        >
+          Kính Chào Quý Khách
+        </h5>
+        <h1
+          style="
+            font-family: &quot;Playfair Display&quot;;
+            margin-bottom: 20px;
+            font-size: 3rem;
+          "
+        >
+          Tiệm Trà Thượng Hạng
+        </h1>
+
+        <div class="dropdown d-inline-block mb-4">
+          <button
+            class="btn btn-light rounded-pill px-4 py-2 shadow-sm dropdown-toggle fw-bold text-dark border"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            style="font-size: 0.95rem"
+          >
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+            <span id="order-mode-text">Đang xác định...</span>
+          </button>
+          <ul class="dropdown-menu shadow border-0 rounded-3 mt-2">
+  <li>
+    <a class="dropdown-item" href="#" onclick="changeMode('DINE_IN')">
+      🪑 Tại bàn <span class="fw-bold">(Bàn <span id="dropdown-table-1"></span>)</span>
+    </a>
+  </li>
+  <li>
+    <a class="dropdown-item" href="#" onclick="changeMode('TAKE_AWAY')">
+      🥡 Mang đi <span class="fw-bold">(Bàn <span id="dropdown-table-2"></span>)</span>
+    </a>
+  </li>
+</ul>
+
+
+        </div>
+
+        <p class="text-muted mb-4 fs-5">
+          Thưởng thức những phẩm trà danh tiếng và không gian thư giãn tuyệt
+          vời.<br />
+          Quý khách có thể Đăng nhập để tích điểm hoặc gọi món ngay.
+        </p>
+
+        <button
+          class="btn btn-dark rounded-pill px-5 py-3 fs-5"
+          onclick="goToMenu()"
+        >
+          Vào Thực Đơn (Guest) <i class="bi bi-arrow-right ms-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0">
+            <h5
+              class="modal-title fw-bold text-center w-100"
+              style="color: var(--main-color)"
+            >
+              Thành Viên Thân Thiết
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body px-4 pb-4">
+            <form onsubmit="handleLogin(event)">
+              <div class="mb-3">
+                <label class="form-label small text-muted fw-bold"
+                  >Số điện thoại tích điểm</label
+                >
+                <input
+                  type="tel"
+                  class="form-control rounded-3 bg-light border-0 py-3 text-center fw-bold fs-5"
+                  placeholder="09xx xxx xxx"
+                  required
+                  id="loginPhone"
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm"
+                style="background: var(--main-color); border: none"
+              >
+                Xác Nhận / Đăng Nhập
+              </button>
+            </form>
+            <p class="text-center mt-3 small text-muted">
+              Hệ thống sẽ tự động nhận diện thành viên qua SĐT.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+/* =========================================================
+   1️⃣ XỬ LÝ idBan TỪ QR (QUAN TRỌNG NHẤT)
+========================================================= */
+
+const urlParams = new URLSearchParams(window.location.search);
+
+// Ưu tiên idBan → đúng theo backend MongoDB
+let currentTable =
+  urlParams.get("idBan") ||
+  localStorage.getItem("current_table_id");
+
+// Nếu có idBan thì lưu lại để các trang khác dùng
+if (currentTable) {
+  localStorage.setItem("current_table_id", currentTable);
+  localStorage.setItem("idBan", currentTable);
+} else {
+  // Không có bàn → coi là mang đi
+  localStorage.removeItem("current_table_id");
+  localStorage.removeItem("idBan");
+}
+
+let orderType = currentTable ? "DINE_IN" : "TAKE_AWAY";
+
+const savedType = localStorage.getItem("orderType");
+if (savedType) {
+  orderType = savedType;
+}
+
+/* =========================================================
+   2️⃣ KHỞI TẠO GIAO DIỆN
+========================================================= */
+
+updateModeUI();
+checkLoginStatus();
+
+function updateModeUI() {
+  const textEl = document.getElementById("order-mode-text");
+
+  if (currentTable) {
+    if (orderType === "DINE_IN") {
+      textEl.innerHTML =
+        `<i class="bi bi-shop me-1"></i> Tại bàn – Bàn số ${currentTable}`;
+    } else {
+      textEl.innerHTML =
+        `<i class="bi bi-bag-check-fill me-1"></i> Mang đi – Bàn số ${currentTable}`;
+    }
+  } else {
+    textEl.innerHTML =
+      `<i class="bi bi-bag-check-fill me-1"></i> Khách mang đi`;
+  }
+
+  const t1 = document.getElementById("dropdown-table-1");
+  const t2 = document.getElementById("dropdown-table-2");
+
+  if (t1) t1.innerText = currentTable ?? "-";
+  if (t2) t2.innerText = currentTable ?? "-";
+}
+
+function setOrderType(type) {
+  orderType = type;
+  localStorage.setItem("orderType", type);
+  updateModeUI();
+}
+
+function changeMode(type) {
+  setOrderType(type);
+}
+
+/* =========================================================
+   3️⃣ ĐĂNG NHẬP (GIỮ NGUYÊN)
+========================================================= */
+
+function checkLoginStatus() {
+  const user = JSON.parse(localStorage.getItem("user_login"));
+  if (user && user.isLoggedIn) {
+    document.getElementById("btnLogin").classList.add("d-none");
+    document.getElementById("userDisplay").classList.remove("d-none");
+    document.getElementById("userNameSpan").innerText = user.name;
+  } else {
+    document.getElementById("btnLogin").classList.remove("d-none");
+    document.getElementById("userDisplay").classList.add("d-none");
+  }
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const phone = document.getElementById("loginPhone").value.trim();
+
+  if (phone.length < 9) {
+    alert("Vui lòng nhập số điện thoại hợp lệ!");
+    return;
+  }
+
+  const randomNames = ["Minh Anh", "Thanh Tùng", "Ngọc Diệp", "Gia Bảo"];
+  const fakeName =
+    randomNames[Math.floor(Math.random() * randomNames.length)];
+
+  const userInfo = {
+    name: fakeName,
+    phone: phone,
+    isLoggedIn: true,
+  };
+
+  localStorage.setItem("user_login", JSON.stringify(userInfo));
+
+  const modalEl = document.getElementById("loginModal");
+  const modal = bootstrap.Modal.getInstance(modalEl);
+  modal.hide();
+
+  checkLoginStatus();
+  alert(`🎉 Chào mừng ${userInfo.name}! Bạn đã tích lũy 150 điểm.`);
+}
+
+function logout() {
+  if (confirm("Bạn muốn đăng xuất?")) {
+    localStorage.removeItem("user_login");
+    checkLoginStatus();
+  }
+}
+
+/* =========================================================
+   4️⃣ ĐIỀU HƯỚNG GIỮ idBan
+========================================================= */
+
+function goToMenu() {
+  let url = "index.html";
+
+  if (currentTable) {
+    url += `?idBan=${currentTable}&type=${orderType}`;
+  } else {
+    url += `?type=TAKE_AWAY`;
+  }
+
+  window.location.href = url;
+}
+
+function goToGift() {
+  let url = "index.html?cat=gift";
+
+  if (currentTable) {
+    url += `&idBan=${currentTable}&type=${orderType}`;
+  } else {
+    url += `&type=TAKE_AWAY`;
+  }
+
+  window.location.href = url;
+}
+
+/* =========================================================
+   5️⃣ CẬP NHẬT TRẠNG THÁI BÀN → CÓ KHÁCH
+   (SỬA ĐÚNG API /api/ban-an)
+========================================================= */
+
+const API_BAN_AN = "http://localhost:8080/api/ban-an";
+
+if (currentTable) {
+  const flagKey = `welcome_confirmed_${currentTable}`;
+
+  if (!sessionStorage.getItem(flagKey)) {
+    fetch(`${API_BAN_AN}/${currentTable}/trang-thai/1`, {
+      method: "PUT",
+    })
+      .then(() => {
+        sessionStorage.setItem(flagKey, "true");
+        console.log("Bàn", currentTable, "→ CÓ KHÁCH");
+      })
+      .catch((err) => {
+        console.error("Lỗi cập nhật trạng thái bàn:", err);
+      });
+  }
+}
+
+</script>
+  </body>
+</html>

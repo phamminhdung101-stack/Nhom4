@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Theo dõi đơn hàng - Tiệm Trà Thượng Hạng</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary-color: #8d6e63;
+        --bg-light: #fdfbf7;
+        --text-dark: #4e342e;
+      }
+
+      body {
+        font-family: "Be Vietnam Pro", sans-serif;
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        padding-bottom: 120px;
+      }
+
+      /* TIMELINE STYLES */
+      .timeline {
+        position: relative;
+        padding-left: 30px;
+        border-left: 2px dashed #c0a080;
+        margin-left: 20px;
+        margin-top: 30px;
+      }
+      .timeline-item {
+        position: relative;
+        margin-bottom: 40px;
+        opacity: 0.4;
+        transition: all 0.5s ease;
+        filter: grayscale(100%);
+      }
+      /* Item cuối bỏ đường kẻ thừa */
+      .timeline-item:last-child {
+        border-left: 2px solid transparent;
+        margin-bottom: 0;
+      }
+
+      .timeline-item.active {
+        opacity: 1;
+        filter: grayscale(0%);
+      }
+
+      .timeline-icon {
+        position: absolute;
+        left: -47px;
+        top: 0;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #c0a080;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #c0a080;
+        z-index: 10;
+        transition: all 0.3s;
+      }
+      .timeline-item.active .timeline-icon {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        box-shadow: 0 0 0 4px rgba(141, 110, 99, 0.2);
+        transform: scale(1.1);
+      }
+
+      /* Hiệu ứng Pulse (Nhịp tim) cho trạng thái đang diễn ra */
+      .pulse {
+        animation: pulse-animation 1.5s infinite;
+      }
+      @keyframes pulse-animation {
+        0% {
+          box-shadow: 0 0 0 0 rgba(141, 110, 99, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(141, 110, 99, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(141, 110, 99, 0);
+        }
+      }
+
+      /* STATUS CARD */
+      .status-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(0, 0, 0, 0.02);
+      }
+
+      /* Thanh tiến trình */
+      .progress-bar-custom {
+        height: 6px;
+        background: #eee;
+        border-radius: 10px;
+        margin-top: 15px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: var(--primary-color);
+        width: 10%;
+        transition: width 0.5s ease;
+      }
+
+      /* Quick Actions */
+      .quick-actions {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 5px 2px;
+        scrollbar-width: none; /* Ẩn thanh cuộn */
+      }
+      .action-btn {
+        white-space: nowrap;
+        border: 1px solid #eee;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        transition: 0.2s;
+      }
+      .action-btn:active {
+        transform: scale(0.95);
+        background: #f8f9fa;
+      }
+
+      /* Rating Stars */
+      .rating-star {
+        font-size: 1.8rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .rating-star.active {
+        color: #ffd700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-3 bg-white shadow-sm d-flex align-items-center fixed-top">
+      <a href="#" class="text-dark me-3" onclick="goToMenu()">
+        <i class="bi bi-house-door-fill fs-4"></i
+      ></a>
+      <h5 class="m-0 fw-bold">Trạng thái đơn hàng</h5>
+    </div>
+
+    <div class="container py-4" style="margin-top: 60px">
+      <div class="status-card p-4 text-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <small class="text-muted text-uppercase fw-bold">Mã đơn hàng</small>
+          <span class="badge bg-light text-dark border" id="order-time"
+            >--:--</span
+          >
+        </div>
+
+        <h2 class="fw-bold text-primary display-6 mb-0" id="order-id">
+          #DH-...
+        </h2>
+        <div id="status-badge-container" class="mt-3">
+          <span
+            class="badge bg-warning text-dark rounded-pill px-4 py-2 fs-6 shadow-sm"
+            id="status-text"
+            >Đang tải...</span
+          >
+        </div>
+
+        <div class="mt-4" id="progress-container">
+          <div class="d-flex justify-content-between small text-muted mb-1">
+            <span>Tiến độ</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-bar-custom">
+            <div class="progress-fill" id="progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <h6 class="fw-bold mb-3 ms-2 text-uppercase text-muted small">
+        Quy trình thực hiện
+      </h6>
+      <div class="timeline">
+        <div class="timeline-item" id="step-pending">
+          <div class="timeline-icon"><i class="bi bi-receipt"></i></div>
+          <h6 class="mb-1">Đã nhận đơn</h6>
+          <p class="text-muted small mb-0">Hệ thống đã ghi nhận yêu cầu.</p>
+        </div>
+
+        <div class="timeline-item" id="step-cooking">
+          <div class="timeline-icon"><i class="bi bi-cup-hot-fill"></i></div>
+          <h6 class="mb-1">Đang pha chế</h6>
+          <p class="text-muted small mb-0">
+            Nghệ nhân trà đang thực hiện món...
+          </p>
+        </div>
+
+        <div class="timeline-item" id="step-delivering">
+          <div class="timeline-icon"><i class="bi bi-bicycle"></i></div>
+          <h6 class="mb-1">Đang mang ra bàn / Giao</h6>
+          <p class="text-muted small mb-0">Món ngon đang đến bên bạn.</p>
+        </div>
+
+        <div class="timeline-item" id="step-completed">
+          <div class="timeline-icon"><i class="bi bi-check-lg"></i></div>
+          <h6 class="mb-1">Hoàn tất & Đánh giá</h6>
+
+          <div
+            id="rating-box"
+            class="mt-3 bg-white p-3 rounded-4 shadow-sm border d-none"
+          >
+            <p class="small fw-bold text-center mb-2">
+              Bạn hài lòng về đồ uống chứ?
+            </p>
+            <div class="d-flex justify-content-center gap-2 mb-3">
+              <i class="bi bi-star-fill rating-star" onclick="rate(1)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(2)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(3)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(4)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(5)"></i>
+            </div>
+            <textarea
+              class="form-control bg-light border-0 mb-3 small"
+              rows="2"
+              placeholder="Lời nhắn cho quán..."
+            ></textarea>
+            <button
+              class="btn btn-primary w-100 rounded-pill btn-sm fw-bold"
+              onclick="alert('Cảm ơn đánh giá của bạn!')"
+            >
+              Gửi Đánh Giá
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="fixed-bottom bg-white p-3 shadow-lg border-top"
+      style="border-radius: 20px 20px 0 0"
+    >
+      <p class="small fw-bold text-muted mb-2 ps-1">Bạn cần hỗ trợ thêm?</p>
+      <div class="quick-actions">
+        <button class="action-btn" onclick="requestService('thêm đá')">
+          🧊 Thêm đá
+        </button>
+        <button class="action-btn" onclick="requestService('thêm đường')">
+          🍬 Thêm đường
+        </button>
+        <button class="action-btn" onclick="requestService('gọi nhân viên')">
+          🛎️ Gọi nhân viên
+        </button>
+        <button
+          class="action-btn text-danger border-danger"
+          onclick="requestService('thanh toán')"
+        >
+          💵 Thanh toán
+        </button>
+      </div>
+      <!-- THAY ĐỔI DUY NHẤT Ở NÚT "Gọi thêm món khác" -->
+
+<button
+  class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold"
+  onclick="goToMenu()"
+>
+  <i class="bi bi-plus-lg me-1"></i> Gọi thêm món khác
+</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const API_DON_HANG = "http://localhost:8080/api/don-hang";
+const API_CHI_TIET = "http://localhost:8080/api/chi-tiet-don";
+
+const urlParams = new URLSearchParams(window.location.search);
+let idBan = urlParams.get("idBan") || localStorage.getItem("idBan");
+
+if (!idBan) {
+  alert("Không tìm thấy bàn!");
+  window.location.href = "../index.html";
+}
+
+localStorage.setItem("idBan", idBan);
+      // 1. KIỂM TRA ĐƠN HÀNG KHI VÀO TRANG
+      async function checkOrder() {
+  try {
+
+    const res = await fetch(`${API_DON_HANG}/ban/${idBan}`);
+
+    if (!res.ok) {
+      showNoOrder();
+      return;
+    }
+
+    const order = await res.json();
+
+    if (!order || !order.idDonHang) {
+      showNoOrder();
+      return;
+    }
+
+    document.getElementById("order-id").innerText =
+      "#DH-" + order.idDonHang;
+
+    document.getElementById("order-time").innerText =
+      new Date(order.idDonHang).toLocaleTimeString("vi-VN");
+
+    updateUI(order.trangThai ?? 0);
+
+  } catch (error) {
+    console.error("Lỗi load đơn:", error);
+    showNoOrder();
+  }
+}
+function showNoOrder() {
+  document.getElementById("order-id").innerText = "Chưa có đơn";
+  document.getElementById("status-text").innerText = "Vui lòng gọi món";
+  updateProgress(0);
+}
+      // 2. HÀM CẬP NHẬT GIAO DIỆN (Logic cốt lõi)
+      function updateUI(status) {
+
+  document.querySelectorAll(".timeline-item").forEach((el) => {
+    el.classList.remove("active");
+    el.querySelector(".timeline-icon").classList.remove("pulse");
+  });
+
+  document.getElementById("rating-box").classList.add("d-none");
+  document.getElementById("progress-container").style.display = "block";
+
+  const badge = document.getElementById("status-text");
+
+  // 0 = Pending
+  if (status === 0) {
+    setActiveStep("step-pending", false);
+    badge.innerText = "Đang chờ xác nhận";
+    badge.className =
+      "badge bg-warning text-dark rounded-pill px-4 py-2 fs-6 shadow-sm";
+    updateProgress(10);
+  }
+
+  // 1 = Cooking
+  else if (status === 1) {
+    setActiveStep("step-pending", false);
+    setActiveStep("step-cooking", true);
+    badge.innerText = "Bếp đang pha chế";
+    badge.className =
+      "badge bg-primary text-white rounded-pill px-4 py-2 fs-6 shadow-sm";
+    updateProgress(45);
+  }
+
+  // 2 = Delivering
+  else if (status === 2) {
+    setActiveStep("step-pending", false);
+    setActiveStep("step-cooking", false);
+    setActiveStep("step-delivering", true);
+    badge.innerText = "Đang mang ra bàn";
+    badge.className =
+      "badge bg-info text-dark rounded-pill px-4 py-2 fs-6 shadow-sm";
+    updateProgress(80);
+  }
+
+  // 3 = Completed
+  else if (status === 3) {
+    setActiveStep("step-pending", false);
+    setActiveStep("step-cooking", false);
+    setActiveStep("step-delivering", false);
+    setActiveStep("step-completed", false);
+
+    badge.innerText = "Đã hoàn tất";
+    badge.className =
+      "badge bg-success text-white rounded-pill px-4 py-2 fs-6 shadow-sm";
+
+    updateProgress(100);
+
+    document.getElementById("rating-box").classList.remove("d-none");
+    document.getElementById("progress-container").style.display = "none";
+  }
+}
+
+      // Hàm phụ trợ bật sáng Step
+      function setActiveStep(id, pulse) {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.add("active");
+          if (pulse) el.querySelector(".timeline-icon").classList.add("pulse");
+        }
+      }
+
+      // Hàm cập nhật thanh tiến trình
+      function updateProgress(percent) {
+        document.getElementById("progress-bar").style.width = percent + "%";
+        document.getElementById("progress-percent").innerText = percent + "%";
+      }
+
+      // Hàm gọi dịch vụ
+      function requestService(serviceName) {
+  alert(
+    `🔔 Đã gửi yêu cầu: "${serviceName}" từ Bàn ${idBan}.\nNhân viên sẽ đến ngay!`
+  );
+}
+
+      // Hàm đánh giá 5 sao
+      function rate(star) {
+        const stars = document.querySelectorAll(".rating-star");
+        stars.forEach((s, index) => {
+          if (index < star) s.classList.add("active");
+          else s.classList.remove("active");
+        });
+      }
+
+      // 3. VÒNG LẶP KIỂM TRA (POLLING) - Cứ 2 giây check Admin 1 lần
+      setInterval(() => {
+        checkOrder();
+      }, 2000);
+
+      // Chạy ngay lần đầu
+      checkOrder();
+      function goToMenu() {
+  if (idBan) {
+    window.location.href = "../index.html?idBan=" + idBan;
+  } else {
+    window.location.href = "../index.html";
+  }
+}
+    </script>
+  </body>
+</html>

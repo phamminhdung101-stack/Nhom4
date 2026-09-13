@@ -1,0 +1,331 @@
+/* ============================================================
+   FILE: assets/css/style.css
+   THEME: Nâu Kem & Trắng Sứ (Indochine Premium)
+   UPDATED: Glassmorphism, Animations, Skeleton Loading
+   ============================================================ */
+
+:root {
+  /* BẢNG MÀU CHÍNH */
+  --primary-color: #8d6e63; /* Nâu nhạt sang trọng */
+  --primary-hover: #6d4c41; /* Nâu đậm (Hover) */
+  --text-dark: #4e342e; /* Nâu đen (Chữ chính) */
+  --text-muted: #8d8d8d; /* Xám ghi (Chữ phụ) */
+  --bg-light: #fdfbf7; /* Trắng sứ (Nền web) */
+  --white: #ffffff; /* Trắng tinh */
+  --accent-gold: #d4af37; /* Vàng kim (Điểm nhấn) */
+
+  /* Hiệu ứng bóng đổ mềm mại (Soft Shadow) */
+  --shadow-sm: 0 2px 8px rgba(78, 52, 46, 0.05);
+  --shadow-md: 0 5px 15px rgba(78, 52, 46, 0.08);
+  --shadow-lg: 0 10px 25px rgba(78, 52, 46, 0.12);
+}
+
+/* 1. CẤU HÌNH CHUNG */
+body {
+  font-family: "Be Vietnam Pro", sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  padding-bottom: 100px; /* Chừa chỗ cho thanh giỏ hàng */
+  -webkit-font-smoothing: antialiased; /* Làm mượt font chữ */
+}
+
+a {
+  text-decoration: none;
+}
+
+/* Ghi đè Bootstrap */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+.text-dark {
+  color: var(--text-dark) !important;
+}
+.bg-light {
+  background-color: var(--bg-light) !important;
+}
+
+/* 2. HEADER & DANH MỤC (GLASSMORPHISM) */
+header {
+  background-color: rgba(255, 255, 255, 0.85) !important; /* Trong suốt 85% */
+  backdrop-filter: blur(12px); /* Mờ nền sau */
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(141, 110, 99, 0.1);
+  transition: all 0.3s ease;
+}
+
+.category-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 5px;
+  scrollbar-width: none; /* Firefox */
+}
+.category-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Nút danh mục */
+.btn-custom {
+  border: 1px solid rgba(141, 110, 99, 0.2);
+  border-radius: 50px;
+  padding: 8px 24px;
+  font-size: 14px;
+  white-space: nowrap;
+  background: var(--white);
+  color: var(--text-dark);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-weight: 600;
+}
+
+.btn-custom.active,
+.btn-custom:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(141, 110, 99, 0.3);
+  transform: translateY(-1px);
+}
+
+/* 3. CARD MÓN ĂN (ANIMATION & HOVER) */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card {
+  border: none !important;
+  background: transparent !important;
+  animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; /* Hiệu ứng xuất hiện */
+}
+
+/* Hiệu ứng delay cho từng card để chúng hiện lần lượt (Sẽ dùng JS để thêm class này nếu muốn xịn hơn, hoặc để mặc định) */
+.product-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.product-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.product-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.product-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.product-card .card-img-wrapper {
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.product-card:hover .card-img-wrapper {
+  box-shadow: var(--shadow-md);
+}
+
+.product-card img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.08); /* Phóng to ảnh nhẹ khi hover */
+}
+
+/* Nút cộng nhỏ (Floating Action) */
+.btn-add-cart {
+  width: 36px;
+  height: 36px;
+  background-color: var(--white);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+.btn-add-cart:active {
+  transform: scale(0.9);
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+/* Badge (Best Seller) */
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ffecb3, #ffd54f) !important;
+  color: #5d4037 !important;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 4. MODAL CHI TIẾT (PREMIUM) */
+.modal-content {
+  border: none;
+  border-radius: 24px;
+  background-color: rgba(255, 255, 255, 0.98); /* Hơi trong suốt */
+  box-shadow: var(--shadow-lg);
+}
+
+#modal-img {
+  height: 280px;
+  object-fit: cover;
+  width: 100%;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+}
+
+/* Radio Button (Size/Sugar) */
+.btn-check:checked + .btn-outline-custom {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 10px rgba(141, 110, 99, 0.3);
+}
+
+.btn-outline-custom {
+  color: var(--text-dark);
+  border: 1px solid #e0e0e0;
+  background-color: var(--white);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 12px; /* Bo tròn hơn */
+  transition: all 0.2s;
+}
+
+/* 5. SIDEBAR & NAV (LAYOUT PHÊ LA) */
+.sidebar-menu {
+  position: sticky;
+  top: 90px;
+  padding-right: 20px;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 14px 0;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+  border-bottom: 1px dashed rgba(141, 110, 99, 0.15);
+}
+
+.sidebar-link:hover {
+  color: var(--primary-color);
+  padding-left: 8px;
+}
+
+.sidebar-link.active {
+  color: var(--primary-color);
+  font-weight: 800;
+  border-left: 3px solid var(--primary-color);
+  padding-left: 12px;
+  border-bottom: none;
+}
+
+/* 6. THANH GIỎ HÀNG & NÚT NỔI */
+.fab-container .btn-warning {
+  background: var(--accent-gold);
+  color: var(--white);
+  border: none;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+  transition: transform 0.2s;
+}
+.fab-container .btn-warning:active {
+  transform: scale(0.95);
+}
+
+.navbar.fixed-bottom {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+  padding-bottom: env(safe-area-inset-bottom); /* Cho iPhone X+ */
+}
+
+/* Nút Checkout */
+.navbar.fixed-bottom .btn-primary,
+.modal-footer .btn-primary {
+  background-color: var(--primary-color) !important;
+  border: none;
+  box-shadow: 0 4px 15px rgba(141, 110, 99, 0.4);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+}
+.navbar.fixed-bottom .btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* --- 7. SKELETON LOADING (HIỆU ỨNG CHỜ) --- */
+.skeleton {
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  border-radius: 8px;
+  background-size: 200% 100%;
+  animation: 1.5s shine linear infinite;
+}
+
+.skeleton-img {
+  height: 150px;
+  width: 100%;
+  margin-bottom: 10px;
+  border-radius: 12px;
+}
+.skeleton-text {
+  height: 16px;
+  width: 80%;
+  margin-bottom: 8px;
+}
+.skeleton-price {
+  height: 20px;
+  width: 40%;
+}
+
+@keyframes shine {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+/* --- 8. CUSTOM TOAST (THÔNG BÁO ĐẸP) --- */
+.custom-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40, 40, 40, 0.9);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1060;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes slideDown {
+  from {
+    top: -50px;
+    opacity: 0;
+  }
+  to {
+    top: 20px;
+    opacity: 1;
+  }
+}

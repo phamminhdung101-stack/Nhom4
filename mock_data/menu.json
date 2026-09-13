@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "name": "Hồng Trà Cổ Thụ Shan Tuyết",
+    "price": 65000,
+    "description": "Thu hái từ cây trà cổ thụ trên núi cao, vị chát dịu hậu ngọt sâu.",
+    "image": "assets/img/tea1.jpg",
+    "category": "tra-dac-san",
+    "bestSeller": true,
+    "discount": 0
+  },
+  {
+    "id": 2,
+    "name": "Thiết Quan Âm Thượng Hạng",
+    "price": 55000,
+    "description": "Dòng trà Oolong nổi tiếng, hương hoa lan thoang thoảng quý phái.",
+    "image": "assets/img/tea2.jpg",
+    "category": "tra-dac-san",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 3,
+    "name": "Bạch Trà Mẫu Đơn",
+    "price": 85000,
+    "description": "Búp trà non phủ lông tơ trắng, vị thanh khiết như sương mai.",
+    "image": "assets/img/tea3.jpg",
+    "category": "tra-dac-san",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 4,
+    "name": "Trà Sen Tây Hồ (Ấm)",
+    "price": 120000,
+    "description": "Tinh hoa trà Việt, ướp gạo sen tự nhiên thơm ngát.",
+    "image": "assets/img/tea4.jpg",
+    "category": "tra-dac-san",
+    "bestSeller": true,
+    "discount": 0
+  },
+  {
+    "id": 5,
+    "name": "Trà Vải Hoa Hồng Pháp",
+    "price": 55000,
+    "description": "Sự kết hợp lãng mạn giữa vải thiều tươi và nụ hồng Pháp.",
+    "image": "assets/img/fruit1.jpg",
+    "category": "tra-trai-cay",
+    "bestSeller": true,
+    "discount": 10
+  },
+  {
+    "id": 6,
+    "name": "Trà Ổi Hồng Hạt Chia",
+    "price": 45000,
+    "description": "Ổi hồng thơm lừng kết hợp trà nhài và hạt chia dinh dưỡng.",
+    "image": "assets/img/fruit2.jpg",
+    "category": "tra-trai-cay",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 7,
+    "name": "Lục Trà Cam Sả Mật Ong",
+    "price": 45000,
+    "description": "Giải nhiệt thanh mát, tăng sức đề kháng.",
+    "image": "assets/img/fruit3.jpg",
+    "category": "tra-trai-cay",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 8,
+    "name": "Trà Dâu Tằm Pha Lê",
+    "price": 48000,
+    "description": "Mứt dâu tằm nhà làm, chua ngọt kích thích vị giác.",
+    "image": "assets/img/fruit4.jpg",
+    "category": "tra-trai-cay",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 10,
+    "name": "Trà Sữa Ô Long Nướng",
+    "price": 55000,
+    "description": "Vị trà nướng đậm đà, thơm mùi khói đặc trưng.",
+    "image": "assets/img/milk1.jpg",
+    "category": "tra-sua",
+    "bestSeller": true,
+    "discount": 0
+  },
+  {
+    "id": 11,
+    "name": "Trà Sữa Nhài Hạnh Nhân",
+    "price": 52000,
+    "description": "Thơm hương nhài, bùi vị hạnh nhân lát.",
+    "image": "assets/img/milk2.jpg",
+    "category": "tra-sua",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 12,
+    "name": "Trà Sữa Thiết Quan Âm",
+    "price": 60000,
+    "description": "Dòng trà sữa đậm vị dành cho người sành trà.",
+    "image": "assets/img/milk3.jpg",
+    "category": "tra-sua",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 20,
+    "name": "Túi Trà Ô Long Sữa (200gr)",
+    "price": 180000,
+    "description": "Túi zip bảo quản, hương vị ô long sữa thơm ngậy tự nhiên.",
+    "image": "assets/img/gift1.jpg",
+    "category": "san-pham-goi",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 21,
+    "name": "Set Quà Tết: An Khang",
+    "price": 550000,
+    "description": "Gồm 3 loại trà thượng hạng và mứt Tết, hộp sơn mài.",
+    "image": "assets/img/gift2.jpg",
+    "category": "san-pham-goi",
+    "bestSeller": true,
+    "discount": 5
+  },
+  {
+    "id": 22,
+    "name": "Cà Phê Geisha - Túi 150gr",
+    "price": 350000,
+    "description": "Dòng cà phê thượng hạng, hương hoa quả phong phú.",
+    "image": "assets/img/gift3.jpg",
+    "category": "san-pham-goi",
+    "bestSeller": false,
+    "discount": 0
+  },
+  {
+    "id": 23,
+    "name": "Trà Shan Tuyết - Hộp Thiếc",
+    "price": 450000,
+    "description": "Thu hái từ cây trà trên 100 năm tuổi, bao bì sang trọng.",
+    "image": "assets/img/gift4.jpg",
+    "category": "san-pham-goi",
+    "bestSeller": false,
+    "discount": 0
+  }
+]

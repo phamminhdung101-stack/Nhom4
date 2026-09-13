@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mã QR Bàn - Admin</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    
+    <style>
+      body {
+        background-color: #f2f4f8;
+        font-family: "Be Vietnam Pro", sans-serif;
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+      }
+      .sidebar {
+        width: 260px;
+        background: #4e342e;
+        color: white;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .nav-link {
+        color: rgba(255, 255, 255, 0.7);
+        padding: 12px;
+        margin-bottom: 5px;
+        text-decoration: none;
+        display: flex;
+        gap: 10px;
+        border-radius: 10px;
+        transition: 0.2s;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+      }
+      .content {
+        flex: 1;
+        padding: 40px;
+        overflow-y: auto;
+      }
+      .qr-card-preview {
+        width: 260px;
+        height: 380px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 25px 15px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: 0.2s;
+      }
+      .qr-card-preview::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 8px;
+        background: linear-gradient(90deg, #8d6e63, #d4af37);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="sidebar d-print-none">
+      <h4 class="fw-bold mb-4 px-2 text-uppercase">
+        <i class="bi bi-cup-hot-fill me-2"></i>Tiệm Trà
+      </h4>
+      <nav>
+        <a href="dashboard.html" class="nav-link">
+          <i class="bi bi-grid-fill"></i> Tổng quan
+        </a>
+        <a href="orders.html" class="nav-link">
+          <i class="bi bi-receipt"></i> Đơn hàng
+        </a>
+        <a href="tables.html" class="nav-link">
+          <i class="bi bi-map"></i> Sơ đồ bàn
+        </a>
+        <a href="qr_maker.html" class="nav-link active">
+          <i class="bi bi-qr-code"></i> Mã QR Bàn
+        </a>
+      </nav>
+    </div>
+
+    <div class="content">
+      <h4 class="fw-bold mb-4">Danh sách mã QR theo bàn</h4>
+
+      <div
+        id="qrContainer"
+        class="d-grid"
+        style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px;"
+      ></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="../assets/js/qr_maker.js"></script>
+  </body>
+</html>

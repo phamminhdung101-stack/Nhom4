@@ -1,0 +1,277 @@
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sơ Đồ Bàn - Admin</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #f2f4f8;
+        font-family: "Be Vietnam Pro", sans-serif;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .sidebar {
+        width: 260px;
+        background: #4e342e;
+        color: white;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .nav-link {
+        color: rgba(255, 255, 255, 0.7);
+        padding: 12px;
+        margin-bottom: 5px;
+        text-decoration: none;
+        display: flex;
+        gap: 10px;
+        border-radius: 10px;
+        transition: 0.2s;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+      }
+      .content {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+      }
+      .table-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 20px;
+      }
+      .table-item {
+        aspect-ratio: 1/1;
+        background: white;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        border: 2px solid transparent;
+        transition: 0.2s;
+      }
+      .table-item:hover {
+        transform: translateY(-5px);
+      }
+      .table-item.active {
+        background: #e3f2fd;
+        border-color: #2196f3;
+      }
+      .table-item.busy {
+        background: #fff3e0;
+        border-color: #ff9800;
+      }
+      .table-info-box {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="sidebar">
+      <h4 class="fw-bold mb-4 px-2 text-uppercase">
+        <i class="bi bi-cup-hot-fill me-2"></i>Tiệm Trà
+      </h4>
+      <nav>
+        <a href="dashboard.html" class="nav-link">
+          <i class="bi bi-grid-fill"></i> Tổng quan
+        </a>
+        <a href="orders.html" class="nav-link">
+          <i class="bi bi-receipt"></i> Đơn hàng (KDS)
+        </a>
+        <a href="tables.html" class="nav-link active">
+          <i class="bi bi-map"></i> Sơ đồ bàn
+        </a>
+        <a href="qr_maker.html" class="nav-link">
+          <i class="bi bi-qr-code"></i> Tạo mã QR
+        </a>
+        <hr class="border-secondary opacity-50" />
+        <a href="../index.html" class="nav-link text-warning">
+          <i class="bi bi-box-arrow-right"></i> Xem Website
+        </a>
+      </nav>
+    </div>
+
+    <div class="content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h3 class="fw-bold m-0">Sơ Đồ Bàn</h3>
+          <div class="mt-2 d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" onclick="setFilter('all')">
+              Tất cả
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="setFilter(0)">
+              Trống
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="setFilter(1)">
+              Có khách
+            </button>
+          </div>
+        </div>
+
+        <button class="btn btn-danger" onclick="resetTables()">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>
+          Reset trạng thái bàn
+        </button>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="table-grid" id="table-container"></div>
+        </div>
+        <div class="col-lg-4">
+          <div class="table-info-box" id="table-info">
+            <p class="text-muted m-0">Chọn một bàn để xem thông tin</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BAN = "http://localhost:8080/api/ban-an";
+      const API_RESET = "http://localhost:8080/api/ban-an/reset";
+      const API_ORDER = "http://localhost:8080/api/orders/ban";
+
+      let danhSachBan = [];
+      let filterTrangThai = "all";
+      let selectedBanId = null;
+
+      function getStatusInfo(trangThai) {
+        return Number(trangThai) === 1
+          ? { text: "Có khách", class: "busy" }
+          : { text: "Trống", class: "" };
+      }
+
+      function setFilter(trangThai) {
+        filterTrangThai = trangThai;
+        renderTables();
+      }
+
+      async function renderTables() {
+        const container = document.getElementById("table-container");
+        container.innerHTML = "";
+
+        const res = await fetch(API_BAN);
+        danhSachBan = await res.json();
+
+        danhSachBan
+          .filter((ban) => {
+            if (filterTrangThai === "all") return true;
+            return Number(ban.trangThai) === Number(filterTrangThai);
+          })
+          .forEach((ban) => {
+            const status = getStatusInfo(ban.trangThai);
+            const div = document.createElement("div");
+            div.className = `table-item ${status.class}`;
+            div.onclick = () => showTableInfo(ban.idBan);
+
+            div.innerHTML = `
+              <i class="bi bi-hdd-network fs-2 mb-1 text-secondary"></i>
+              <span class="fw-bold text-dark">${ban.tenBan}</span>
+              <span class="small text-muted">${status.text}</span>
+            `;
+
+            container.appendChild(div);
+          });
+      }
+
+      async function showTableInfo(idBan) {
+        selectedBanId = idBan;
+        const ban = danhSachBan.find((b) => b.idBan === idBan);
+        const status = getStatusInfo(ban.trangThai);
+
+        const box = document.getElementById("table-info");
+        box.innerHTML = `
+          <h5 class="fw-bold mb-2">${ban.tenBan}</h5>
+          <p class="mb-2"><strong>Trạng thái:</strong> ${status.text}</p>
+          ${
+            Number(ban.trangThai) === 1
+              ? `<button class="btn btn-success btn-sm mb-3" onclick="hoanThanhBan()">
+                  <i class="bi bi-check-circle me-1"></i>Hoàn thành
+                </button>`
+              : ""
+          }
+          <hr />
+          <strong>Món đã gọi</strong>
+          <div id="order-list" class="mt-2 text-muted">Đang tải...</div>
+        `;
+
+        try {
+          const res = await fetch(`${API_ORDER}/${idBan}`);
+          const orders = await res.json();
+          const orderList = document.getElementById("order-list");
+
+          if (!orders || orders.length === 0) {
+            orderList.innerHTML = "Chưa có món nào";
+            return;
+          }
+
+          orderList.innerHTML = orders
+            .map(
+              (o) => `
+              <div class="d-flex justify-content-between">
+                <span>${o.tenMon}</span>
+                <span>x${o.soLuong}</span>
+              </div>
+            `
+            )
+            .join("");
+        } catch {
+          document.getElementById("order-list").innerHTML =
+            "Không tải được dữ liệu";
+        }
+      }
+
+      async function hoanThanhBan() {
+        if (!selectedBanId) return;
+
+        await fetch(`${API_BAN}/${selectedBanId}/trang-thai/0`, {
+          method: "PUT",
+        });
+
+        selectedBanId = null;
+        document.getElementById("table-info").innerHTML =
+          '<p class="text-muted m-0">Chọn một bàn để xem thông tin</p>';
+        renderTables();
+      }
+
+      async function resetTables() {
+        if (!confirm("Bạn có chắc muốn reset toàn bộ trạng thái bàn về TRỐNG?"))
+          return;
+
+        await fetch(API_RESET, { method: "PUT" });
+        document.getElementById("table-info").innerHTML =
+          '<p class="text-muted m-0">Chọn một bàn để xem thông tin</p>';
+        renderTables();
+      }
+
+      renderTables();
+    </script>
+  </body>
+</html>
