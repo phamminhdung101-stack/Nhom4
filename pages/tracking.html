@@ -432,19 +432,32 @@ function showNoOrder() {
       }
 
       // 3. VÒNG LẶP KIỂM TRA (POLLING) - Cứ 2 giây check Admin 1 lần
-      setInterval(() => {
-        checkOrder();
-      }, 2000);
+      // setInterval(() => {
+      //   checkOrder();
+      // }, 2000);
 
       // Chạy ngay lần đầu
       checkOrder();
       function goToMenu() {
-  if (idBan) {
-    window.location.href = "../index.html?idBan=" + idBan;
-  } else {
-    window.location.href = "../index.html";
-  }
-}
+        if (idBan) {
+          window.location.href = "../index.html?idBan=" + idBan;
+        } else {
+          window.location.href = "../index.html";
+        }
+      }
+
+      window.clientType = "CUSTOMER";
+      window.handleOrderStatus = function(data) {
+        checkOrder();
+      };
+      window.handleNewOrder = function(data) {
+        checkOrder();
+      };
     </script>
+    <script src="../assets/js/websocket.js"></script>
+    <script>
+      connectWebSocket();
+    </script>
+    <div id="ws-status" style="position: fixed; bottom: 10px; right: 10px; font-weight: bold; background: white; padding: 5px; border-radius: 5px;"></div>
   </body>
 </html>
