@@ -19,6 +19,7 @@ import chandanv.local.chandanv.models.entity.ChiTietDonHang;
 import chandanv.local.chandanv.models.entity.LichSuBanHang;
 import chandanv.local.chandanv.services.ChiTietDonHangService;
 import chandanv.local.chandanv.services.LichSuBanHangService;
+import chandanv.local.chandanv.websocket.OrderWebSocketHandler;
 
 @RestController
 @RequestMapping("/api/chi-tiet-don")
@@ -27,12 +28,15 @@ public class ChiTietDonHangController {
 
     private final ChiTietDonHangService service;
     private final LichSuBanHangService lichSuBanHangService;
+    private final OrderWebSocketHandler webSocketHandler;
 
     public ChiTietDonHangController(
             ChiTietDonHangService service,
-            LichSuBanHangService lichSuBanHangService) {
+            LichSuBanHangService lichSuBanHangService,
+            OrderWebSocketHandler webSocketHandler) {
         this.service = service;
         this.lichSuBanHangService = lichSuBanHangService;
+        this.webSocketHandler = webSocketHandler;
     }
 
     @GetMapping
@@ -47,7 +51,9 @@ public class ChiTietDonHangController {
 
     @PostMapping
     public ChiTietDonHang create(@RequestBody ChiTietDonHang chiTietDonHang) {
-        return service.save(chiTietDonHang);
+        ChiTietDonHang saved = service.save(chiTietDonHang);
+        webSocketHandler.broadcast(String.format("{\"type\":\"NEW_ORDER\",\"orderId\":\"%s\"}", saved.getIdChiTiet()));
+        return saved;
     }
 
     @PutMapping("/{id}")
@@ -61,7 +67,9 @@ public class ChiTietDonHangController {
     public ChiTietDonHang updateTrangThai(
             @PathVariable String id,
             @RequestBody Map<String, Integer> body) {
-        return service.updateTrangThai(id, body.get("trangThai"));
+        ChiTietDonHang updated = service.updateTrangThai(id, body.get("trangThai"));
+        webSocketHandler.broadcast(String.format("{\"type\":\"ORDER_STATUS_UPDATED\",\"orderId\":\"%s\",\"status\":%d}", id, updated.getTrangThai()));
+        return updated;
     }
 
     @DeleteMapping("/{id}")
@@ -83,6 +91,7 @@ public class ChiTietDonHangController {
 
         lichSuBanHangService.save(ls);
         service.delete(id);
+        webSocketHandler.broadcast(String.format("{\"type\":\"ORDER_STATUS_UPDATED\",\"orderId\":\"%s\",\"status\":3}", id));
     }
 
     @GetMapping("/don-hang/{idDonHang}")

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import chandanv.local.chandanv.models.entity.DonHang;
 import chandanv.local.chandanv.repositories.DonHangRepository;
+import java.util.List;
 
 @Service
 public class DonHangService {
@@ -35,5 +36,15 @@ public class DonHangService {
         .stream()
         .findFirst()
         .orElse(null);
-}
+    }
+
+    public List<DonHang> getAll() {
+        return repo.findAll();
+    }
+
+    public DonHang updateTrangThai(String id, Integer trangThai) {
+        DonHang dh = repo.findById(id).orElseThrow();
+        dh.setTrangThai(trangThai);
+        return repo.save(dh);
+    }
 }
