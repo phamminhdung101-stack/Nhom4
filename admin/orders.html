@@ -18,6 +18,7 @@
       .order-card { background:#fff; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 4px 10px rgba(0,0,0,.05); border-left:6px solid #ddd }
       .status-pending{border-left-color:#ffc107}
       .status-cooking{border-left-color:#2196f3}
+      .status-delivering{border-left-color:#17a2b8}
       .status-completed{border-left-color:#4caf50;opacity:.6}
       .filter-btn{border:1px solid #ddd;background:#fff;padding:8px 20px;border-radius:30px;font-weight:600;color:#666;margin-right:8px}
       .filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
@@ -34,6 +35,7 @@
       }
       .status-btn.pending{background:#fff3cd;color:#856404}
       .status-btn.cooking{background:#e3f2fd;color:#0d6efd}
+      .status-btn.delivering{background:#d1ecf1;color:#0c5460}
       .status-btn.completed{background:#e8f5e9;color:#2e7d32}
       .status-btn:hover{transform:scale(1.05)}
     </style>
@@ -71,8 +73,9 @@
       let ordersCache = [];
 
       function mapStatus(trangThai) {
-        if (trangThai === 1) return "Chờ xác nhận";
-        if (trangThai === 2) return "Đang pha chế";
+        if (trangThai === 0) return "Chờ xác nhận";
+        if (trangThai === 1) return "Đang pha chế";
+        if (trangThai === 2) return "Đang mang ra bàn";
         if (trangThai === 3) return "Hoàn thành";
         return "Hoàn thành";
       }
@@ -80,17 +83,19 @@
       function mapStatusClass(status) {
         if (status === "Chờ xác nhận") return "pending";
         if (status === "Đang pha chế") return "cooking";
+        if (status === "Đang mang ra bàn") return "delivering";
         return "completed";
       }
 
       function nextTrangThai(current) {
+        if (current === 0) return 1;
         if (current === 1) return 2;
         if (current === 2) return 3;
         return 3;
       }
 
       function loadOrders() {
-        fetch("http://localhost:8080/api/chi-tiet-don")
+        fetch("http://localhost:8080/api/don-hang")
           .then(res => res.json())
           .then(data => {
             ordersCache = data;
@@ -100,15 +105,12 @@
 
       function updateTrangThai(order) {
         if (order.trangThai === 3) {
-          fetch(`http://localhost:8080/api/chi-tiet-don/hoan-thanh/${order._id}`, {
-            method: "POST"
-          }).then(() => loadOrders());
-          return;
+          // You might not have a hoan-thanh endpoint for DonHang, just use PATCH for status 3
         }
 
         const newTrangThai = nextTrangThai(order.trangThai);
 
-        fetch(`http://localhost:8080/api/chi-tiet-don/${order._id}/trang-thai`, {
+        fetch(`http://localhost:8080/api/don-hang/${order.id}/trang-thai`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ trangThai: newTrangThai })
@@ -124,7 +126,10 @@
           if(btn.innerText.includes(filter==="all"?"Tất cả":filter)) btn.classList.add("active");
         });
 
-        ordersCache.forEach(o=>{
+        // Lọc DonHang chưa hoàn thành hoặc theo filter
+        const sortedOrders = ordersCache.sort((a,b) => (b.idDonHang || 0) - (a.idDonHang || 0));
+
+        sortedOrders.forEach(o=>{
           const statusText = mapStatus(o.trangThai);
           const statusClass = mapStatusClass(statusText);
           if(filter!=="all" && statusText!==filter) return;
@@ -133,13 +138,12 @@
             <div class="col-md-6 col-lg-4">
               <div class="order-card status-${statusClass}">
                 <div class="d-flex justify-content-between mb-2">
-                  <h5 class="fw-bold m-0 text-primary">CT#${o.idChiTiet}</h5>
+                  <h5 class="fw-bold m-0 text-primary">Đơn hàng #${o.idDonHang}</h5>
                 </div>
-                <h6 class="fw-bold mb-3">Đơn hàng #${o.idDonHang}</h6>
+                <h6 class="fw-bold mb-3">Bàn #${o.idGioHang || o.idBan || '?'}</h6>
 
                 <div class="bg-light p-2 rounded mb-2 small text-muted">
-                  <div>• Số lượng: ${o.soLuong}</div>
-                  <div>• Đơn giá: ${o.donGiaThanhTien.donGia.toLocaleString()} ₫</div>
+                  <div>• Tổng tiền: ${(o.tongTien || 0).toLocaleString()} ₫</div>
                 </div>
 
                 ${o.ghiChu ? `
@@ -148,7 +152,7 @@
                 </div>` : ``}
 
                 <div class="d-flex justify-content-between align-items-center">
-                  <span class="fw-bold fs-5">${o.donGiaThanhTien.thanhTien.toLocaleString()} ₫</span>
+                  <span class="fw-bold fs-5">${(o.tongTien || 0).toLocaleString()} ₫</span>
                   <button class="status-btn ${statusClass}"
                     onclick='updateTrangThai(${JSON.stringify(o)})'>
                     ${statusText}
@@ -164,8 +168,26 @@
         renderOrders(status);
       }
 
+      // WebSocket Handlers
+      window.clientType = "KITCHEN";
+      window.handleNewOrder = function(data) {
+        // Show notification and reload
+        alert("Có đơn hàng mới!");
+        loadOrders();
+      };
+      
+      window.handleOrderStatus = function(data) {
+        loadOrders();
+      };
+
+      // Remove setInterval polling, replace with WebSocket
       loadOrders();
-      setInterval(loadOrders, 5000);
+      // setInterval(loadOrders, 5000); // REPLACED BY WEBSOCKET
     </script>
+    <script src="../assets/js/websocket.js"></script>
+    <script>
+      connectWebSocket();
+    </script>
+    <div id="ws-status" style="position: fixed; bottom: 10px; right: 10px; font-weight: bold;"></div>
   </body>
 </html>
