@@ -17,6 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="../assets/css/chat.css" />
 
     <style>
       :root {
@@ -459,5 +460,9 @@ function showNoOrder() {
       connectWebSocket();
     </script>
     <div id="ws-status" style="position: fixed; bottom: 10px; right: 10px; font-weight: bold; background: white; padding: 5px; border-radius: 5px;"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="../assets/js/customer-chat.js"></script>
   </body>
 </html>

@@ -18,12 +18,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import chandanv.local.chandanv.models.entity.BanAn;
 import chandanv.local.chandanv.services.BanAnService;
+import chandanv.local.chandanv.services.InMemoryChatService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Controller
 @RequestMapping("/ban-an")
 public class BanAnController {
 
     private final BanAnService service;
+
+    @Autowired(required = false)
+    private InMemoryChatService inMemoryChatService;
 
     public BanAnController(BanAnService service) {
         this.service = service;
@@ -56,6 +61,11 @@ public class BanAnController {
         }
 
         service.capNhatTrangThai(idBan, trangThai);
+
+        if (trangThai == 0 && inMemoryChatService != null) {
+            inMemoryChatService.clearTableChat(idBan);
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -63,6 +73,11 @@ public class BanAnController {
     @PutMapping("/reset")
     public ResponseEntity<Void> resetTrangThaiBan() {
         service.resetTatCaBan();
+
+        if (inMemoryChatService != null) {
+            inMemoryChatService.clearAll();
+        }
+
         return ResponseEntity.ok().build();
     }
 
