@@ -18,6 +18,7 @@
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="../assets/css/chat.css" />
 
     <style>
       body {
@@ -153,14 +154,33 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
     <script>
-      const API_BAN = "http://localhost:8080/api/ban-an";
-      const API_RESET = "http://localhost:8080/api/ban-an/reset";
-      const API_ORDER = "http://localhost:8080/api/orders/ban";
+      function getBackendHost() {
+        if (window.location.port === "8080") {
+          return window.location.host;
+        }
+        return "localhost:8080";
+      }
+
+      const API_BASE = "http://" + getBackendHost();
+      const API_BAN = API_BASE + "/api/ban-an";
+      const API_RESET = API_BASE + "/api/ban-an/reset";
+      const API_ORDER = API_BASE + "/api/don-hang/ban";
 
       let danhSachBan = [];
       let filterTrangThai = "all";
       let selectedBanId = null;
+
+      // In-memory chat storage for active session (NEVER stored to localStorage/MongoDB)
+      const tableChatSessions = new Map(); // idBan -> [ { role, sender, content, timestamp } ]
+      const tableChatUnread = new Map();   // idBan -> count
+
+      let staffStompClient = null;
+      let isStaffConnected = false;
+      let staffTableSub = null;
 
       function getStatusInfo(trangThai) {
         return Number(trangThai) === 1
@@ -189,9 +209,16 @@
             const status = getStatusInfo(ban.trangThai);
             const div = document.createElement("div");
             div.className = `table-item ${status.class}`;
+            div.id = `table-card-${ban.idBan}`;
             div.onclick = () => showTableInfo(ban.idBan);
 
+            const unread = tableChatUnread.get(ban.idBan) || 0;
+            const chatBadgeHtml = unread > 0
+              ? `<span class="table-chat-indicator" id="chat-badge-${ban.idBan}"><i class="bi bi-chat-dots-fill"></i> ${unread}</span>`
+              : `<span class="table-chat-indicator d-none" id="chat-badge-${ban.idBan}"></span>`;
+
             div.innerHTML = `
+              ${chatBadgeHtml}
               <i class="bi bi-hdd-network fs-2 mb-1 text-secondary"></i>
               <span class="fw-bold text-dark">${ban.tenBan}</span>
               <span class="small text-muted">${status.text}</span>
@@ -203,15 +230,28 @@
 
       async function showTableInfo(idBan) {
         selectedBanId = idBan;
+
+        // Clear unread badge for this table
+        tableChatUnread.delete(idBan);
+        const badgeEl = document.getElementById(`chat-badge-${idBan}`);
+        if (badgeEl) {
+          badgeEl.classList.add("d-none");
+          badgeEl.innerHTML = "";
+        }
+
         const ban = danhSachBan.find((b) => b.idBan === idBan);
-        const status = getStatusInfo(ban.trangThai);
+        const status = getStatusInfo(ban ? ban.trangThai : 0);
+        const tenBan = ban ? ban.tenBan : `Bàn ${idBan}`;
+
+        // Subscribe to this table's specific topic if connected
+        subscribeToCurrentTable(idBan);
 
         const box = document.getElementById("table-info");
         box.innerHTML = `
-          <h5 class="fw-bold mb-2">${ban.tenBan}</h5>
+          <h5 class="fw-bold mb-2">${tenBan}</h5>
           <p class="mb-2"><strong>Trạng thái:</strong> ${status.text}</p>
           ${
-            Number(ban.trangThai) === 1
+            ban && Number(ban.trangThai) === 1
               ? `<button class="btn btn-success btn-sm mb-3" onclick="hoanThanhBan()">
                   <i class="bi bi-check-circle me-1"></i>Hoàn thành
                 </button>`
@@ -220,40 +260,414 @@
           <hr />
           <strong>Món đã gọi</strong>
           <div id="order-list" class="mt-2 text-muted">Đang tải...</div>
+
+          <!-- Staff Table Chat Section -->
+          <div class="staff-chat-container">
+            <div class="staff-chat-header">
+              <strong class="small text-uppercase text-dark">
+                <i class="bi bi-chat-dots-fill text-primary me-1"></i> Trò chuyện (${tenBan})
+              </strong>
+              <span class="badge bg-light text-muted border" id="staff-chat-status">
+                ${isStaffConnected ? "🟢 Đã kết nối" : "🔴 Mất kết nối"}
+              </span>
+            </div>
+            <div class="staff-chat-messages" id="staff-chat-box"></div>
+            <div class="d-flex gap-2">
+              <input type="text" class="form-control form-control-sm rounded-pill" id="staff-chat-input" 
+                     placeholder="Phản hồi khách..." maxlength="500" onkeydown="handleStaffKey(event)" />
+              <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="sendStaffChat()">Gửi</button>
+            </div>
+          </div>
         `;
+
+        renderStaffChatMessages(idBan);
+        loadStaffChatHistory(idBan);
 
         try {
           const res = await fetch(`${API_ORDER}/${idBan}`);
-          const orders = await res.json();
           const orderList = document.getElementById("order-list");
 
-          if (!orders || orders.length === 0) {
+          if (!res.ok) {
             orderList.innerHTML = "Chưa có món nào";
             return;
           }
 
-          orderList.innerHTML = orders
-            .map(
-              (o) => `
-              <div class="d-flex justify-content-between">
-                <span>${o.tenMon}</span>
-                <span>x${o.soLuong}</span>
-              </div>
-            `
-            )
-            .join("");
+          const order = await res.json();
+          if (!order || !order.idDonHang) {
+            orderList.innerHTML = "Chưa có món nào";
+            return;
+          }
+
+          orderList.innerHTML = `
+            <div class="d-flex justify-content-between mb-1">
+              <span>Đơn: <strong>#${order.idDonHang}</strong></span>
+              <span class="text-primary fw-bold">${(order.tongTien || 0).toLocaleString()}đ</span>
+            </div>
+            <small class="text-muted d-block">${order.ghiChu ? 'Ghi chú: ' + order.ghiChu : 'Đang phục vụ'}</small>
+          `;
         } catch {
           document.getElementById("order-list").innerHTML =
-            "Không tải được dữ liệu";
+            "Chưa có món nào";
+        }
+      }
+
+      async function loadStaffChatHistory(idBan) {
+        try {
+          const host = getBackendHost();
+          const res = await fetch(`http://${host}/api/chat/history/${idBan}`);
+          if (res.ok) {
+            const history = await res.json();
+            if (Array.isArray(history)) {
+              tableChatSessions.set(idBan, history);
+              if (selectedBanId === idBan) {
+                renderStaffChatMessages(idBan);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("Could not load staff chat history:", e);
+        }
+      }
+
+      function renderStaffChatMessages(idBan) {
+        const chatBox = document.getElementById("staff-chat-box");
+        if (!chatBox) return;
+
+        const messages = tableChatSessions.get(idBan) || [];
+        if (messages.length === 0) {
+          chatBox.innerHTML = `<div class="staff-chat-empty">Chưa có tin nhắn nào trong phiên này</div>`;
+          return;
+        }
+
+        chatBox.innerHTML = "";
+        messages.forEach((msg) => {
+          const isStaff = msg.role === "STAFF";
+          const row = document.createElement("div");
+          row.className = `chat-message-row ${isStaff ? "mine" : "theirs"}`;
+          const time = msg.timestamp
+            ? new Date(msg.timestamp).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
+            : "";
+
+          row.innerHTML = `
+            <span class="chat-sender-name">${isStaff ? "Nhân viên" : msg.sender || "Khách"}</span>
+            <div class="chat-bubble" style="font-size:0.83rem;">${msg.content}</div>
+            <span class="chat-time">${time}</span>
+          `;
+          chatBox.appendChild(row);
+        });
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      function handleStaffKey(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          sendStaffChat();
+        }
+      }
+
+      function sendStaffChat() {
+        if (!selectedBanId) return;
+        const input = document.getElementById("staff-chat-input");
+        if (!input) return;
+
+        const text = input.value.trim();
+        if (!text) return;
+
+        if (!isStaffConnected || !staffStompClient) {
+          alert("WebSocket chưa kết nối. Đang thử kết nối lại...");
+          return;
+        }
+
+        const adminUsername = localStorage.getItem("adminUsername") || "Nhân viên";
+
+        const msgPayload = {
+          idBan: selectedBanId,
+          content: text,
+          role: "STAFF",
+          sender: adminUsername,
+          type: "CHAT"
+        };
+
+        try {
+          staffStompClient.send("/app/chat.send", {}, JSON.stringify(msgPayload));
+          input.value = "";
+          input.focus();
+        } catch (e) {
+          console.error("Gửi phản hồi thất bại:", e);
+        }
+      }
+
+      function playStaffBeep() {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          const ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+          osc.frequency.setValueAtTime(987.77, ctx.currentTime + 0.12); // B5
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.4);
+        } catch (e) {}
+      }
+
+      function showStaffToast(msg) {
+        const toast = document.createElement("div");
+        toast.className = "chat-toast";
+        toast.style.cursor = "pointer";
+        toast.onclick = () => showTableInfo(msg.idBan);
+        toast.innerHTML = `
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-bell-fill text-danger fs-5"></i>
+            <div>
+              <strong class="d-block small text-danger">Tin nhắn từ Bàn ${msg.idBan}</strong>
+              <span class="small text-truncate d-inline-block" style="max-width: 230px;">${msg.content}</span>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          toast.style.transition = "opacity 0.4s";
+          toast.style.opacity = "0";
+          setTimeout(() => toast.remove(), 400);
+        }, 4500);
+      }
+
+      function subscribeToCurrentTable(idBan) {
+        if (!staffStompClient || !isStaffConnected) return;
+        if (staffTableSub) {
+          try { staffTableSub.unsubscribe(); } catch(e) {}
+          staffTableSub = null;
+        }
+
+        try {
+          staffTableSub = staffStompClient.subscribe(`/topic/chat/table/${idBan}`, function (messageOutput) {
+            try {
+              const msg = JSON.parse(messageOutput.body);
+              handleStaffIncomingMessage(msg);
+            } catch(e) {}
+          });
+        } catch(e) {}
+      }
+
+      function connectStaffChatWebSocket() {
+        const host = getBackendHost();
+        let adminId = localStorage.getItem("adminId");
+        if (!adminId || adminId === "undefined" || adminId === "null") {
+          adminId = "ghann";
+        }
+        let adminUsername = localStorage.getItem("adminUsername");
+        if (!adminUsername || adminUsername === "undefined" || adminUsername === "null") {
+          adminUsername = "Nhân viên";
+        }
+
+        const headers = {
+          role: "STAFF",
+          adminId: adminId,
+          sender: adminUsername,
+        };
+
+        if (typeof Stomp !== "undefined") {
+          try {
+            let socket;
+            if (typeof SockJS !== "undefined") {
+              socket = new SockJS(`http://${host}/ws-chat`);
+            } else {
+              const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+              socket = new WebSocket(`${wsProtocol}//${host}/ws-chat`);
+            }
+
+            staffStompClient = Stomp.over(socket);
+            staffStompClient.debug = null;
+
+            staffStompClient.connect(
+              headers,
+              function () {
+                isStaffConnected = true;
+                const statusEl = document.getElementById("staff-chat-status");
+                if (statusEl) statusEl.innerText = "🟢 Đã kết nối";
+
+                // Subscribe to global staff notification topic
+                staffStompClient.subscribe("/topic/chat/staff", function (output) {
+                  const msg = JSON.parse(output.body);
+                  handleStaffIncomingMessage(msg);
+                });
+
+                if (selectedBanId) {
+                  subscribeToCurrentTable(selectedBanId);
+                }
+              },
+              function () {
+                isStaffConnected = false;
+                const statusEl = document.getElementById("staff-chat-status");
+                if (statusEl) statusEl.innerText = "🔴 Mất kết nối";
+                setTimeout(connectStaffChatWebSocket, 4000);
+              }
+            );
+            return;
+          } catch (e) {
+            console.warn("Stomp init for staff failed, falling back to native STOMP WebSocket:", e);
+          }
+        }
+
+        connectNativeStaffStomp(host, headers);
+      }
+
+      function connectNativeStaffStomp(host, headers) {
+        try {
+          const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+          const socket = new WebSocket(`${wsProtocol}//${host}/ws-chat`);
+
+          socket.onopen = function () {
+            const frame =
+              "CONNECT\n" +
+              "accept-version:1.2,1.1,1.0\n" +
+              "heart-beat:10000,10000\n" +
+              "role:STAFF\n" +
+              `adminId:${headers.adminId}\n` +
+              `sender:${headers.sender}\n` +
+              "\n\0";
+            socket.send(frame);
+          };
+
+          socket.onmessage = function (event) {
+            const data = event.data;
+            if (data.startsWith("CONNECTED")) {
+              isStaffConnected = true;
+              const statusEl = document.getElementById("staff-chat-status");
+              if (statusEl) statusEl.innerText = "🟢 Đã kết nối";
+
+              // Subscribe staff notifications
+              socket.send("SUBSCRIBE\nid:sub-staff\ndestination:/topic/chat/staff\n\n\0");
+              if (selectedBanId) {
+                socket.send(`SUBSCRIBE\nid:sub-table-${selectedBanId}\ndestination:/topic/chat/table/${selectedBanId}\n\n\0`);
+              }
+            } else if (data.startsWith("MESSAGE")) {
+              const bodyIndex = data.indexOf("\n\n");
+              if (bodyIndex !== -1) {
+                const body = data.substring(bodyIndex + 2).replace(/\0$/, "").trim();
+                try {
+                  const msg = JSON.parse(body);
+                  handleStaffIncomingMessage(msg);
+                } catch(err) {}
+              }
+            }
+          };
+
+          socket.onclose = function () {
+            isStaffConnected = false;
+            const statusEl = document.getElementById("staff-chat-status");
+            if (statusEl) statusEl.innerText = "🔴 Mất kết nối";
+            setTimeout(connectStaffChatWebSocket, 4000);
+          };
+
+          staffStompClient = {
+            send: function (destination, headers, body) {
+              if (socket.readyState === WebSocket.OPEN) {
+                const frame =
+                  "SEND\n" +
+                  `destination:${destination}\n` +
+                  "content-type:application/json\n" +
+                  "\n" +
+                  body +
+                  "\0";
+                socket.send(frame);
+              }
+            },
+            subscribe: function (destination, callback) {
+              if (socket.readyState === WebSocket.OPEN) {
+                socket.send(`SUBSCRIBE\nid:sub-${Date.now()}\ndestination:${destination}\n\n\0`);
+              }
+              return { unsubscribe: () => {} };
+            }
+          };
+        } catch(e) {
+          setTimeout(connectStaffChatWebSocket, 4000);
+        }
+      }
+
+      function handleStaffIncomingMessage(msg) {
+        if (!msg) return;
+
+        // Xử lý sự kiện đặt lại phiên chat khi bàn hoàn thành hoặc reset
+        if (msg.type === "CLEAR_CHAT") {
+          const targetBan = msg.idBan;
+          if (!targetBan || targetBan === 0) {
+            tableChatSessions.clear();
+            tableChatUnread.clear();
+            document.querySelectorAll(".table-chat-indicator").forEach((el) => {
+              el.classList.add("d-none");
+              el.innerHTML = "";
+            });
+            if (selectedBanId) {
+              renderStaffChatMessages(selectedBanId);
+            }
+          } else {
+            tableChatSessions.delete(targetBan);
+            tableChatUnread.delete(targetBan);
+            const badgeEl = document.getElementById(`chat-badge-${targetBan}`);
+            if (badgeEl) {
+              badgeEl.classList.add("d-none");
+              badgeEl.innerHTML = "";
+            }
+            if (selectedBanId === targetBan) {
+              renderStaffChatMessages(targetBan);
+            }
+          }
+          return;
+        }
+
+        if (!msg.idBan) return;
+        const idBan = msg.idBan;
+
+        if (!tableChatSessions.has(idBan)) {
+          tableChatSessions.set(idBan, []);
+        }
+
+        // Tránh trùng lặp tin nhắn nếu nhận từ nhiều kênh subscribe
+        const sessionList = tableChatSessions.get(idBan);
+        const isDuplicate = sessionList.some(
+          (m) => m.timestamp === msg.timestamp && m.role === msg.role && m.content === msg.content
+        );
+        if (!isDuplicate) {
+          sessionList.push(msg);
+        }
+
+        if (selectedBanId === idBan) {
+          renderStaffChatMessages(idBan);
+        } else if (msg.role === "CUSTOMER" && !isDuplicate) {
+          // Chỉ tăng tin nhắn chưa đọc & báo động khi có tin nhắn mới từ khách hàng
+          const currentUnread = (tableChatUnread.get(idBan) || 0) + 1;
+          tableChatUnread.set(idBan, currentUnread);
+
+          // Cập nhật badge trên sơ đồ bàn
+          const badgeEl = document.getElementById(`chat-badge-${idBan}`);
+          if (badgeEl) {
+            badgeEl.classList.remove("d-none");
+            badgeEl.innerHTML = `<i class="bi bi-chat-dots-fill"></i> ${currentUnread}`;
+          }
+
+          playStaffBeep();
+          showStaffToast(msg);
         }
       }
 
       async function hoanThanhBan() {
         if (!selectedBanId) return;
+        const currentBanId = selectedBanId;
 
-        await fetch(`${API_BAN}/${selectedBanId}/trang-thai/0`, {
+        await fetch(`${API_BAN}/${currentBanId}/trang-thai/0`, {
           method: "PUT",
         });
+
+        tableChatSessions.delete(currentBanId);
+        tableChatUnread.delete(currentBanId);
 
         selectedBanId = null;
         document.getElementById("table-info").innerHTML =
@@ -266,12 +680,17 @@
           return;
 
         await fetch(API_RESET, { method: "PUT" });
+        tableChatSessions.clear();
+        tableChatUnread.clear();
+
+        selectedBanId = null;
         document.getElementById("table-info").innerHTML =
           '<p class="text-muted m-0">Chọn một bàn để xem thông tin</p>';
         renderTables();
       }
 
       renderTables();
+      connectStaffChatWebSocket();
     </script>
   </body>
 </html>
