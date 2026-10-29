@@ -44,7 +44,7 @@ Khách quét QR trên bàn để gọi món bằng điện thoại. Nhân viên 
 15. **Không đưa lên git:** `ssl/*.p12` (khoá riêng của chứng chỉ), `logs/`, `target/`. Đã có trong `.gitignore`, và server tự tạo lại khi chạy.
 16. **Ảnh món nằm trong `uploads/` và có trên git** (tên file = mã món: `1.jpg` … `67.jpg`). Thêm / đổi ảnh thì commit cả file ảnh để cả nhóm có. → [mục 5](#5-tài-khoản-và-các-trang)
 
-> Làm **lần lượt từ mục 1 đến mục 4** là chạy được và tự kiểm tra được máy mình chạy đúng. Các mục sau để tra cứu khi cần. Lịch sử thay đổi: `CHANGELOG.md`.
+> Làm **lần lượt từ mục 1 đến mục 4** là chạy được và tự kiểm tra được máy mình chạy đúng. Các mục sau để tra cứu khi cần..
 
 ---
 
