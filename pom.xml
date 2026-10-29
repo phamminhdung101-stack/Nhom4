@@ -22,11 +22,12 @@
     <packaging>jar</packaging>
 
     <name>tiemtra</name>
-    <description>Spring Boot MongoDB QR Table Project</description>
+    <description>Order món qua QR – Spring Boot + MongoDB + WebSocket</description>
 
     <!-- Properties -->
     <properties>
-        <java.version>21</java.version>
+        <!-- 17 = mức tối thiểu của Spring Boot 3: máy cài JDK 17, 21, 24... đều build/chạy được -->
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -40,10 +41,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Thymeleaf -->
+        <!-- BCrypt để băm mật khẩu (chỉ module crypto, không bật toàn bộ Spring Security) -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
         <!-- MongoDB -->
@@ -79,12 +80,12 @@
     <build>
         <plugins>
 
-            <!-- Compiler (FIX CẢNH BÁO release) -->
+            <!-- Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>21</release>
+                    <release>${java.version}</release>
                 </configuration>
             </plugin>
 

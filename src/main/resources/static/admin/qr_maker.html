@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <link rel="stylesheet" href="../assets/css/app.css" />
+    <title>Mã QR bàn - Tiệm Trà</title>
+    <style>
+      .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+      .qr-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 18px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .qr-box { width: 180px; height: 180px; }
+      .qr-box img, .qr-box canvas { width: 180px !important; height: 180px !important; }
+      .shop-name { font-family: serif; font-weight: 700; color: #4e342e; }
+      .table-no { font-size: 1.6rem; font-weight: 800; color: #d4af37; }
+      @media print {
+        .sidebar, .admin-topbar, .no-print, .ws-status, .app-toast-box { display: none !important; }
+        body { display: block; height: auto; overflow: visible; background: #fff; }
+        .main-content { padding: 0; overflow: visible; }
+        .qr-grid { grid-template-columns: repeat(3, 1fr); }
+        .qr-card { box-shadow: none; border: 1px dashed #999; break-inside: avoid; }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar" id="adminSidebar" data-page="qr"></aside>
+
+    <main class="main-content">
+      <div class="admin-topbar" data-title="Mã QR bàn"></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 no-print">
+        <div>
+          <h3 class="fw-bold m-0">Mã QR Gọi Món Tại Bàn</h3>
+          <p class="text-muted small m-0">Mỗi bàn có mã bí mật riêng – khách phải quét đúng mã mới gọi món/chat được cho bàn đó.</p>
+        </div>
+        <button class="btn btn-dark" onclick="window.print()"><i class="bi bi-printer me-1"></i>In tất cả</button>
+      </div>
+
+      <div class="alert alert-warning d-none no-print" id="localhost-warning">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        Mã QR đang trỏ tới <b id="qr-base"></b> – điện thoại <b>không</b> mở được địa chỉ này.
+        Hãy mở trang quản trị bằng địa chỉ IP LAN của máy chạy server (ví dụ <code>https://192.168.1.10:8443/admin</code>) rồi tạo lại mã.
+      </div>
+
+      <div class="qr-grid" id="qrContainer"><p class="text-muted">Đang tải danh sách bàn...</p></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="../assets/js/app.js?v=20261028f"></script>
+    <script src="../assets/js/admin.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        if (!Admin.session) return;
+        const $ = (id) => document.getElementById(id);
+        const base = App.API_BASE;
+
+        if (/\/\/(localhost|127\.0\.0\.1)(:|$)/.test(base)) {
+          $("qr-base").textContent = base;
+          $("localhost-warning").classList.remove("d-none");
+        }
+
+        async function load() {
+          try {
+            render(await App.api("/api/ban-an"));
+          } catch (e) {
+            $("qrContainer").innerHTML = '<p class="text-danger"></p>';
+            $("qrContainer").querySelector("p").textContent = e.message;
+          }
+        }
+
+        function render(list) {
+          const container = $("qrContainer");
+          container.innerHTML = "";
+          if (!list.length) {
+            container.innerHTML = "<p>Chưa có bàn nào.</p>";
+            return;
+          }
+          list.forEach((ban) => container.appendChild(card(ban)));
+        }
+
+        function card(ban) {
+          const url = base + ban.maQR;
+          const el = document.createElement("div");
+          el.className = "qr-card";
+          el.innerHTML = `
+            <div class="shop-name">Tiệm Trà Thượng Hạng</div>
+            <div class="qr-box"></div>
+            <div class="small text-uppercase text-muted fw-bold">Quét để gọi món</div>
+            <div class="table-no"></div>
+            <div class="d-flex gap-2 w-100 no-print">
+              <a class="btn btn-outline-secondary btn-sm w-50" target="_blank" rel="noopener">Mở thử</a>
+              <button class="btn btn-dark btn-sm w-50" data-act="save"><i class="bi bi-download"></i> Tải & lưu</button>
+            </div>
+            <button class="btn btn-link btn-sm text-danger no-print" data-act="rotate">Đổi mã (vô hiệu QR cũ)</button>`;
+          el.querySelector(".table-no").textContent = ban.tenBan.toUpperCase();
+          el.querySelector("a").href = url;
+
+          const box = el.querySelector(".qr-box");
+          new QRCode(box, { text: url, width: 360, height: 360, correctLevel: QRCode.CorrectLevel.M });
+
+          el.querySelector('[data-act="save"]').addEventListener("click", (e) =>
+            App.withBusy(e.currentTarget, () => save(ban, box))
+          );
+          el.querySelector('[data-act="rotate"]').addEventListener("click", (e) => {
+            if (!confirm(`Đổi mã QR của ${ban.tenBan}? Mã đã in trước đó sẽ không dùng được nữa.`)) return;
+            App.withBusy(e.currentTarget, async () => {
+              try {
+                const updated = await App.api(`/api/ban-an/${ban.idBan}/doi-ma-qr`, { method: "POST" });
+                el.replaceWith(card(updated));
+                App.toast(`Đã cấp mã mới cho ${ban.tenBan}`, "success");
+              } catch (err) {
+                App.toast(err.message, "error");
+              }
+            });
+          });
+          return el;
+        }
+
+        async function save(ban, box) {
+          const canvas = box.querySelector("canvas");
+          if (!canvas) return App.toast("Trình duyệt không tạo được ảnh QR", "error");
+          const dataUrl = canvas.toDataURL("image/png");
+
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = `QR_Ban_${ban.idBan}.png`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          try {
+            await App.api(`/api/ban-an/${ban.idBan}/qr-image`, { method: "POST", body: { image: dataUrl } });
+            App.toast(`Đã tải và lưu ảnh QR cho ${ban.tenBan}`, "success");
+          } catch (err) {
+            App.toast("Đã tải ảnh nhưng chưa lưu lên server: " + err.message, "error", 4000);
+          }
+        }
+
+        load();
+      })();
+    </script>
+  </body>
+</html>

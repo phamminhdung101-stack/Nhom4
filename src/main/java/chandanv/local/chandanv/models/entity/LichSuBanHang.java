@@ -1,32 +1,47 @@
 package chandanv.local.chandanv.models.entity;
 
+import java.time.Instant;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Ghi lại mỗi đơn khi chuyển sang Hoàn thành (giữ cấu trúc collection lich_su_ban_hang của dữ liệu cũ).
+ * Trang Doanh thu KHÔNG đọc bảng này: báo cáo tính trực tiếp từ don_hang (DonHangService.baoCao).
+ */
 @Document(collection = "lich_su_ban_hang")
 public class LichSuBanHang {
 
     @Id
-    private String _id;
+    private String id;
 
-    private int idLichSu;
-    private int idChiTiet;
-    private int tongTienGoc;
-    private int tienGiam;
-    private int tongTienThanhToan;
+    @Indexed(unique = true, sparse = true)
+    private Long idDonHang;
 
-    public int getIdLichSu() { return idLichSu; }
-    public void setIdLichSu(int idLichSu) { this.idLichSu = idLichSu; }
+    private Integer idBan;
+    private long tongTienGoc;
+    private long tienGiam;
+    private long tongTienThanhToan;
+    private Instant thoiGian;
 
-    public int getIdChiTiet() { return idChiTiet; }
-    public void setIdChiTiet(int idChiTiet) { this.idChiTiet = idChiTiet; }
+    public String getId() { return id; }
 
-    public int getTongTienGoc() { return tongTienGoc; }
-    public void setTongTienGoc(int tongTienGoc) { this.tongTienGoc = tongTienGoc; }
+    public Long getIdDonHang() { return idDonHang; }
+    public void setIdDonHang(Long idDonHang) { this.idDonHang = idDonHang; }
 
-    public int getTienGiam() { return tienGiam; }
-    public void setTienGiam(int tienGiam) { this.tienGiam = tienGiam; }
+    public Integer getIdBan() { return idBan; }
+    public void setIdBan(Integer idBan) { this.idBan = idBan; }
 
-    public int getTongTienThanhToan() { return tongTienThanhToan; }
-    public void setTongTienThanhToan(int tongTienThanhToan) { this.tongTienThanhToan = tongTienThanhToan; }
+    public long getTongTienGoc() { return tongTienGoc; }
+    public void setTongTienGoc(long tongTienGoc) { this.tongTienGoc = tongTienGoc; }
+
+    public long getTienGiam() { return tienGiam; }
+    public void setTienGiam(long tienGiam) { this.tienGiam = tienGiam; }
+
+    public long getTongTienThanhToan() { return tongTienThanhToan; }
+    public void setTongTienThanhToan(long tongTienThanhToan) { this.tongTienThanhToan = tongTienThanhToan; }
+
+    public Instant getThoiGian() { return thoiGian; }
+    public void setThoiGian(Instant thoiGian) { this.thoiGian = thoiGian; }
 }

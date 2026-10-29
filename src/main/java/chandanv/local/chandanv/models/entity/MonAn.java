@@ -2,65 +2,44 @@ package chandanv.local.chandanv.models.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "mon_an")
 public class MonAn {
 
     @Id
-    private String _id;
+    private String id;
 
     private int idMon;
-    private String TenMon;
+
+    // Dữ liệu trong MongoDB đang dùng tên trường viết hoa "TenMon"/"Gia" -> giữ nguyên tên cột,
+    // còn trong Java/JSON dùng camelCase chuẩn (tenMon, gia).
+    @Field("TenMon")
+    private String tenMon;
+
     private int idLoai;
-    private int Gia;
-    private String image; 
 
-    public String get_id() {
-        return _id;
-    }
+    @Field("Gia")
+    private int gia;
 
-    public void set_id(String _id) {
-        this._id = _id;
-    }
+    /** Đường dẫn ảnh, ví dụ /uploads/1.jpg */
+    private String image;
 
-    public int getIdMon() {
-        return idMon;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setIdMon(int idMon) {
-        this.idMon = idMon;
-    }
+    public int getIdMon() { return idMon; }
+    public void setIdMon(int idMon) { this.idMon = idMon; }
 
-    public String getTenMon() {
-        return TenMon;
-    }
+    public String getTenMon() { return tenMon; }
+    public void setTenMon(String tenMon) { this.tenMon = tenMon; }
 
-    public void setTenMon(String tenMon) {
-        this.TenMon = tenMon;
-    }
+    public int getIdLoai() { return idLoai; }
+    public void setIdLoai(int idLoai) { this.idLoai = idLoai; }
 
-    public int getIdLoai() {
-        return idLoai;
-    }
+    public int getGia() { return gia; }
+    public void setGia(int gia) { this.gia = gia; }
 
-    public void setIdLoai(int idLoai) {
-        this.idLoai = idLoai;
-    }
-
-    public int getGia() {
-        return Gia;
-    }
-
-    public void setGia(int gia) {
-        this.Gia = gia;
-    }
-
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }

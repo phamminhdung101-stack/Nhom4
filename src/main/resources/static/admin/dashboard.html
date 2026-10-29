@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <link rel="stylesheet" href="../assets/css/app.css" />
+    <title>Doanh thu - Tiệm Trà</title>
+    <style>
+      .viz-root {
+        --text-primary: #2b2724;
+        --text-secondary: #5f5955;
+        --text-muted: #8a847f;
+        --grid: #ebe8e4;
+        --series-1: #2a78d6; /* doanh thu / tại bàn */
+        --series-2: #eb6834; /* tại quầy */
+        --good: #0ca30c;
+        --critical: #d03b3b;
+      }
+      .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      .filter-bar .preset { border: 1px solid #ddd; background: #fff; padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+      .filter-bar .preset.active { background: var(--admin-accent); border-color: var(--admin-accent); color: #fff; }
+      .filter-bar input[type="date"] { max-width: 150px; }
+      .kpi h6 { font-size: 0.72rem; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 6px; }
+      .kpi .val { font-size: 1.45rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+      .kpi .sub { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+      .kpi.hero .val { font-size: 1.9rem; }
+      .delta { font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+      .delta.up { color: #08770a; }
+      .delta.down { color: var(--critical); }
+      .delta.flat { color: var(--text-muted); }
+      .live-strip { font-size: 0.85rem; color: var(--text-secondary); }
+      .card-title { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 2px; }
+      .card-sub { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; }
+      .chart-box { position: relative; height: 280px; }
+      /* Thanh tỷ trọng kênh: 2 đoạn, khe 2px giữa các đoạn */
+      .split-bar { display: flex; gap: 2px; height: 14px; border-radius: 7px; overflow: hidden; background: var(--grid); }
+      .split-bar span { display: block; height: 100%; }
+      .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+      .share { position: relative; height: 8px; background: var(--grid); border-radius: 4px; min-width: 60px; }
+      .share > span { position: absolute; inset: 0 auto 0 0; background: var(--series-1); border-radius: 4px; }
+      .tbl { font-size: 0.86rem; }
+      .tbl th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); font-weight: 600; border-bottom-width: 1px; }
+      .tbl td { color: var(--text-primary); vertical-align: middle; }
+      .tbl .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .scroll-y { max-height: 420px; overflow-y: auto; }
+      .scroll-y thead th { position: sticky; top: 0; background: #fff; z-index: 1; }
+      .st { font-size: 0.78rem; white-space: nowrap; }
+      .st-3 { color: #08770a; }
+      .st-4 { color: var(--critical); }
+      .st-0, .st-1, .st-2 { color: #8a6100; }
+      .empty { color: var(--text-muted); font-size: 0.88rem; padding: 18px 0; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar" id="adminSidebar" data-page="dashboard"></aside>
+
+    <main class="main-content viz-root">
+      <div class="admin-topbar" data-title="Doanh thu"></div>
+
+      <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+        <div>
+          <h3 class="fw-bold text-dark mb-1">Báo cáo doanh thu</h3>
+          <p class="text-muted m-0 small" id="range-text">Đang tải...</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm rounded-pill" id="btn-refresh"><i class="bi bi-arrow-clockwise"></i> Làm mới</button>
+          <button class="btn btn-outline-success btn-sm rounded-pill" id="btn-csv"><i class="bi bi-file-earmark-spreadsheet"></i> Xuất Excel (CSV)</button>
+        </div>
+      </div>
+
+      <!-- Bộ lọc thời gian: 1 hàng, phía trên mọi biểu đồ -->
+      <div class="stat-card mb-3 py-3">
+        <div class="filter-bar">
+          <span id="presets" class="d-flex flex-wrap gap-2">
+            <button class="preset" data-preset="today">Hôm nay</button>
+            <button class="preset" data-preset="yesterday">Hôm qua</button>
+            <button class="preset active" data-preset="7">7 ngày</button>
+            <button class="preset" data-preset="30">30 ngày</button>
+            <button class="preset" data-preset="month">Tháng này</button>
+            <button class="preset" data-preset="lastmonth">Tháng trước</button>
+          </span>
+          <span class="d-flex align-items-center gap-2 ms-md-auto">
+            <input type="date" class="form-control form-control-sm" id="f-tu" aria-label="Từ ngày" />
+            <span class="text-muted small">→</span>
+            <input type="date" class="form-control form-control-sm" id="f-den" aria-label="Đến ngày" />
+            <button class="btn btn-sm btn-dark rounded-pill px-3" id="btn-apply">Xem</button>
+          </span>
+        </div>
+      </div>
+
+      <p class="live-strip mb-3" id="live-strip"></p>
+
+      <!-- Chỉ số chính -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4 col-xl-3">
+          <div class="stat-card kpi hero h-100">
+            <h6>DOANH THU (ĐƠN HOÀN THÀNH)</h6>
+            <div class="val" id="k-revenue">–</div>
+            <div class="sub" id="k-delta"></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl"><div class="stat-card kpi h-100"><h6>ĐƠN HOÀN THÀNH</h6><div class="val" id="k-done">–</div><div class="sub" id="k-done-sub"></div></div></div>
+        <div class="col-6 col-md-4 col-xl"><div class="stat-card kpi h-100"><h6>TRUNG BÌNH / ĐƠN</h6><div class="val" id="k-avg">–</div><div class="sub">giá trị mỗi đơn</div></div></div>
+        <div class="col-6 col-md-4 col-xl"><div class="stat-card kpi h-100"><h6>SỐ LY ĐÃ BÁN</h6><div class="val" id="k-cups">–</div><div class="sub" id="k-cups-sub"></div></div></div>
+        <div class="col-6 col-md-4 col-xl"><div class="stat-card kpi h-100"><h6>ĐANG XỬ LÝ</h6><div class="val" id="k-pending">–</div><div class="sub" id="k-pending-sub"></div></div></div>
+        <div class="col-6 col-md-4 col-xl"><div class="stat-card kpi h-100"><h6>ĐƠN HUỶ</h6><div class="val" id="k-cancel">–</div><div class="sub" id="k-cancel-sub"></div></div></div>
+      </div>
+
+      <!-- Biểu đồ -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-7" id="day-col">
+          <div class="stat-card h-100">
+            <div class="card-title">Doanh thu theo ngày</div>
+            <div class="card-sub">Đơn hoàn thành · rê chuột vào cột để xem số đơn, số đơn huỷ</div>
+            <div class="chart-box"><canvas id="dayChart" role="img" aria-label="Biểu đồ cột doanh thu theo ngày"></canvas></div>
+          </div>
+        </div>
+        <div class="col-lg-5" id="hour-col">
+          <div class="stat-card h-100">
+            <div class="card-title">Giờ cao điểm</div>
+            <div class="card-sub" id="peak-text">Doanh thu theo khung giờ trong ngày</div>
+            <div class="chart-box"><canvas id="hourChart" role="img" aria-label="Biểu đồ cột doanh thu theo giờ"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+          <div class="stat-card h-100">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="card-title">Doanh thu theo món</div>
+                <div class="card-sub" id="item-sub"></div>
+              </div>
+              <button class="btn btn-link btn-sm p-0" id="btn-all-items">Xem tất cả</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table tbl mb-0">
+                <thead><tr><th>#</th><th>Món</th><th class="num">SL</th><th class="num">Doanh thu</th><th style="width: 28%">Tỷ trọng</th></tr></thead>
+                <tbody id="item-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="stat-card mb-4">
+            <div class="card-title">Kênh bán</div>
+            <div class="card-sub">Gọi món tại bàn (quét QR) so với bán tại quầy (POS)</div>
+            <div class="split-bar mb-3" id="channel-bar" role="img"></div>
+            <div id="channel-legend"></div>
+          </div>
+          <div class="stat-card">
+            <div class="card-title">Doanh thu theo bàn</div>
+            <div class="card-sub">Chỉ đơn gọi tại bàn</div>
+            <div class="table-responsive scroll-y" style="max-height: 260px">
+              <table class="table tbl mb-0">
+                <thead><tr><th>Bàn</th><th class="num">Số đơn</th><th class="num">Doanh thu</th></tr></thead>
+                <tbody id="table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card mb-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="card-title">Chi tiết đơn hàng</div>
+            <div class="card-sub" id="order-sub"></div>
+          </div>
+          <select class="form-select form-select-sm" id="order-filter" style="max-width: 190px" aria-label="Lọc trạng thái">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="3">✅ Hoàn thành</option>
+            <option value="active">⏳ Đang xử lý</option>
+            <option value="4">❌ Đã huỷ</option>
+          </select>
+        </div>
+        <div class="table-responsive scroll-y">
+          <table class="table tbl mb-0">
+            <thead><tr><th>Mã đơn</th><th>Thời gian</th><th>Bàn</th><th class="num">Số món</th><th class="num">Tổng tiền</th><th>Trạng thái</th><th>Ghi chú</th></tr></thead>
+            <tbody id="order-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    <div id="ws-status" class="ws-status"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="../assets/js/app.js?v=20261028f"></script>
+    <script src="../assets/js/admin.js?v=20261028f"></script>
+    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        if (!Admin.session) return;
+        const $ = (id) => document.getElementById(id);
+        const css = getComputedStyle(document.querySelector(".viz-root"));
+        const C = (name) => css.getPropertyValue(name).trim();
+        const ITEM_LIMIT = 10;
+
+        let report = null;
+        let showAllItems = false;
+        let dayChart = null;
+        let hourChart = null;
+
+        // ---------- Khoảng thời gian ----------
+        const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        const vn = (s) => { const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
+        const short = (s) => { const [, m, d] = s.split("-"); return `${d}/${m}`; };
+
+        function presetRange(p) {
+          const t = new Date();
+          const day = (n) => new Date(t.getFullYear(), t.getMonth(), t.getDate() + n);
+          switch (p) {
+            case "today": return [day(0), day(0)];
+            case "yesterday": return [day(-1), day(-1)];
+            case "30": return [day(-29), day(0)];
+            case "month": return [new Date(t.getFullYear(), t.getMonth(), 1), day(0)];
+            case "lastmonth": return [new Date(t.getFullYear(), t.getMonth() - 1, 1), new Date(t.getFullYear(), t.getMonth(), 0)];
+            default: return [day(-6), day(0)];
+          }
+        }
+
+        function setRange(tu, den, preset) {
+          $("f-tu").value = iso(tu);
+          $("f-den").value = iso(den);
+          document.querySelectorAll(".preset").forEach((b) => b.classList.toggle("active", b.dataset.preset === preset));
+          load();
+        }
+
+        $("presets").addEventListener("click", (e) => {
+          const b = e.target.closest("[data-preset]");
+          if (!b) return;
+          const [tu, den] = presetRange(b.dataset.preset);
+          setRange(tu, den, b.dataset.preset);
+        });
+        $("btn-apply").addEventListener("click", () => {
+          document.querySelectorAll(".preset").forEach((b) => b.classList.remove("active"));
+          load();
+        });
+
+        // ---------- Tải báo cáo ----------
+        async function load() {
+          const tu = $("f-tu").value, den = $("f-den").value;
+          if (!tu || !den) return App.toast("Chọn đủ ngày bắt đầu và kết thúc", "error");
+          try {
+            report = await App.api(`/api/don-hang/bao-cao?tu=${tu}&den=${den}`);
+            render();
+          } catch (e) {
+            App.toast(e.message, "error");
+          }
+        }
+
+        function render() {
+          const r = report, t = r.tongQuan;
+          $("range-text").textContent = r.tu === r.den
+            ? `Ngày ${vn(r.tu)} · so với ngày trước đó`
+            : `Từ ${vn(r.tu)} đến ${vn(r.den)} (${r.soNgay} ngày) · so với ${r.soNgay} ngày liền trước`;
+          $("live-strip").innerHTML = `<i class="bi bi-broadcast me-1"></i>Hiện tại: <b>${r.hienTai.banCoKhach}/${r.hienTai.tongSoBan}</b> bàn có khách · <b>${r.hienTai.donDangXuLy}</b> đơn đang chờ bếp`;
+
+          $("k-revenue").textContent = App.formatMoney(t.doanhThu);
+          const d = t.thayDoiPhanTram;
+          $("k-delta").innerHTML = d === null
+            ? `<span class="delta flat">Kỳ trước chưa có doanh thu</span>`
+            : `<span class="delta ${d > 0 ? "up" : d < 0 ? "down" : "flat"}"><i class="bi ${d > 0 ? "bi-arrow-up-right" : d < 0 ? "bi-arrow-down-right" : "bi-dash"}"></i> ${d > 0 ? "+" : ""}${d}%</span>
+               <span class="text-muted"> so với kỳ trước (${App.formatMoney(t.doanhThuKyTruoc)})</span>`;
+          $("k-done").textContent = t.soDonHoanThanh;
+          $("k-done-sub").textContent = `trên tổng ${t.tongSoDon} đơn`;
+          $("k-avg").textContent = App.formatMoney(t.giaTriTrungBinh);
+          $("k-cups").textContent = t.soLy;
+          $("k-cups-sub").textContent = r.soNgay > 1 ? `~${Math.round(t.soLy / r.soNgay)} ly/ngày` : "ly / món";
+          $("k-pending").textContent = t.soDonDangXuLy;
+          $("k-pending-sub").textContent = `${App.formatMoney(t.tienDangXuLy)} · chưa tính doanh thu`;
+          $("k-cancel").textContent = t.soDonHuy;
+          $("k-cancel-sub").textContent = `${t.tyLeHuy}% số đơn · ${App.formatMoney(t.tienHuy)}`;
+
+          renderDayChart(r);
+          renderHourChart(r);
+          renderItems();
+          renderChannels(r.theoKenh);
+          renderTables(r.theoBan);
+          renderOrders();
+        }
+
+        // ---------- Biểu đồ (1 trục, 1 chuỗi màu, có tooltip) ----------
+        const money = (v) => App.formatMoney(v);
+        const kAxis = (v) => (v >= 1e6 ? v / 1e6 + "tr" : v >= 1000 ? v / 1000 + "k" : v);
+
+        function barOptions(tooltipLines) {
+          return {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false }, // vùng rê chuột rộng hơn cột
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "#2b2724",
+                padding: 10,
+                displayColors: false,
+                callbacks: { label: (c) => tooltipLines(c.dataIndex) },
+              },
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: C("--text-muted"), maxRotation: 0, autoSkip: true, autoSkipPadding: 8 } },
+              y: { beginAtZero: true, border: { display: false }, grid: { color: C("--grid") }, ticks: { color: C("--text-muted"), callback: kAxis, maxTicksLimit: 5 } },
+            },
+          };
+        }
+
+        function barDataset(data) {
+          return {
+            data,
+            backgroundColor: C("--series-1"),
+            hoverBackgroundColor: "#1c5cab",
+            borderRadius: { topLeft: 4, topRight: 4 },
+            borderSkipped: "bottom",
+            maxBarThickness: 34,
+            categoryPercentage: 0.8,
+          };
+        }
+
+        function renderDayChart(r) {
+          const single = r.soNgay === 1;
+          $("day-col").classList.toggle("d-none", single); // 1 ngày -> chỉ xem theo giờ
+          $("hour-col").className = single ? "col-12" : "col-lg-5";
+          if (single || typeof Chart === "undefined") return;
+          const pts = r.theoNgay;
+          const labels = pts.map((p) => short(p.ngay));
+          const data = pts.map((p) => p.doanhThu);
+          const lines = (i) => [money(pts[i].doanhThu), `${pts[i].soDon} đơn hoàn thành`, ...(pts[i].soDonHuy ? [`${pts[i].soDonHuy} đơn huỷ`] : [])];
+          if (dayChart) dayChart.destroy();
+          dayChart = new Chart($("dayChart"), { type: "bar", data: { labels, datasets: [barDataset(data)] }, options: barOptions(lines) });
+        }
+
+        function renderHourChart(r) {
+          if (typeof Chart === "undefined") return;
+          // Chỉ hiện khung giờ có bán hàng (mở rộng ra 1 giờ mỗi bên); chưa có đơn -> 7h–22h
+          const pts = r.theoGio;
+          const hours = pts.filter((p) => p.soDon > 0).map((p) => p.gio);
+          const from = hours.length ? Math.max(0, Math.min(...hours) - 1) : 7;
+          const to = hours.length ? Math.min(23, Math.max(...hours) + 1) : 22;
+          const view = pts.slice(from, to + 1);
+          const peak = view.reduce((a, b) => (b.doanhThu > a.doanhThu ? b : a), view[0]);
+          $("peak-text").textContent = peak && peak.doanhThu > 0
+            ? `Đông nhất: ${peak.gio}h–${peak.gio + 1}h (${money(peak.doanhThu)}, ${peak.soDon} đơn)`
+            : "Chưa có đơn hoàn thành trong khoảng này";
+          const lines = (i) => [`${view[i].gio}h – ${view[i].gio + 1}h`, money(view[i].doanhThu), `${view[i].soDon} đơn`];
+          if (hourChart) hourChart.destroy();
+          hourChart = new Chart($("hourChart"), {
+            type: "bar",
+            data: { labels: view.map((p) => p.gio + "h"), datasets: [barDataset(view.map((p) => p.doanhThu))] },
+            options: barOptions(lines),
+          });
+        }
+
+        // ---------- Bảng ----------
+        function renderItems() {
+          const list = report.theoMon;
+          const total = list.reduce((s, m) => s + m.doanhThu, 0);
+          const shown = showAllItems ? list : list.slice(0, ITEM_LIMIT);
+          $("item-sub").textContent = list.length ? `${list.length} món đã bán · tỷ trọng theo doanh thu` : "";
+          $("btn-all-items").classList.toggle("d-none", list.length <= ITEM_LIMIT);
+          $("btn-all-items").textContent = showAllItems ? "Thu gọn" : `Xem tất cả (${list.length})`;
+          $("item-body").innerHTML = shown.length
+            ? shown.map((m, i) => {
+                const pct = total ? (m.doanhThu * 100) / total : 0;
+                return `<tr>
+                  <td class="text-muted">${i + 1}</td>
+                  <td>${App.escapeHtml(m.tenMon)}</td>
+                  <td class="num">${m.soLuong}</td>
+                  <td class="num">${money(m.doanhThu)}</td>
+                  <td><div class="d-flex align-items-center gap-2"><div class="share flex-grow-1"><span style="width:${pct.toFixed(1)}%"></span></div><small class="text-muted" style="width:42px">${pct.toFixed(1)}%</small></div></td>
+                </tr>`;
+              }).join("")
+            : `<tr><td colspan="5" class="empty">Chưa có món nào được bán trong khoảng này</td></tr>`;
+        }
+        $("btn-all-items").addEventListener("click", () => { showAllItems = !showAllItems; renderItems(); });
+
+        function renderChannels(list) {
+          const total = list.reduce((s, k) => s + k.doanhThu, 0);
+          const colors = [C("--series-1"), C("--series-2")];
+          $("channel-bar").innerHTML = total
+            ? list.filter((k) => k.doanhThu > 0).map((k) => `<span style="width:${(k.doanhThu * 100) / total}%;background:${colors[list.indexOf(k)]}" title="${App.escapeHtml(k.kenh)}: ${money(k.doanhThu)}"></span>`).join("")
+            : "";
+          $("channel-bar").setAttribute("aria-label", list.map((k) => `${k.kenh} ${money(k.doanhThu)}`).join(", "));
+          $("channel-legend").innerHTML = list.map((k, i) => {
+            const pct = total ? Math.round((k.doanhThu * 1000) / total) / 10 : 0;
+            return `<div class="d-flex justify-content-between small py-1">
+              <span><span class="swatch" style="background:${colors[i]}"></span>${App.escapeHtml(k.kenh)}</span>
+              <span class="text-nowrap"><b>${money(k.doanhThu)}</b> <span class="text-muted">· ${k.soDon} đơn · ${pct}%</span></span>
+            </div>`;
+          }).join("");
+        }
+
+        function renderTables(list) {
+          $("table-body").innerHTML = list.length
+            ? list.map((b) => `<tr><td>${App.escapeHtml(b.tenBan)}</td><td class="num">${b.soDon}</td><td class="num">${money(b.doanhThu)}</td></tr>`).join("")
+            : `<tr><td colspan="3" class="empty">Chưa có đơn tại bàn</td></tr>`;
+        }
+
+        function filteredOrders() {
+          const f = $("order-filter").value;
+          return report.donHang.filter((o) =>
+            f === "all" ? true : f === "active" ? o.trangThai < 3 : String(o.trangThai) === f);
+        }
+
+        function renderOrders() {
+          const list = filteredOrders();
+          $("order-sub").textContent = `${list.length} đơn${report.donHangBiCat ? " · chỉ hiện 500 đơn mới nhất, hãy thu hẹp khoảng ngày" : ""}`;
+          $("order-body").innerHTML = list.length
+            ? list.map((o) => {
+                const st = App.TRANG_THAI_DON[o.trangThai] || { text: "?", icon: "" };
+                const note = o.trangThai === 4 ? `Huỷ bởi ${o.nguoiHuy || "?"}${o.lyDoHuy ? ": " + o.lyDoHuy : ""}` : "";
+                return `<tr>
+                  <td class="fw-semibold">#DH-${o.idDonHang ?? "?"}</td>
+                  <td class="text-nowrap">${App.escapeHtml(App.formatDateTime(o.thoiGian))}</td>
+                  <td>${o.idBan > 0 ? "Bàn " + o.idBan : "Tại quầy"}</td>
+                  <td class="num">${o.soMon}</td>
+                  <td class="num ${o.trangThai === 4 ? "text-decoration-line-through text-muted" : ""}">${money(o.tongTien)}</td>
+                  <td><span class="st st-${o.trangThai}">${st.icon} ${st.text}</span></td>
+                  <td class="small text-muted">${App.escapeHtml(note)}</td>
+                </tr>`;
+              }).join("")
+            : `<tr><td colspan="7" class="empty">Không có đơn nào</td></tr>`;
+        }
+        $("order-filter").addEventListener("change", renderOrders);
+
+        // ---------- Xuất CSV (mở được bằng Excel, có BOM để hiện đúng tiếng Việt) ----------
+        function csvCell(v) {
+          const s = String(v ?? "");
+          return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        }
+        $("btn-csv").addEventListener("click", () => {
+          if (!report) return;
+          const t = report.tongQuan;
+          const rows = [
+            ["BÁO CÁO DOANH THU", `${vn(report.tu)} - ${vn(report.den)}`],
+            ["Doanh thu (đơn hoàn thành)", t.doanhThu],
+            ["Doanh thu kỳ trước", t.doanhThuKyTruoc],
+            ["Số đơn hoàn thành", t.soDonHoanThanh],
+            ["Trung bình / đơn", t.giaTriTrungBinh],
+            ["Số ly đã bán", t.soLy],
+            ["Đơn đang xử lý", t.soDonDangXuLy, t.tienDangXuLy],
+            ["Đơn huỷ", t.soDonHuy, t.tienHuy],
+            [],
+            ["DOANH THU THEO NGÀY"], ["Ngày", "Doanh thu", "Số đơn", "Số đơn huỷ"],
+            ...report.theoNgay.map((p) => [vn(p.ngay), p.doanhThu, p.soDon, p.soDonHuy]),
+            [],
+            ["DOANH THU THEO MÓN"], ["Món", "Số lượng", "Doanh thu"],
+            ...report.theoMon.map((m) => [m.tenMon, m.soLuong, m.doanhThu]),
+            [],
+            ["CHI TIẾT ĐƠN"], ["Mã đơn", "Thời gian", "Bàn", "Số món", "Tổng tiền", "Trạng thái", "Ghi chú"],
+            ...report.donHang.map((o) => [
+              "DH-" + o.idDonHang, App.formatDateTime(o.thoiGian), o.idBan > 0 ? "Bàn " + o.idBan : "Tại quầy", o.soMon, o.tongTien,
+              (App.TRANG_THAI_DON[o.trangThai] || {}).text || "", o.trangThai === 4 ? `Huỷ bởi ${o.nguoiHuy || ""} ${o.lyDoHuy || ""}` : "",
+            ]),
+          ];
+          const csv = "﻿" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+          a.download = `doanh-thu_${report.tu}_${report.den}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+        });
+
+        // ---------- Realtime: có đơn mới / đổi trạng thái -> tải lại (nếu khoảng xem gồm hôm nay) ----------
+        const reload = App.debounce(() => {
+          if (report && $("f-den").value >= iso(new Date())) load();
+        }, 800);
+        $("btn-refresh").addEventListener("click", load);
+        OrderSocket.connect({
+          join: { type: "JOIN_ROOM", room: "CASHIER", token: Admin.session.token },
+          onEvent: reload,
+        });
+
+        const [tu, den] = presetRange("7");
+        setRange(tu, den, "7");
+      })();
+    </script>
+  </body>
+</html>

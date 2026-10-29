@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giỏ hàng - Tiệm Trà Thượng Hạng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/chat.css" />
+    <link rel="stylesheet" href="../assets/css/app.css" />
+    <style>
+      .qty-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #8d6e63;
+        transition: all 0.2s;
+      }
+      .qty-btn:active { background-color: #8d6e63; color: #fff; }
+      .cart-line { transition: opacity 0.25s ease, transform 0.25s ease; }
+      .cart-line.removing { opacity: 0; transform: translateX(30px); }
+      .cart-line.pending { opacity: 0.6; }
+    </style>
+  </head>
+  <body class="bg-light">
+    <header class="fixed-top bg-white shadow-sm p-3 d-flex align-items-center">
+      <a href="../index.html" class="text-dark me-3" aria-label="Về thực đơn"><i class="bi bi-arrow-left fs-4"></i></a>
+      <h5 class="m-0 fw-bold">Giỏ hàng</h5>
+      <span class="ms-auto badge bg-light text-dark border" id="table-label"></span>
+    </header>
+
+    <main class="container" style="margin-top: 80px; margin-bottom: 140px">
+      <p class="small text-muted mb-3">
+        <i class="bi bi-people-fill me-1"></i>Đây là <b>giỏ chung của cả bàn</b>: mọi người cùng bàn thêm món vào đây,
+        ai bấm <b>Gửi bếp</b> thì cả giỏ được gửi đi. Bấm <b>+</b> / <b>−</b> để đổi số lượng, <i class="bi bi-trash"></i> để bỏ món.
+      </p>
+      <div id="cart-items-container" class="d-flex flex-column gap-3">
+        <div class="skeleton" style="height: 90px; border-radius: 16px"></div>
+        <div class="skeleton" style="height: 90px; border-radius: 16px"></div>
+      </div>
+
+      <div class="bg-white p-3 rounded-4 shadow-sm mt-3">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Tạm tính</span>
+          <span class="fw-bold" id="temp-total">0đ</span>
+        </div>
+        <hr />
+        <div class="d-flex justify-content-between fs-5">
+          <span class="fw-bold">Tổng cộng</span>
+          <span class="fw-bold text-primary" id="final-total">0đ</span>
+        </div>
+        <small class="text-muted d-block mt-2">Giá đã gồm size và topping. Thanh toán tại bàn sau khi phục vụ.</small>
+      </div>
+      <a href="../index.html" class="btn btn-outline-secondary w-100 rounded-pill mt-3">
+        <i class="bi bi-plus-lg me-1"></i>Chọn thêm món
+      </a>
+    </main>
+
+    <nav class="navbar fixed-bottom bg-white shadow-top p-3 safe-area-pb">
+      <div class="w-100">
+        <button id="btn-open-checkout" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-primary fs-6">
+          <i class="bi bi-send me-1"></i>Gửi bếp • <span id="btn-total">0đ</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold">Gửi đơn xuống bếp?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center py-2">
+              <i class="bi bi-shop-window display-5 text-primary"></i>
+              <h5 class="fw-bold text-primary mt-2" id="table-confirm-title"></h5>
+              <p class="text-muted small mb-2">
+                Đơn hàng sẽ được gửi xuống bếp ngay.<br />
+                Nhân viên sẽ đến <b>thanh toán tại bàn</b> sau khi phục vụ.
+              </p>
+            </div>
+            <textarea class="form-control bg-light border-0 small" rows="2" id="orderNote" maxlength="300"
+              placeholder="Ghi chú thêm cho bếp (ít ngọt, nhiều đá...)"></textarea>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-primary" id="btn-confirm-action">
+              <i class="bi bi-send-fill me-1"></i>Gửi bếp ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="../assets/js/app.js?v=20261028f"></script>
+    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        const $ = (id) => document.getElementById(id);
+        const table = App.captureTableFromUrl();
+        let cart = { items: [], tongTien: 0 };
+        let dangGui = false; // máy này đang gửi bếp (để không tự báo "máy khác vừa gửi")
+
+        if (!table) {
+          App.toast("Vui lòng quét mã QR trên bàn để gọi món.", "error", 4000);
+          setTimeout(() => (window.location.href = "../welcome.html"), 1500);
+          return;
+        }
+        $("table-label").textContent = "Bàn " + table.idBan;
+        $("table-confirm-title").textContent = "BÀN SỐ " + table.idBan;
+
+        const base = `/api/gio-hang/${table.idBan}`;
+
+        async function load() {
+          try {
+            render(await App.api(base));
+          } catch (e) {
+            $("cart-items-container").innerHTML = `<p class="text-center text-danger py-4"></p>`;
+            $("cart-items-container").querySelector("p").textContent = e.message;
+          }
+        }
+
+        function render(data) {
+          cart = data || { items: [], tongTien: 0 };
+          const container = $("cart-items-container");
+          if (!cart.items.length) {
+            container.innerHTML = `
+              <div class="text-center py-5 fade-in">
+                <i class="bi bi-cart-x fs-1 text-muted"></i>
+                <p class="mt-3 text-muted">Giỏ hàng trống trơn!</p>
+                <a href="../index.html" class="btn btn-outline-primary rounded-pill">Về thực đơn</a>
+              </div>`;
+          } else {
+            container.innerHTML = cart.items
+              .map(
+                (i) => `
+              <div class="card border-0 shadow-sm rounded-4 cart-line fade-in" data-item="${App.escapeHtml(i.id)}">
+                <div class="p-3">
+                  <div class="d-flex justify-content-between gap-2">
+                    <div>
+                      <h6 class="fw-bold mb-1">${App.escapeHtml(i.tenMon)}</h6>
+                      <small class="text-muted d-block">${App.escapeHtml(i.moTaTuyChon || "")}</small>
+                      ${i.ghiChu ? `<small class="text-warning-emphasis d-block">📝 ${App.escapeHtml(i.ghiChu)}</small>` : ""}
+                    </div>
+                    <button class="btn btn-sm text-danger p-0" data-action="remove" aria-label="Xoá món">
+                      <i class="bi bi-trash fs-5"></i>
+                    </button>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="text-primary fw-bold">${App.formatMoney(i.thanhTien)}</span>
+                    <div class="d-flex align-items-center gap-2">
+                      <button class="qty-btn" data-action="dec" aria-label="Giảm">−</button>
+                      <span class="fw-bold" style="min-width: 22px; text-align: center">${i.soLuong}</span>
+                      <button class="qty-btn" data-action="inc" aria-label="Tăng">+</button>
+                    </div>
+                  </div>
+                </div>
+              </div>`
+              )
+              .join("");
+          }
+          const total = App.formatMoney(cart.tongTien);
+          $("temp-total").textContent = total;
+          $("final-total").textContent = total;
+          $("btn-total").textContent = total;
+          $("btn-open-checkout").disabled = !cart.items.length;
+        }
+
+        // Một listener cho cả danh sách (event delegation)
+        $("cart-items-container").addEventListener("click", async (e) => {
+          const btn = e.target.closest("[data-action]");
+          if (!btn) return;
+          const line = btn.closest("[data-item]");
+          const item = cart.items.find((i) => i.id === line.dataset.item);
+          if (!item || line.classList.contains("pending")) return;
+
+          const action = btn.dataset.action;
+          const soLuong = action === "inc" ? item.soLuong + 1 : action === "dec" ? item.soLuong - 1 : 0;
+          line.classList.add(soLuong <= 0 ? "removing" : "pending");
+          try {
+            const path = `${base}/items/${encodeURIComponent(item.id)}`;
+            const data = soLuong <= 0
+              ? await App.api(path, { method: "DELETE" })
+              : await App.api(path, { method: "PATCH", body: { soLuong } });
+            render(data);
+          } catch (err) {
+            line.classList.remove("removing", "pending");
+            App.toast(err.message, "error");
+          }
+        });
+
+        $("btn-open-checkout").addEventListener("click", () => {
+          if (!cart.items.length) return App.toast("Giỏ hàng đang trống!", "error");
+          bootstrap.Modal.getOrCreateInstance($("checkoutModal")).show();
+        });
+
+        $("btn-confirm-action").addEventListener("click", (e) =>
+          App.withBusy(e.currentTarget, async () => {
+            dangGui = true;
+            try {
+              await App.api(`/api/don-hang/dat-mon/${table.idBan}`, {
+                method: "POST",
+                body: { ghiChu: $("orderNote").value.trim() },
+              });
+              // Chỉ chạy tới đây khi server đã lưu đơn thành công
+              bootstrap.Modal.getInstance($("checkoutModal")).hide();
+              if (window.confetti) confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#8D6E63", "#FFD700"] });
+              App.toast("Đã gửi đơn xuống bếp!", "success");
+              setTimeout(() => (window.location.href = "tracking.html"), 900);
+            } catch (err) {
+              dangGui = false;
+              App.toast(err.message, "error", 4000); // giỏ vẫn còn nguyên để thử lại
+            }
+          })
+        );
+
+        // Nhiều điện thoại cùng bàn dùng chung giỏ: máy khác sửa giỏ / gửi bếp -> cập nhật ngay
+        const reloadCart = App.debounce(load, 250);
+        OrderSocket.connect({
+          join: { type: "JOIN_TABLE", idBan: table.idBan, token: table.token },
+          onEvent(data) {
+            if (data.type === "CART_UPDATED" || data.type === "RECONNECTED") {
+              reloadCart();
+              if (data.type === "CART_UPDATED" && !data.tongSoLuong && !dangGui) {
+                const m = bootstrap.Modal.getInstance($("checkoutModal"));
+                if (m) m.hide(); // giỏ vừa trống (máy khác đã gửi) -> đóng hộp xác nhận
+              }
+            } else if (data.type === "NEW_ORDER" && !dangGui) {
+              App.toast(`Máy khác cùng bàn đã gửi đơn #DH-${data.idDonHang} (${data.soMon} món) xuống bếp`, "success", 5000);
+            }
+          },
+        });
+
+        load();
+      })();
+    </script>
+    <script src="../assets/js/customer-chat.js?v=20261028f"></script>
+  </body>
+</html>

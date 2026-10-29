@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Trang Chủ - Tiệm Trà Thượng Hạng</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Be+Vietnam+Pro:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --main-color: #8d6e63;
+        --dark-brown: #4e342e;
+        --porcelain-bg: #fdfbf7;
+        --white: #ffffff;
+      }
+
+      body {
+        font-family: "Be Vietnam Pro", sans-serif;
+        background-color: var(--porcelain-bg);
+        color: var(--dark-brown);
+        overflow-x: hidden;
+      }
+
+      /* NAVBAR */
+      .navbar {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        padding-top: 12px;
+        padding-bottom: 12px;
+      }
+
+      /* Logo Styles */
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo-icon {
+        width: 50px;
+        height: 50px;
+        background: #4e342e;
+        color: #d4af37;
+        border: 2px solid #d4af37;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+      }
+      .navbar-brand:hover .logo-icon {
+        transform: rotate(-10deg);
+      }
+      .logo-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .brand-title {
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        color: #4e342e;
+        font-size: 1.5rem;
+        line-height: 1.2;
+        margin-bottom: 2px;
+      }
+      .brand-subtitle {
+        font-family: "Be Vietnam Pro", sans-serif;
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        color: #8d6e63;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .nav-link {
+        font-weight: 500;
+        color: var(--dark-brown) !important;
+        margin: 0 10px;
+        transition: 0.3s;
+      }
+      .nav-link:hover {
+        color: var(--main-color) !important;
+      }
+
+      /* BANNER */
+      .banner-img {
+        height: 550px;
+        object-fit: cover;
+        width: 100%;
+        filter: brightness(0.85);
+      }
+      @media (max-width: 768px) {
+        .banner-img {
+          height: 400px;
+        }
+      }
+      .carousel-caption {
+        bottom: 25%;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+      }
+      .hero-title {
+        font-family: "Playfair Display", serif;
+        font-size: 3rem;
+        color: #fff;
+      }
+
+      /* BUTTON CTA */
+      .btn-order-now {
+        background-color: var(--white);
+        color: var(--main-color);
+        border: none;
+        padding: 14px 35px;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .btn-order-now:hover {
+        transform: translateY(-3px);
+        background-color: var(--main-color);
+        color: white;
+      }
+
+      /* WELCOME CARD */
+      /* Thẻ bàn: trạng thái vào bàn (chữ nói rõ, màu chỉ để nhấn mạnh) */
+      .table-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        border: 1px solid #ddd;
+        background: #f5f5f5;
+        color: #555;
+        max-width: 100%;
+      }
+      .table-badge[data-state="ok"] { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+      .table-badge[data-state="wait"] { background: #fff8e1; border-color: #ffcc80; color: #7a4f01; }
+
+      /* Hướng dẫn 3 bước gọi món */
+      .step-card {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      }
+      .step-card b { display: block; margin-bottom: 2px; }
+      .step-card small { color: #6d5d57; line-height: 1.45; display: block; }
+      .step-no {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--dark-brown);
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .welcome-section {
+        padding: 50px 30px;
+        text-align: center;
+        background: var(--porcelain-bg);
+        margin-top: -60px;
+        position: relative;
+        z-index: 10;
+        border-radius: 30px 30px 0 0;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+      }
+    </style>
+      <link rel="stylesheet" href="assets/css/app.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+      <div class="container">
+        <a class="navbar-brand logo-container" href="#">
+          <div class="logo-icon">
+            <i class="bi bi-cup-hot-fill"></i>
+          </div>
+          <div class="logo-text">
+            <span class="brand-title">Tiệm Trà</span>
+            <span class="brand-subtitle">Thượng Hạng</span>
+          </div>
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item"><a class="nav-link" href="#">Trang chủ</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Thực đơn</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html#qua-tang">Quà tặng</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/tracking.html">Đơn của tôi</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div
+      id="homeCarousel"
+      class="carousel slide"
+      data-bs-ride="carousel"
+      data-bs-interval="3000"
+    >
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="0"
+          class="active"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="1"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="2"
+        ></button>
+      </div>
+
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img
+            src="assets/img/banner1.jpg"
+            class="banner-img"
+            alt="Banner 1"
+            onerror="App.imgFallback(this)"
+          />
+          <div class="carousel-caption text-shadow">
+            <h2 class="hero-title">Tinh Hoa Trà Việt</h2>
+            <p class="d-none d-md-block fs-5">
+              Gửi trọn hương vị thượng hạng trong từng chén trà
+            </p>
+            <button class="btn btn-order-now mt-3" onclick="goToMenu()">
+              Thưởng Trà Ngay
+            </button>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <img
+            src="assets/img/banner2.jpg"
+            class="banner-img"
+            alt="Banner 2"
+            onerror="App.imgFallback(this)"
+          />
+          <div class="carousel-caption text-shadow">
+            <h2 class="hero-title">Quà Tặng Đẳng Cấp</h2>
+            <p class="d-none d-md-block fs-5">
+              Trao gửi tâm tình qua những set trà cao cấp
+            </p>
+            <button class="btn btn-order-now mt-3" onclick="goToGift()">
+              Xem Bộ Sưu Tập
+            </button>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <img
+            src="assets/img/banner3.jpg"
+            class="banner-img"
+            alt="Banner 3"
+            onerror="App.imgFallback(this)"
+          />
+          <div class="carousel-caption text-shadow">
+            <h2 class="hero-title">Không Gian An Yên</h2>
+            <p class="d-none d-md-block fs-5">
+              Nơi lắng đọng cảm xúc và tìm lại sự cân bằng
+            </p>
+            <button class="btn btn-order-now mt-3" onclick="goToMenu()">
+              Khám Phá
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#homeCarousel"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Trước</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#homeCarousel"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Sau</span>
+      </button>
+    </div>
+
+    <div class="container">
+      <div class="welcome-section">
+        <h5
+          class="fw-bold text-uppercase"
+          style="color: var(--main-color); letter-spacing: 1px"
+        >
+          Kính Chào Quý Khách
+        </h5>
+        <h1
+          style="
+            font-family: &quot;Playfair Display&quot;;
+            margin-bottom: 20px;
+            font-size: 3rem;
+          "
+        >
+          Tiệm Trà Thượng Hạng
+        </h1>
+
+        <!-- Bàn đang ngồi: khách biết ngay mình đã vào bàn chưa -->
+        <div class="table-badge mb-3" id="table-badge" data-state="none">
+          <i class="bi bi-geo-alt-fill me-1"></i>
+          <span id="order-mode-text">Đang xác định bàn...</span>
+        </div>
+
+        <p class="text-muted mb-4 fs-5">
+          Gọi món ngay tại bàn bằng điện thoại – không cần tải ứng dụng, không cần đăng ký.
+        </p>
+
+        <button class="btn btn-dark rounded-pill px-5 py-3 fs-5 mb-4" onclick="goToMenu()">
+          <i class="bi bi-cup-hot me-2"></i>Xem thực đơn &amp; gọi món
+        </button>
+
+        <!-- Cách gọi món: 3 bước -->
+        <div class="row g-3 justify-content-center text-start">
+          <div class="col-md-4">
+            <div class="step-card">
+              <span class="step-no">1</span>
+              <div>
+                <b>Chọn món</b>
+                <small>Chạm vào món, chọn size, độ ngọt, topping rồi bấm <i>Thêm vào giỏ</i>.</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="step-card">
+              <span class="step-no">2</span>
+              <div>
+                <b>Gửi bếp</b>
+                <small>Bấm <i>Giỏ hàng</i> ở cuối trang, kiểm tra món rồi bấm <i>Gửi bếp</i>. Cả bàn dùng chung 1 giỏ.</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="step-card">
+              <span class="step-no">3</span>
+              <div>
+                <b>Nhận món &amp; thanh toán</b>
+                <small>Xem món đang làm tới đâu ở <i>Đơn hàng</i>, cần gì bấm <i>Chat</i>. Thanh toán tại bàn với nhân viên.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vào bàn: chờ nhân viên xác nhận / bị từ chối / mã QR sai -->
+    <div class="modal fade" id="joinModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="join-title" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
+          <div class="display-5 mb-2" id="join-icon">⏳</div>
+          <h5 class="fw-bold mb-2" id="join-title"></h5>
+          <p class="text-muted mb-3" id="join-text"></p>
+          <div class="spinner-border text-secondary mx-auto mb-3" id="join-spinner" role="status" aria-label="Đang chờ"></div>
+          <div class="d-flex gap-2 justify-content-center flex-wrap" id="join-actions">
+            <button class="btn btn-dark rounded-pill px-4 d-none" id="join-retry">Thử lại</button>
+            <button class="btn btn-outline-secondary rounded-pill px-4" id="join-browse" data-bs-dismiss="modal">Xem thực đơn trước</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/app.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        const $ = (id) => document.getElementById(id);
+
+        // 1. Lấy bàn từ QR (?idBan=..&t=..) – lưu lại rồi xoá mã khỏi thanh địa chỉ
+        // Chỉ tự xin vào bàn khi VỪA QUÉT QR; bị đưa về đây vì phiên đã kết thúc thì hỏi trước
+        // (tránh trang theo dõi đơn đang mở tự chiếm lại bàn vừa trả).
+        const vuaQuetQR = new URLSearchParams(location.search).has("t");
+        App.captureTableFromUrl();
+        const scan = App.getTableScan();
+        let pollTimer = null;
+
+        /** Thẻ bàn: khách biết ngay mình đã vào bàn chưa (xanh = gọi món được, vàng = chờ duyệt, xám = chưa quét). */
+        function updateModeUI() {
+          const t = App.getTableScan();
+          const daVao = !!App.getTable();
+          const badge = $("table-badge");
+          if (!t) {
+            badge.dataset.state = "none";
+            $("order-mode-text").textContent = "Chưa quét mã QR – hãy quét mã dán trên bàn để gọi món";
+          } else if (daVao) {
+            badge.dataset.state = "ok";
+            $("order-mode-text").textContent = "Bạn đang ngồi: Bàn " + t.idBan + " – gọi món được rồi";
+          } else {
+            badge.dataset.state = "wait";
+            $("order-mode-text").textContent = "Bàn " + t.idBan + " – đang chờ nhân viên xác nhận";
+          }
+        }
+
+        // 2. Xin vào bàn. Máy đầu tiên ở bàn trống = chủ bàn (dùng ngay);
+        //    bàn đã có người -> chờ nhân viên xác nhận (chặn người lạ quét trộm QR đặt món vào bàn người khác)
+        const joinModal = bootstrap.Modal.getOrCreateInstance($("joinModal"));
+
+        function showJoin(state, info) {
+          const ban = "Bàn " + (scan ? scan.idBan : "");
+          const s = {
+            waiting: ["⏳", "Chờ nhân viên xác nhận",
+              `${ban} đang có khách. Để tránh người lạ đặt món vào bàn của người khác, nhân viên sẽ xác nhận bạn đang ngồi ở bàn này` +
+              `${info && info.ten ? ` (máy của bạn: ${info.ten})` : ""}. Vui lòng giơ tay hoặc báo nhân viên.`],
+            rejected: ["🚫", "Chưa được vào bàn",
+              `Máy của bạn chưa được cho phép vào ${ban} hoặc phiên của bàn đã kết thúc. Nếu bạn đang ngồi ở bàn này, hãy báo nhân viên rồi bấm "Thử lại".`],
+            invalid: ["❌", "Mã QR không hợp lệ", "Mã QR đã cũ hoặc không đúng. Vui lòng quét lại mã QR dán trên bàn."],
+            ended: ["🔁", "Phiên của bàn đã kết thúc",
+              `${ban} đã trả bàn hoặc máy của bạn đã được mời ra. Nếu bạn vẫn đang ngồi ở ${ban} và muốn gọi thêm, bấm "Vào bàn lại".`],
+          }[state];
+          $("join-icon").textContent = s[0];
+          $("join-title").textContent = s[1];
+          $("join-text").textContent = s[2];
+          $("join-spinner").classList.toggle("d-none", state !== "waiting");
+          $("join-retry").classList.toggle("d-none", state !== "rejected" && state !== "ended");
+          $("join-retry").textContent = state === "ended" ? "Vào bàn lại" : "Thử lại";
+          joinModal.show();
+        }
+
+        /** xinVao = true: được phép gửi yêu cầu vào bàn (vừa quét QR / khách bấm nút). */
+        async function joinTable(xinVao) {
+          if (!scan) return;
+          clearTimeout(pollTimer);
+          let info = null;
+          // Máy đã có mã của phiên này -> hỏi xem còn hợp lệ không (tránh tạo máy mới mỗi lần mở trang)
+          if (App.getTableScan().token) {
+            try {
+              info = await App.api(`/api/ban-an/${scan.idBan}/thiet-bi/toi`, { redirectOn403: false });
+            } catch (e) {
+              if (e.status !== 403) return App.toast(e.message, "error", 4000);
+              App.setTableDevice(null); // máy không còn trong phiên
+            }
+          }
+          if (!info) {
+            if (!xinVao) {
+              updateModeUI();
+              return showJoin("ended");
+            }
+            try {
+              info = await App.api(`/api/ban-an/${scan.idBan}/vao-ban`, { method: "POST", body: { qr: scan.qr }, redirectOn403: false });
+              if (info.laChu) App.toast(`Chào mừng bạn đến ${info.tenBan}! Bạn có thể gọi món ngay.`, "success", 4000);
+            } catch (e) {
+              if (e.status === 403 || e.status === 404) {
+                App.clearTable();
+                updateModeUI();
+                return showJoin("invalid");
+              }
+              return App.toast(e.message, "error", 4000);
+            }
+          }
+          App.setTableDevice(info);
+          updateModeUI();
+          if (info.trangThai === "DA_DUYET") {
+            joinModal.hide();
+          } else {
+            showJoin("waiting", info);
+            pollTimer = setTimeout(poll, 3000);
+          }
+        }
+
+        // Máy chờ duyệt: hỏi server mỗi 3 giây
+        async function poll() {
+          try {
+            const info = await App.api(`/api/ban-an/${scan.idBan}/thiet-bi/toi`, { redirectOn403: false });
+            App.setTableDevice(info);
+            if (info.trangThai === "DA_DUYET") {
+              joinModal.hide();
+              updateModeUI();
+              App.toast("Nhân viên đã xác nhận – bạn có thể gọi món!", "success", 4000);
+              return;
+            }
+          } catch (e) {
+            if (e.status === 403) {
+              App.setTableDevice(null);
+              updateModeUI();
+              return showJoin("rejected");
+            }
+          }
+          pollTimer = setTimeout(poll, 3000);
+        }
+
+        $("join-retry").addEventListener("click", () => joinTable(true));
+
+        function goToMenu() {
+          window.location.href = "index.html";
+        }
+
+        function goToGift() {
+          window.location.href = "index.html#qua-tang";
+        }
+
+        updateModeUI();
+        joinTable(vuaQuetQR);
+
+        Object.assign(window, { goToMenu, goToGift });
+      })();
+    </script>
+  </body>
+</html>

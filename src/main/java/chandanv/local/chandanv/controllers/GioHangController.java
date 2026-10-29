@@ -1,106 +1,66 @@
 package chandanv.local.chandanv.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import chandanv.local.chandanv.models.dto.ThemMonRequest;
 import chandanv.local.chandanv.models.entity.GioHang;
-import chandanv.local.chandanv.models.entity.GioHangItem;
+import chandanv.local.chandanv.services.AuthService;
 import chandanv.local.chandanv.services.GioHangService;
+import jakarta.servlet.http.HttpServletRequest;
 
+/** Giỏ hàng chung của bàn – cần mã riêng của máy đã được duyệt ở bàn (header X-Table-Token) hoặc token nhân viên. */
 @RestController
-@RequestMapping("/api/gio-hang")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/gio-hang/{idBan}")
 public class GioHangController {
 
     private final GioHangService service;
+    private final AuthService auth;
 
-    public GioHangController(GioHangService service) {
+    public GioHangController(GioHangService service, AuthService auth) {
         this.service = service;
+        this.auth = auth;
     }
 
-    @GetMapping("/{idBan}")
-    public GioHang get(@PathVariable Integer idBan) {
-
-        GioHang gioHang = service.getByIdBan(idBan);
-
-        if (gioHang == null) {
-            GioHang empty = new GioHang();
-            empty.setIdBan(idBan);
-            empty.setItems(new ArrayList<>());
-            return empty;
-        }
-
-        if (gioHang.getItems() == null) {
-            gioHang.setItems(new ArrayList<>());
-        }
-
-        return gioHang;
+    @GetMapping
+    public GioHang get(@PathVariable int idBan, HttpServletRequest req) {
+        auth.yeuCauBanHoacNhanVien(req, idBan);
+        return service.lay(idBan);
     }
 
-    @PatchMapping("/{idBan}")
-    public GioHang update(
-            @PathVariable Integer idBan,
-            @RequestBody List<GioHangItem> items) {
-
-        if (items == null) {
-            items = new ArrayList<>();
-        }
-
-        return service.update(idBan, items);
+    @PostMapping("/items")
+    public GioHang themMon(@PathVariable int idBan, @RequestBody ThemMonRequest body, HttpServletRequest req) {
+        auth.yeuCauBanHoacNhanVien(req, idBan);
+        return service.themMon(idBan, body);
     }
 
-    @PostMapping("/{idBan}/add")
-    public GioHang addToCart(
-            @PathVariable Integer idBan,
-            @RequestBody GioHangItem item) {
-
-        if (item == null) {
-            return service.getByIdBan(idBan);
-        }
-
-        return service.addToCart(idBan, item);
+    /** body {"soLuong": n}; n <= 0 sẽ xoá dòng. */
+    @PatchMapping("/items/{itemId}")
+    public GioHang capNhatSoLuong(@PathVariable int idBan, @PathVariable String itemId,
+                                  @RequestBody Map<String, Integer> body, HttpServletRequest req) {
+        auth.yeuCauBanHoacNhanVien(req, idBan);
+        return service.capNhatSoLuong(idBan, itemId, body.get("soLuong"));
     }
 
-    @PutMapping("/{idBan}/update")
-    public GioHang updateQuantity(
-            @PathVariable Integer idBan,
-            @RequestBody GioHangItem item) {
-
-        if (item == null || item.getIdMon() == null) {
-            return service.getByIdBan(idBan);
-        }
-
-        return service.updateQuantity(
-                idBan,
-                item.getIdMon(),
-                item.getSoLuong());
+    @DeleteMapping("/items/{itemId}")
+    public GioHang xoaMon(@PathVariable int idBan, @PathVariable String itemId, HttpServletRequest req) {
+        auth.yeuCauBanHoacNhanVien(req, idBan);
+        return service.xoaMon(idBan, itemId);
     }
 
-    @DeleteMapping("/{idBan}/remove/{idMon}")
-    public GioHang removeItem(
-            @PathVariable Integer idBan,
-            @PathVariable Integer idMon) {
-
-        if (idMon == null) {
-            return service.getByIdBan(idBan);
-        }
-
-        return service.removeItem(idBan, idMon);
-    }
-
-    @DeleteMapping("/{idBan}")
-    public void delete(@PathVariable Integer idBan) {
-        service.delete(idBan);
+    @DeleteMapping
+    public ResponseEntity<Void> xoaGio(@PathVariable int idBan, HttpServletRequest req) {
+        auth.yeuCauBanHoacNhanVien(req, idBan);
+        service.xoaGio(idBan);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,92 +1,75 @@
 package chandanv.local.chandanv.services;
 
-import chandanv.local.chandanv.models.dto.ChatMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+
+import chandanv.local.chandanv.models.dto.ChatMessage;
+
+/** Lưu tạm tin nhắn chat theo bàn trong RAM (không ghi MongoDB), xoá khi bàn hoàn thành/reset. */
 @Service
 public class InMemoryChatService {
 
-    // In-memory cache: idBan -> List of ChatMessage
-    // Strictly stored in RAM until table status is completed or reset. ZERO MongoDB persistence!
-    private final Map<Integer, List<ChatMessage>> tableChatCache = new ConcurrentHashMap<>();
+    private static final int MAX_MESSAGES_PER_TABLE = 100;
 
-    @Autowired(required = false)
-    private SimpMessagingTemplate messagingTemplate;
+    private final Map<Integer, List<ChatMessage>> tableChatCache = new ConcurrentHashMap<>();
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public InMemoryChatService(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     public void addMessage(int idBan, ChatMessage message) {
         if (idBan <= 0 || message == null) return;
-
-        List<ChatMessage> list = tableChatCache.computeIfAbsent(idBan, k -> new CopyOnWriteArrayList<>());
-        list.add(message);
-
-        // Keep maximum 100 messages per active meal session in RAM
-        if (list.size() > 100) {
-            list.remove(0);
+        List<ChatMessage> list = tableChatCache.computeIfAbsent(idBan, k -> new ArrayList<>());
+        synchronized (list) {
+            list.add(message);
+            while (list.size() > MAX_MESSAGES_PER_TABLE) {
+                list.remove(0);
+            }
         }
     }
 
     public List<ChatMessage> getMessages(int idBan) {
         List<ChatMessage> list = tableChatCache.get(idBan);
-        if (list == null || list.isEmpty()) {
-            return Collections.emptyList();
+        if (list == null) return Collections.emptyList();
+        synchronized (list) {
+            return new ArrayList<>(list);
         }
-        return new ArrayList<>(list);
+    }
+
+    /** Tin hệ thống (vd. "Đơn #DH-5 đã bị huỷ") hiện trong khung chat của bàn cho cả khách và nhân viên. */
+    public void thongBao(int idBan, String text) {
+        if (idBan <= 0) return;
+        ChatMessage msg = new ChatMessage(ChatMessage.MessageType.NOTIFICATION, idBan, "Hệ thống", "SYSTEM", text);
+        addMessage(idBan, msg);
+        messagingTemplate.convertAndSend("/topic/chat/table/" + idBan, msg);
+        messagingTemplate.convertAndSend("/topic/chat/staff", msg);
     }
 
     public void clearTableChat(int idBan) {
         if (idBan <= 0) return;
-
         tableChatCache.remove(idBan);
-
-        // Notify both customer and staff that the session for this table was reset
-        if (messagingTemplate != null) {
-            ChatMessage clearMsg = new ChatMessage(
-                    ChatMessage.MessageType.CLEAR_CHAT,
-                    idBan,
-                    "Hệ thống",
-                    "SYSTEM",
-                    "Phiên trò chuyện của bàn " + idBan + " đã được đặt lại."
-            );
-            messagingTemplate.convertAndSend("/topic/chat/table/" + idBan, clearMsg);
-            messagingTemplate.convertAndSend("/topic/chat/staff", clearMsg);
-        }
+        ChatMessage clearMsg = systemMessage(idBan, "Phiên trò chuyện của bàn " + idBan + " đã được đặt lại.");
+        messagingTemplate.convertAndSend("/topic/chat/table/" + idBan, clearMsg);
+        messagingTemplate.convertAndSend("/topic/chat/staff", clearMsg);
     }
 
     public void clearAll() {
-        for (Integer idBan : tableChatCache.keySet()) {
-            if (messagingTemplate != null) {
-                ChatMessage clearMsg = new ChatMessage(
-                        ChatMessage.MessageType.CLEAR_CHAT,
-                        idBan,
-                        "Hệ thống",
-                        "SYSTEM",
-                        "Toàn bộ trạng thái bàn và phiên chat đã được đặt lại."
-                );
-                messagingTemplate.convertAndSend("/topic/chat/table/" + idBan, clearMsg);
-            }
+        for (Integer idBan : new ArrayList<>(tableChatCache.keySet())) {
+            messagingTemplate.convertAndSend("/topic/chat/table/" + idBan,
+                    systemMessage(idBan, "Toàn bộ trạng thái bàn và phiên chat đã được đặt lại."));
         }
-
         tableChatCache.clear();
+        messagingTemplate.convertAndSend("/topic/chat/staff", systemMessage(0, "Đã reset toàn bộ bàn."));
+    }
 
-        if (messagingTemplate != null) {
-            ChatMessage clearMsg = new ChatMessage(
-                    ChatMessage.MessageType.CLEAR_CHAT,
-                    0,
-                    "Hệ thống",
-                    "SYSTEM",
-                    "Đã reset toàn bộ bàn."
-            );
-            messagingTemplate.convertAndSend("/topic/chat/staff", clearMsg);
-        }
+    private static ChatMessage systemMessage(int idBan, String text) {
+        return new ChatMessage(ChatMessage.MessageType.CLEAR_CHAT, idBan, "Hệ thống", "SYSTEM", text);
     }
 }
-

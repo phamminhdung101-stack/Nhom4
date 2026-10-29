@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <link rel="stylesheet" href="../assets/css/app.css" />
+    <title>Màn hình bếp (KDS) - Tiệm Trà</title>
+    <style>
+      .order-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        border-left: 6px solid #ddd;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      .status-pending { border-left-color: #ffc107; }
+      .status-cooking { border-left-color: #2196f3; }
+      .status-delivering { border-left-color: #17a2b8; }
+      .status-completed { border-left-color: #4caf50; opacity: 0.65; }
+      .filter-btn { border: 1px solid #ddd; background: #fff; padding: 7px 18px; border-radius: 30px; font-weight: 600; color: #666; }
+      .filter-btn.active { background: var(--admin-accent); color: #fff; border-color: var(--admin-accent); }
+      .filter-btn .count { font-size: 0.75rem; opacity: 0.8; }
+      .status-btn { border: none; padding: 8px 14px; border-radius: 20px; font-weight: 600; font-size: 14px; transition: transform 0.15s; }
+      .status-btn:hover { transform: scale(1.04); }
+      .status-btn.pending { background: #fff3cd; color: #856404; }
+      .status-btn.cooking { background: #e3f2fd; color: #0d6efd; }
+      .status-btn.delivering { background: #d1ecf1; color: #0c5460; }
+      .status-btn.completed { background: #e8f5e9; color: #2e7d32; }
+      .status-cancelled { border-left-color: #9e9e9e; opacity: 0.6; }
+      .status-btn.cancelled { background: #eeeeee; color: #616161; }
+      .cancel-btn { border: 1px solid #f5c2c7; background: #fff; color: #c62828; padding: 7px 12px; border-radius: 20px; font-weight: 600; font-size: 13px; }
+      .cancel-btn:hover { background: #fdecea; }
+      .cancel-reason { font-size: 0.8rem; color: #757575; }
+      .age { font-size: 0.78rem; }
+      .age.late { color: #c62828; font-weight: 700; }
+      @media (max-width: 768px) {
+        #filters { flex-wrap: nowrap !important; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .filter-btn { white-space: nowrap; }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar" id="adminSidebar" data-page="orders"></aside>
+
+    <main class="main-content">
+      <div class="admin-topbar" data-title="Màn hình bếp"></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h3 class="fw-bold text-dark m-0">Màn Hình Bếp & Điều Phối</h3>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="sound-toggle" checked />
+          <label class="form-check-label small" for="sound-toggle">Âm báo (đơn mới, tin nhắn, huỷ đơn)</label>
+        </div>
+      </div>
+
+      <p class="small text-muted mb-3">
+        <i class="bi bi-info-circle me-1"></i>Bấm nút trên mỗi đơn để chuyển bước:
+        <b>Nhận đơn → Pha chế → Mang ra → Hoàn thành</b>. Đơn chờ quá 15 phút hiện giờ màu đỏ.
+        Khách xin huỷ: bấm <b>Huỷ</b> trên đơn. Bàn tự về <i>Trống</i> khi khách đã nhận đủ món.
+        Màn hình này chỉ hiện <b>đơn hôm nay</b> và đơn ngày trước còn chưa xong – xem đơn cũ ở trang <a href="dashboard.html">Doanh thu</a>.
+      </p>
+      <div class="mb-4 d-flex flex-wrap gap-2" id="filters">
+        <button class="filter-btn active" data-filter="active">🔥 Đang xử lý <span class="count" data-count="active"></span></button>
+        <button class="filter-btn" data-filter="0">⏳ Chờ xác nhận <span class="count" data-count="0"></span></button>
+        <button class="filter-btn" data-filter="1">🧋 Đang pha chế <span class="count" data-count="1"></span></button>
+        <button class="filter-btn" data-filter="2">🛵 Đang mang ra <span class="count" data-count="2"></span></button>
+        <button class="filter-btn" data-filter="3">✅ Hoàn thành <span class="count" data-count="3"></span></button>
+        <button class="filter-btn" data-filter="4">❌ Đã huỷ <span class="count" data-count="4"></span></button>
+        <button class="filter-btn" data-filter="all">Tất cả hôm nay</button>
+      </div>
+
+      <div class="row" id="orders-container">
+        <div class="col-12 text-muted">Đang tải đơn hàng...</div>
+      </div>
+    </main>
+    <div id="ws-status" class="ws-status"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/app.js?v=20261028f"></script>
+    <script src="../assets/js/admin.js?v=20261028f"></script>
+    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        if (!Admin.session) return;
+        const $ = (id) => document.getElementById(id);
+        const NEXT_LABEL = { 0: "Nhận đơn → Pha chế", 1: "Xong → Mang ra", 2: "Đã giao → Hoàn thành" };
+        let orders = [];
+        let filter = "active";
+        const newIds = new Set();
+
+        async function load() {
+          try {
+            orders = await App.api("/api/don-hang");
+            render();
+          } catch (e) {
+            App.toast(e.message, "error");
+          }
+        }
+
+        function visible(o) {
+          if (filter === "all") return true;
+          if (filter === "active") return o.trangThai < 3;
+          return String(o.trangThai) === filter;
+        }
+
+        function ageText(iso) {
+          const min = Math.floor((Date.now() - new Date(iso)) / 60000);
+          if (isNaN(min)) return "";
+          return min < 1 ? "vừa xong" : min < 60 ? min + " phút trước" : App.formatDateTime(iso);
+        }
+
+        function render() {
+          const counts = { active: 0, 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
+          orders.forEach((o) => {
+            counts[o.trangThai] = (counts[o.trangThai] || 0) + 1;
+            if (o.trangThai < 3) counts.active++;
+          });
+          document.querySelectorAll("[data-count]").forEach((el) => (el.textContent = counts[el.dataset.count] ? `(${counts[el.dataset.count]})` : ""));
+
+          const list = orders.filter(visible);
+          // Đang xử lý: đơn cũ nhất lên đầu (làm trước); các tab khác: mới nhất lên đầu
+          if (filter === "active") list.sort((a, b) => new Date(a.thoiGian) - new Date(b.thoiGian));
+
+          const container = $("orders-container");
+          if (!list.length) {
+            container.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="bi bi-inbox fs-1 d-block mb-2"></i>Không có đơn nào</div>';
+            return;
+          }
+          container.innerHTML = list
+            .map((o) => {
+              const st = App.TRANG_THAI_DON[o.trangThai] || App.TRANG_THAI_DON[0];
+              const minutes = (Date.now() - new Date(o.thoiGian)) / 60000;
+              const items = (o.items || [])
+                .map(
+                  (i) => `<li><div><b>${i.soLuong}×</b> ${App.escapeHtml(i.tenMon)}
+                      <span class="opt">${App.escapeHtml(i.moTaTuyChon || "")}</span>
+                      ${i.ghiChu ? `<span class="note">📝 ${App.escapeHtml(i.ghiChu)}</span>` : ""}</div></li>`
+                )
+                .join("");
+              const ban = o.idBan > 0 ? "Bàn " + o.idBan : "Tại quầy";
+              return `
+              <div class="col-md-6 col-xl-4">
+                <div class="order-card status-${st.cls} ${newIds.has(o.id) ? "highlight-new" : ""}" data-id="${App.escapeHtml(o.id)}">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                      <h5 class="fw-bold m-0 text-primary">#DH-${o.idDonHang ?? "?"}</h5>
+                      <span class="fw-bold">${ban}</span>
+                      ${o.idBan > 0 && o.nguoiDat ? `<small class="text-muted ms-1">📱 ${App.escapeHtml(o.nguoiDat)}</small>` : ""}
+                    </div>
+                    <span class="age ${o.trangThai < 3 && minutes > 15 ? "late" : ""}" title="${App.escapeHtml(App.formatDateTime(o.thoiGian))}">
+                      <i class="bi bi-clock"></i> ${ageText(o.thoiGian)}
+                    </span>
+                  </div>
+                  ${items ? `<ul class="order-items mb-2">${items}</ul>` : '<p class="small text-muted">(Đơn cũ – không có chi tiết món)</p>'}
+                  ${o.ghiChu ? `<div class="alert alert-warning py-1 px-2 mb-2 small">📝 ${App.escapeHtml(o.ghiChu)}</div>` : ""}
+                  ${o.trangThai === 4
+                    ? `<div class="cancel-reason mb-1">Huỷ bởi ${App.escapeHtml(o.nguoiHuy || "?")}${o.lyDoHuy ? " – " + App.escapeHtml(o.lyDoHuy) : ""}</div>`
+                    : ""}
+                  <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
+                    <span class="fw-bold">${App.formatMoney(o.tongTien)}</span>
+                    ${o.trangThai < 3
+                      ? `<span class="d-flex gap-2">
+                           <button class="cancel-btn" data-cancel title="Huỷ đơn (vd. khách nhắn tin xin huỷ)"><i class="bi bi-x-circle"></i> Huỷ</button>
+                           <button class="status-btn ${st.cls}" data-next="${o.trangThai + 1}">${NEXT_LABEL[o.trangThai]}</button>
+                         </span>`
+                      : `<span class="status-btn ${st.cls}">${st.icon} ${st.text}</span>`}
+                  </div>
+                </div>
+              </div>`;
+            })
+            .join("");
+          newIds.clear();
+        }
+
+        function replace(updated) {
+          const idx = orders.findIndex((o) => o.id === updated.id);
+          if (idx >= 0) orders[idx] = updated;
+          render();
+        }
+
+        $("orders-container").addEventListener("click", (e) => {
+          const cancel = e.target.closest("[data-cancel]");
+          if (cancel) {
+            const id = cancel.closest("[data-id]").dataset.id;
+            const o = orders.find((x) => x.id === id);
+            const lyDo = prompt(`Huỷ đơn #DH-${o ? o.idDonHang : "?"}?\nLý do (có thể để trống):`, "Khách nhắn tin xin huỷ");
+            if (lyDo === null) return; // bấm Cancel
+            App.withBusy(cancel, async () => {
+              try {
+                replace(await App.api(`/api/don-hang/${encodeURIComponent(id)}/huy`, { method: "POST", body: { lyDo } }));
+                App.toast("Đã huỷ đơn", "success");
+              } catch (err) {
+                App.toast(err.message, "error");
+                load();
+              }
+            });
+            return;
+          }
+          const btn = e.target.closest("[data-next]");
+          if (!btn) return;
+          const id = btn.closest("[data-id]").dataset.id;
+          App.withBusy(btn, async () => {
+            try {
+              replace(await App.api(`/api/don-hang/${encodeURIComponent(id)}/trang-thai`, {
+                method: "PATCH",
+                body: { trangThai: Number(btn.dataset.next) },
+              }));
+            } catch (err) {
+              App.toast(err.message, "error");
+              load(); // đơn có thể vừa bị huỷ / đổi ở nơi khác
+            }
+          });
+        });
+
+        $("filters").addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-filter]");
+          if (!btn) return;
+          filter = btn.dataset.filter;
+          document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+          render();
+        });
+
+        // Âm báo đơn mới / huỷ đơn do admin.js phát (dùng chung mọi trang); công tắc "Âm báo" bên trên điều khiển chung
+        const reload = App.debounce(load, 300);
+        OrderSocket.connect({
+          join: { type: "JOIN_ROOM", room: "KITCHEN", token: Admin.session.token },
+          onEvent(data) {
+            if (data.type === "NEW_ORDER") {
+              newIds.add(data.orderId);
+              App.toast(`Đơn mới #DH-${data.idDonHang} – ${data.tableId > 0 ? "Bàn " + data.tableId : "Tại quầy"} (${data.soMon} món)`, "success", 5000);
+              reload();
+            } else if (data.type === "ORDER_STATUS_UPDATED" && data.status === 4) {
+              if (data.nguoiHuy !== Admin.session.username) { // mình vừa tự huỷ -> không báo lại
+                App.toast(`❌ Đơn #DH-${data.idDonHang} (${data.tableId > 0 ? "Bàn " + data.tableId : "Tại quầy"}) đã bị huỷ bởi ${data.nguoiHuy || "?"}`, "error", 7000);
+              }
+              reload();
+            } else if (data.type === "ORDER_STATUS_UPDATED" || data.type === "RECONNECTED") {
+              reload();
+            }
+          },
+        });
+
+        load();
+        setInterval(render, 60000); // cập nhật "x phút trước"
+      })();
+    </script>
+  </body>
+</html>

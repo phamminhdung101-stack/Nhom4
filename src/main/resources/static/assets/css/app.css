@@ -1,0 +1,122 @@
+/* app.css – thành phần dùng chung: toast, trạng thái kết nối, hiệu ứng mượt */
+
+html { scroll-behavior: smooth; }
+body { -webkit-tap-highlight-color: transparent; }
+
+:focus-visible { outline: 2px solid #8d6e63; outline-offset: 2px; }
+
+/* ---- Toast (thay alert) ---- */
+.app-toast-box {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(92vw, 380px);
+  pointer-events: none;
+}
+.app-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #fff;
+  color: #3e2723;
+  font-size: 0.92rem;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid #8d6e63;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: auto;
+}
+.app-toast.show { opacity: 1; transform: translateY(0); }
+.app-toast i { font-size: 1.15rem; }
+.app-toast-success { border-left-color: #2e7d32; }
+.app-toast-success i { color: #2e7d32; }
+.app-toast-error { border-left-color: #c62828; }
+.app-toast-error i { color: #c62828; }
+.app-toast-info i { color: #8d6e63; }
+
+/* ---- Chấm trạng thái WebSocket ---- */
+.ws-status {
+  position: fixed;
+  right: 12px;
+  top: 72px;
+  z-index: 1020;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+}
+.ws-status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #bdbdbd;
+}
+.ws-status::after { content: "Đang kết nối..."; }
+.ws-status[data-state="connected"]::before { background: #43a047; box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2); }
+.ws-status[data-state="connected"]::after { content: "Trực tiếp"; }
+.ws-status[data-state="disconnected"]::before,
+.ws-status[data-state="error"]::before { background: #e53935; }
+.ws-status[data-state="disconnected"]::after { content: "Mất kết nối"; }
+.ws-status[data-state="error"]::after { content: "Lỗi kết nối"; }
+
+/* ---- Hiệu ứng ---- */
+.fade-in { animation: fadeIn 0.35s ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.bump { animation: bump 0.35s ease; }
+@keyframes bump { 50% { transform: scale(1.04); } }
+
+.highlight-new { animation: highlight 1.8s ease; }
+@keyframes highlight { 0% { box-shadow: 0 0 0 3px #ffb300; } 100% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); } }
+
+/* Nút đang xử lý */
+.is-busy { position: relative; pointer-events: none; opacity: 0.75; }
+.is-busy::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.product-card { cursor: pointer; }
+
+/* Danh sách món trong đơn */
+.order-items { list-style: none; padding: 0; margin: 0; }
+.order-items li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #eee; }
+.order-items li:last-child { border-bottom: none; }
+.order-items .opt { display: block; font-size: 0.78rem; color: #8a8a8a; }
+.order-items .note { display: block; font-size: 0.78rem; color: #b26a00; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Tránh nút chat che nút "Gọi phục vụ" (menu) và bảng hỗ trợ cố định (tracking) */
+body.page-menu .customer-chat-fab { bottom: 150px; }
+body.page-menu .customer-chat-popup { bottom: 212px; height: min(480px, calc(100vh - 280px)); }
+body.page-tracking .customer-chat-fab { bottom: 200px; }
+body.page-tracking .customer-chat-popup { bottom: 262px; height: min(480px, calc(100vh - 330px)); }

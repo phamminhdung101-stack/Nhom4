@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Ảnh món upload & log ###
+uploads/
+*.log
+
+### Chứng chỉ HTTPS (khoá riêng – không commit) ###
+ssl/*.p12
+logs/

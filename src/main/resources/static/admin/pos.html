@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <link rel="stylesheet" href="../assets/css/app.css" />
+    <title>Thu ngân (POS) - Tiệm Trà</title>
+    <style>
+      .pos-wrap { display: flex; gap: 20px; height: 100%; }
+      .pos-menu { flex: 1; min-width: 0; }
+      .pos-bill { width: 340px; flex-shrink: 0; background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,.06); display: flex; flex-direction: column; max-height: calc(100vh - 56px); position: sticky; top: 0; }
+      .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+      .pos-card { background: #fff; border-radius: 12px; padding: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.05); transition: transform .15s; border: 0; text-align: left; }
+      .pos-card:active { transform: scale(.96); }
+      .pos-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; background: #f3ece7; }
+      .bill-list { flex: 1; overflow-y: auto; }
+      .cat-btn.active { background: var(--admin-accent); color: #fff; border-color: var(--admin-accent); }
+      #print-area { display: none; }
+      @media (max-width: 992px) { .pos-wrap { flex-direction: column; } .pos-bill { width: 100%; max-height: none; position: static; } }
+      @media print {
+        body > *:not(#print-area) { display: none !important; }
+        #print-area { display: block !important; font-family: monospace; width: 280px; margin: 0 auto; }
+        body { display: block; height: auto; overflow: visible; }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar" id="adminSidebar" data-page="pos"></aside>
+
+    <main class="main-content">
+      <div class="admin-topbar" data-title="Thu ngân (POS)"></div>
+      <div class="pos-wrap">
+        <section class="pos-menu">
+          <div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
+            <input type="search" class="form-control rounded-pill" style="max-width: 260px" id="pos-search" placeholder="Tìm món..." autocomplete="off" />
+            <div class="d-flex gap-2 flex-wrap" id="cats">
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn active" data-loai="all">Tất cả</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn" data-loai="1">Trà sữa</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn" data-loai="2">Trà nguyên vị</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn" data-loai="3">Trà trái cây</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn" data-loai="4">Cà phê</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn" data-loai="5">Matcha</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn" data-loai="6">Túi trà</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill cat-btn" data-loai="7">Topping</button>
+            </div>
+          </div>
+          <div class="pos-grid" id="pos-grid"><p class="text-muted">Đang tải thực đơn...</p></div>
+        </section>
+
+        <aside class="pos-bill">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="fw-bold m-0">Đơn tại quầy</h5>
+            <button class="btn btn-sm btn-outline-danger" id="btn-clear" title="Xoá hết món trong đơn này"><i class="bi bi-trash me-1"></i>Xoá hết</button>
+          </div>
+          <p class="small text-muted mb-2">Bấm vào món bên trái để thêm (bấm nhiều lần = nhiều ly), dùng <b>+</b> / <b>−</b> để sửa số lượng.</p>
+          <div class="bill-list" id="bill-list"></div>
+          <textarea class="form-control form-control-sm my-2" id="bill-note" rows="2" maxlength="300" placeholder="Ghi chú cho bếp..."></textarea>
+          <div class="d-flex justify-content-between fs-5 fw-bold mb-2"><span>Tổng</span><span class="text-primary" id="total-price">0đ</span></div>
+          <button class="btn btn-dark w-100 py-2 fw-bold" id="btn-checkout"><i class="bi bi-printer me-1"></i> Thanh toán & in hoá đơn</button>
+          <small class="text-muted d-block mt-2 text-center">Đơn được gửi xuống bếp ngay và in hoá đơn cho khách.</small>
+        </aside>
+      </div>
+    </main>
+    <div id="ws-status" class="ws-status"></div>
+
+    <div id="print-area">
+      <h3 style="text-align: center">TIỆM TRÀ THƯỢNG HẠNG</h3>
+      <p style="text-align: center" id="print-meta"></p>
+      <table style="width: 100%; border-collapse: collapse" id="print-items"></table>
+      <hr />
+      <h4 style="text-align: right" id="print-total"></h4>
+      <p style="text-align: center">Cảm ơn quý khách!</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/app.js?v=20261028f"></script>
+    <script src="../assets/js/admin.js?v=20261028f"></script>
+    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        if (!Admin.session) return;
+        const $ = (id) => document.getElementById(id);
+        let products = [];
+        let loai = "all";
+        let keyword = "";
+        const bill = new Map(); // idMon -> {id, name, price, qty}
+
+        async function loadMenu() {
+          try {
+            products = (await App.api("/api/mon-an")).map((m) => ({ id: m.idMon, name: m.tenMon, price: m.gia, idLoai: m.idLoai, image: App.imageUrl(m.image) }));
+            renderMenu();
+          } catch (e) {
+            $("pos-grid").textContent = e.message;
+          }
+        }
+
+        function renderMenu() {
+          const list = products.filter((p) => (loai === "all" || String(p.idLoai) === loai) && (!keyword || p.name.toLowerCase().includes(keyword)));
+          $("pos-grid").innerHTML = list.length
+            ? list.map((p) => `
+              <button class="pos-card" data-id="${p.id}">
+                <img src="${App.escapeHtml(p.image)}" loading="lazy" alt="" onerror="App.imgFallback(this)">
+                <div class="fw-bold small text-truncate mt-1">${App.escapeHtml(p.name)}</div>
+                <div class="text-primary fw-bold small">${App.formatMoney(p.price)}</div>
+              </button>`).join("")
+            : '<p class="text-muted">Không có món phù hợp</p>';
+        }
+
+        function renderBill() {
+          const lines = [...bill.values()];
+          $("bill-list").innerHTML = lines.length
+            ? lines.map((i) => `
+              <div class="d-flex justify-content-between align-items-center py-2 border-bottom" data-id="${i.id}">
+                <div class="me-2">
+                  <div class="fw-bold small">${App.escapeHtml(i.name)}</div>
+                  <small class="text-muted">${App.formatMoney(i.price)}</small>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  <button class="btn btn-sm btn-light" data-act="dec">−</button>
+                  <span class="fw-bold" style="min-width: 22px; text-align: center">${i.qty}</span>
+                  <button class="btn btn-sm btn-light" data-act="inc">+</button>
+                </div>
+              </div>`).join("")
+            : '<div class="text-center text-muted mt-5"><i class="bi bi-cart fs-2 d-block"></i>Chưa có món</div>';
+          const total = lines.reduce((s, i) => s + i.price * i.qty, 0);
+          $("total-price").textContent = App.formatMoney(total);
+          $("btn-checkout").disabled = !lines.length;
+        }
+
+        $("pos-grid").addEventListener("click", (e) => {
+          const card = e.target.closest("[data-id]");
+          if (!card) return;
+          const p = products.find((x) => x.id === Number(card.dataset.id));
+          const line = bill.get(p.id) || { id: p.id, name: p.name, price: p.price, qty: 0 };
+          line.qty = Math.min(99, line.qty + 1);
+          bill.set(p.id, line);
+          renderBill();
+        });
+
+        $("bill-list").addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-act]");
+          if (!btn) return;
+          const id = Number(btn.closest("[data-id]").dataset.id);
+          const line = bill.get(id);
+          line.qty += btn.dataset.act === "inc" ? 1 : -1;
+          if (line.qty <= 0) bill.delete(id);
+          renderBill();
+        });
+
+        $("btn-clear").addEventListener("click", () => { bill.clear(); renderBill(); });
+        $("cats").addEventListener("click", (e) => {
+          const b = e.target.closest("[data-loai]");
+          if (!b) return;
+          loai = b.dataset.loai;
+          document.querySelectorAll(".cat-btn").forEach((x) => x.classList.toggle("active", x === b));
+          renderMenu();
+        });
+        $("pos-search").addEventListener("input", App.debounce((e) => { keyword = e.target.value.trim().toLowerCase(); renderMenu(); }, 200));
+
+        $("btn-checkout").addEventListener("click", (e) =>
+          App.withBusy(e.currentTarget, async () => {
+            try {
+              const order = await App.api("/api/don-hang/tai-quay", {
+                method: "POST",
+                body: { ghiChu: $("bill-note").value.trim(), items: [...bill.values()].map((i) => ({ idMon: i.id, soLuong: i.qty })) },
+              });
+              printReceipt(order);
+              bill.clear();
+              $("bill-note").value = "";
+              renderBill();
+              App.toast(`Đã tạo đơn #DH-${order.idDonHang} và gửi xuống bếp`, "success");
+            } catch (err) {
+              App.toast(err.message, "error", 4000);
+            }
+          })
+        );
+
+        // Hoá đơn in theo dữ liệu server trả về (giá do server tính)
+        function printReceipt(order) {
+          $("print-meta").textContent = `#DH-${order.idDonHang} · ${App.formatDateTime(order.thoiGian)}`;
+          $("print-items").innerHTML = order.items
+            .map((i) => `<tr><td>${App.escapeHtml(i.tenMon)}</td><td>x${i.soLuong}</td><td style="text-align:right">${App.formatMoney(i.thanhTien)}</td></tr>`)
+            .join("");
+          $("print-total").textContent = "TỔNG: " + App.formatMoney(order.tongTien);
+          setTimeout(() => window.print(), 50);
+        }
+
+        OrderSocket.connect({
+          join: { type: "JOIN_ROOM", room: "CASHIER", token: Admin.session.token },
+          onEvent(data) {
+            if (data.type === "NEW_ORDER" && data.tableId > 0) {
+              App.toast(`Bàn ${data.tableId} vừa gọi món (#DH-${data.idDonHang}, ${App.formatMoney(data.tongTien)})`, "info", 5000);
+            }
+          },
+        });
+
+        renderBill();
+        loadMenu();
+      })();
+    </script>
+  </body>
+</html>

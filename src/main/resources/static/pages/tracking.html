@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Theo dõi đơn hàng - Tiệm Trà Thượng Hạng</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/chat.css" />
+    <link rel="stylesheet" href="../assets/css/app.css" />
+
+    <style>
+      :root {
+        --primary-color: #8d6e63;
+        --bg-light: #fdfbf7;
+        --text-dark: #4e342e;
+      }
+
+      body {
+        font-family: "Be Vietnam Pro", sans-serif;
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        padding-bottom: 120px;
+      }
+
+      /* TIMELINE STYLES */
+      .timeline {
+        position: relative;
+        padding-left: 30px;
+        border-left: 2px dashed #c0a080;
+        margin-left: 20px;
+        margin-top: 30px;
+      }
+      .timeline-item {
+        position: relative;
+        margin-bottom: 40px;
+        opacity: 0.4;
+        transition: all 0.5s ease;
+        filter: grayscale(100%);
+      }
+      /* Item cuối bỏ đường kẻ thừa */
+      .timeline-item:last-child {
+        border-left: 2px solid transparent;
+        margin-bottom: 0;
+      }
+
+      .timeline-item.active {
+        opacity: 1;
+        filter: grayscale(0%);
+      }
+
+      .timeline-icon {
+        position: absolute;
+        left: -47px;
+        top: 0;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #c0a080;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #c0a080;
+        z-index: 10;
+        transition: all 0.3s;
+      }
+      .timeline-item.active .timeline-icon {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        box-shadow: 0 0 0 4px rgba(141, 110, 99, 0.2);
+        transform: scale(1.1);
+      }
+
+      /* Hiệu ứng Pulse (Nhịp tim) cho trạng thái đang diễn ra */
+      .pulse {
+        animation: pulse-animation 1.5s infinite;
+      }
+      @keyframes pulse-animation {
+        0% {
+          box-shadow: 0 0 0 0 rgba(141, 110, 99, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(141, 110, 99, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(141, 110, 99, 0);
+        }
+      }
+
+      /* STATUS CARD */
+      .status-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(0, 0, 0, 0.02);
+      }
+
+      /* Thanh tiến trình */
+      .progress-bar-custom {
+        height: 6px;
+        background: #eee;
+        border-radius: 10px;
+        margin-top: 15px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: var(--primary-color);
+        width: 10%;
+        transition: width 0.5s ease;
+      }
+
+      /* Quick Actions */
+      .quick-actions {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 5px 2px;
+        scrollbar-width: none; /* Ẩn thanh cuộn */
+      }
+      .action-btn {
+        white-space: nowrap;
+        border: 1px solid #eee;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        transition: 0.2s;
+      }
+      .action-btn:active {
+        transform: scale(0.95);
+        background: #f8f9fa;
+      }
+
+      /* Rating Stars */
+      .rating-star {
+        font-size: 1.8rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .rating-star.active {
+        color: #ffd700;
+      }
+
+      /* Danh sách các đơn đã đặt trong lượt */
+      .order-block { border-top: 1px dashed #e0d6cf; padding-top: 12px; margin-top: 12px; }
+      .order-block:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+      .order-block.focus .order-code { color: var(--primary-color); }
+      .order-block.cancelled .order-items { text-decoration: line-through; opacity: 0.55; }
+      .order-block .order-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+    </style>
+  </head>
+  <body class="page-tracking">
+    <div class="p-3 bg-white shadow-sm d-flex align-items-center fixed-top">
+      <a href="../index.html" class="text-dark me-3" aria-label="Về thực đơn">
+        <i class="bi bi-house-door-fill fs-4"></i
+      ></a>
+      <h5 class="m-0 fw-bold">Trạng thái đơn hàng</h5>
+    </div>
+
+    <div class="container py-4" style="margin-top: 60px">
+      <div class="status-card p-4 text-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <small class="text-muted text-uppercase fw-bold">Đơn đang theo dõi</small>
+          <span class="badge bg-light text-dark border" id="order-time"
+            >--:--</span
+          >
+        </div>
+
+        <h2 class="fw-bold text-primary display-6 mb-0" id="order-id">
+          #DH-...
+        </h2>
+        <div id="status-badge-container" class="mt-3">
+          <span
+            class="badge bg-warning text-dark rounded-pill px-4 py-2 fs-6 shadow-sm"
+            id="status-text"
+            >Đang tải...</span
+          >
+        </div>
+        <!-- Câu giải thích trạng thái bằng lời thường -->
+        <p class="text-muted mt-3 mb-0" id="status-hint"></p>
+
+        <p class="small text-danger mt-3 mb-0 d-none" id="cancel-info"></p>
+
+        <div class="mt-4" id="progress-container">
+          <div class="d-flex justify-content-between small text-muted mb-1">
+            <span>Tiến độ</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-bar-custom">
+            <div class="progress-fill" id="progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-card p-3 mb-4 d-none" id="items-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold m-0">Các đơn đã đặt <span class="text-muted fw-normal" id="order-count"></span></h6>
+          <span class="fw-bold text-primary" id="order-total" title="Tổng các đơn (không tính đơn đã huỷ)"></span>
+        </div>
+        <div id="order-list"></div>
+      </div>
+
+      <h6 class="fw-bold mb-3 ms-2 text-uppercase text-muted small">
+        Quy trình thực hiện
+      </h6>
+      <div class="timeline">
+        <div class="timeline-item" id="step-pending">
+          <div class="timeline-icon"><i class="bi bi-receipt"></i></div>
+          <h6 class="mb-1">Đã nhận đơn</h6>
+          <p class="text-muted small mb-0">Hệ thống đã ghi nhận yêu cầu.</p>
+        </div>
+
+        <div class="timeline-item" id="step-cooking">
+          <div class="timeline-icon"><i class="bi bi-cup-hot-fill"></i></div>
+          <h6 class="mb-1">Đang pha chế</h6>
+          <p class="text-muted small mb-0">
+            Nghệ nhân trà đang thực hiện món...
+          </p>
+        </div>
+
+        <div class="timeline-item" id="step-delivering">
+          <div class="timeline-icon"><i class="bi bi-bicycle"></i></div>
+          <h6 class="mb-1">Đang mang ra bàn</h6>
+          <p class="text-muted small mb-0">Món ngon đang đến bên bạn.</p>
+        </div>
+
+        <div class="timeline-item" id="step-completed">
+          <div class="timeline-icon"><i class="bi bi-check-lg"></i></div>
+          <h6 class="mb-1">Hoàn tất & Đánh giá</h6>
+
+          <div
+            id="rating-box"
+            class="mt-3 bg-white p-3 rounded-4 shadow-sm border d-none"
+          >
+            <p class="small fw-bold text-center mb-2">
+              Bạn hài lòng về đồ uống chứ?
+            </p>
+            <div class="d-flex justify-content-center gap-2 mb-3">
+              <i class="bi bi-star-fill rating-star" onclick="rate(1)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(2)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(3)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(4)"></i>
+              <i class="bi bi-star-fill rating-star" onclick="rate(5)"></i>
+            </div>
+            <textarea
+              class="form-control bg-light border-0 mb-3 small"
+              rows="2"
+              id="rating-note"
+              maxlength="200"
+              placeholder="Lời nhắn cho quán..."
+            ></textarea>
+            <button
+              class="btn btn-primary w-100 rounded-pill btn-sm fw-bold"
+              onclick="sendRating()"
+            >
+              Gửi Đánh Giá
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="fixed-bottom bg-white p-3 shadow-lg border-top"
+      style="border-radius: 20px 20px 0 0"
+    >
+      <p class="small fw-bold text-muted mb-2 ps-1">Bạn cần hỗ trợ thêm?</p>
+      <div class="quick-actions">
+        <button class="action-btn" onclick="requestService('thêm đá')">
+          🧊 Thêm đá
+        </button>
+        <button class="action-btn" onclick="requestService('thêm đường')">
+          🍬 Thêm đường
+        </button>
+        <button class="action-btn" onclick="requestService('gọi nhân viên')">
+          🛎️ Gọi nhân viên
+        </button>
+        <button
+          class="action-btn text-danger border-danger"
+          onclick="requestService('thanh toán')"
+        >
+          💵 Gọi thanh toán
+        </button>
+      </div>
+
+<button
+  class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold"
+  onclick="goToMenu()"
+>
+  <i class="bi bi-plus-lg me-1"></i> Gọi thêm món khác
+</button>
+    </div>
+
+    <div id="ws-status" class="ws-status"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="../assets/js/app.js?v=20261028f"></script>
+    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        const $ = (id) => document.getElementById(id);
+        const table = App.captureTableFromUrl();
+        const PROGRESS = { 0: 10, 1: 45, 2: 80, 3: 100 };
+        const STEPS = ["step-pending", "step-cooking", "step-delivering", "step-completed"];
+        let orders = []; // mọi đơn của lượt khách hiện tại, mới nhất trước
+        let focus = null; // đơn hiển thị ở thẻ trạng thái + timeline
+        let rating = 0;
+
+        if (!table) {
+          App.toast("Vui lòng quét mã QR trên bàn.", "error", 4000);
+          setTimeout(() => (window.location.href = "../welcome.html"), 1500);
+          return;
+        }
+
+        async function checkOrder() {
+          try {
+            orders = (await App.api(`/api/don-hang/ban/${table.idBan}/luot-nay`)) || [];
+            if (!orders.length) return showNoOrder();
+            // Thẻ trạng thái: đơn mới nhất còn đang làm; hết đơn đang làm -> đơn mới nhất
+            focus = orders.find((o) => o.trangThai < 3) || orders[0];
+            $("order-id").textContent = "#DH-" + focus.idDonHang;
+            $("order-time").textContent = App.formatTime(focus.thoiGian);
+            updateUI(focus.trangThai ?? 0);
+            $("cancel-info").textContent = focus.trangThai === 4
+              ? `Đơn đã được huỷ${focus.lyDoHuy ? " – Lý do: " + focus.lyDoHuy : ""}`
+              : "";
+            renderOrders();
+          } catch (e) {
+            showNoOrder();
+            App.toast(e.message, "error");
+          }
+        }
+        const reload = App.debounce(checkOrder, 200);
+
+        /** Danh sách mọi đơn đã đặt: trạng thái riêng từng đơn + nút huỷ / nhắn xin huỷ. */
+        function renderOrders() {
+          $("items-card").classList.remove("d-none");
+          $("order-count").textContent = `(${orders.length})`;
+          $("order-total").textContent = App.formatMoney(
+            orders.filter((o) => o.trangThai !== 4).reduce((s, o) => s + (o.tongTien || 0), 0)
+          );
+          $("order-list").innerHTML = orders
+            .map((o) => {
+              const st = App.TRANG_THAI_DON[o.trangThai] || { text: "Không rõ", icon: "❔" };
+              const id = App.escapeHtml(o.id);
+              const items = (o.items || [])
+                .map(
+                  (i) => `<li>
+                    <div><b>${i.soLuong}×</b> ${App.escapeHtml(i.tenMon)}
+                      <span class="opt">${App.escapeHtml(i.moTaTuyChon || "")}</span>
+                      ${i.ghiChu ? `<span class="note">📝 ${App.escapeHtml(i.ghiChu)}</span>` : ""}
+                    </div>
+                    <span class="text-nowrap">${App.formatMoney(i.thanhTien)}</span>
+                  </li>`
+                )
+                .join("");
+              let actions = "";
+              if (o.trangThai === 0) {
+                actions = `<button class="btn btn-outline-danger btn-sm rounded-pill px-3" data-cancel="${id}"><i class="bi bi-x-circle me-1"></i>Huỷ đơn</button>
+                           <small class="text-muted">Huỷ được khi quán chưa pha chế</small>`;
+              } else if (o.trangThai === 1 || o.trangThai === 2) {
+                actions = `<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-ask-cancel="${id}"><i class="bi bi-chat-dots me-1"></i>Nhắn quán xin huỷ</button>`;
+              }
+              return `
+                <div class="order-block ${o === focus ? "focus" : ""} ${o.trangThai === 4 ? "cancelled" : ""}">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span><b class="order-code">#DH-${o.idDonHang}</b> <small class="text-muted">· ${App.formatTime(o.thoiGian)}</small></span>
+                    <span class="badge bg-light text-dark border">${st.icon} ${st.text}</span>
+                  </div>
+                  <ul class="order-items mb-1">${items}</ul>
+                  ${o.ghiChu ? `<p class="small text-muted mb-1">Ghi chú: ${App.escapeHtml(o.ghiChu)}</p>` : ""}
+                  ${o.trangThai === 4 ? `<p class="small text-danger mb-1">Đã huỷ${o.lyDoHuy ? " – " + App.escapeHtml(o.lyDoHuy) : ""}</p>` : ""}
+                  <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="order-actions">${actions}</div>
+                    <b class="text-nowrap">${App.formatMoney(o.tongTien)}</b>
+                  </div>
+                </div>`;
+            })
+            .join("");
+        }
+
+        function showNoOrder() {
+          orders = [];
+          focus = null;
+          $("order-id").textContent = "Chưa có đơn";
+          $("status-text").textContent = "Bạn chưa gửi đơn nào";
+          $("status-text").className = "badge bg-light text-dark border rounded-pill px-4 py-2 fs-6 shadow-sm";
+          $("status-hint").textContent = "Chọn món ở thực đơn, vào giỏ hàng rồi bấm \"Gửi bếp\". Đơn sẽ hiện ở đây.";
+          $("items-card").classList.add("d-none");
+          $("cancel-info").classList.add("d-none");
+          updateProgress(0);
+        }
+
+        function updateUI(status) {
+          const info = App.TRANG_THAI_DON[status] || App.TRANG_THAI_DON[0];
+          const cancelled = status === 4;
+          STEPS.forEach((id, idx) => {
+            const el = $(id);
+            el.classList.toggle("active", !cancelled && idx <= status);
+            el.querySelector(".timeline-icon").classList.toggle("pulse", idx === status && status < 3);
+          });
+          const badgeCls = { 0: "bg-warning text-dark", 1: "bg-primary text-white", 2: "bg-info text-dark", 3: "bg-success text-white", 4: "bg-secondary text-white" }[status];
+          const badge = $("status-text");
+          badge.textContent = info.text;
+          badge.className = `badge ${badgeCls} rounded-pill px-4 py-2 fs-6 shadow-sm`;
+          $("status-hint").textContent = {
+            0: "Quán đã nhận đơn, bếp sắp làm. Vẫn huỷ được nếu bạn đổi ý (nút Huỷ đơn bên dưới).",
+            1: "Bếp đang pha chế món của bạn. Muốn huỷ, bấm \"Nhắn quán xin huỷ\" ở danh sách đơn bên dưới.",
+            2: "Nhân viên đang mang món ra bàn, bạn chờ một chút nhé.",
+            3: "Đã phục vụ xong. Chúc ngon miệng! Thanh toán tại bàn với nhân viên.",
+            4: "Đơn này đã huỷ, không tính tiền. Bạn có thể gọi món khác bất cứ lúc nào.",
+          }[status] || "";
+          updateProgress(PROGRESS[status] ?? 0);
+          $("rating-box").classList.toggle("d-none", status !== 3);
+          $("progress-container").style.display = status >= 3 ? "none" : "block";
+          $("cancel-info").classList.toggle("d-none", !cancelled);
+        }
+
+        async function cancelOrder(order, btn) {
+          const lyDo = prompt(`Bạn chắc chắn muốn huỷ đơn #DH-${order.idDonHang}?\nLý do (không bắt buộc):`, "");
+          if (lyDo === null) return;
+          await App.withBusy(btn, async () => {
+            try {
+              await App.api(`/api/don-hang/${encodeURIComponent(order.id)}/huy`, { method: "POST", body: { lyDo } });
+              App.toast(`Đã huỷ đơn #DH-${order.idDonHang}.`, "success", 4000);
+            } catch (e) {
+              App.toast(e.message, "error", 5000); // vd. bếp vừa nhận đơn -> hướng dẫn nhắn tin
+            }
+            await checkOrder();
+          });
+        }
+
+        function askCancel(order) {
+          if (window.CustomerChat && window.CustomerChat.send(`🙏 Cho mình xin huỷ đơn #DH-${order.idDonHang}`)) {
+            App.toast("Đã nhắn quán. Nhân viên sẽ xác nhận việc huỷ.", "success");
+          }
+        }
+
+        $("order-list").addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-cancel],[data-ask-cancel]");
+          if (!btn) return;
+          const order = orders.find((o) => o.id === (btn.dataset.cancel || btn.dataset.askCancel));
+          if (!order) return;
+          if (btn.dataset.cancel) cancelOrder(order, btn);
+          else askCancel(order);
+        });
+
+        function updateProgress(percent) {
+          $("progress-bar").style.width = percent + "%";
+          $("progress-percent").textContent = percent + "%";
+        }
+
+        function requestService(serviceName) {
+          if (window.CustomerChat && window.CustomerChat.send("🔔 Yêu cầu: " + serviceName)) {
+            App.toast(`Đã gửi yêu cầu "${serviceName}" tới nhân viên`, "success");
+          }
+        }
+
+        function rate(star) {
+          rating = star;
+          document.querySelectorAll(".rating-star").forEach((s, i) => s.classList.toggle("active", i < star));
+        }
+
+        function sendRating() {
+          if (!rating) return App.toast("Bạn chọn số sao giúp quán nhé", "info");
+          const note = $("rating-note").value.trim();
+          if (window.CustomerChat) window.CustomerChat.send(`⭐ Đánh giá ${rating}/5${note ? ": " + note : ""}`);
+          App.toast("Cảm ơn đánh giá của bạn!", "success");
+          $("rating-box").classList.add("d-none");
+        }
+
+        function goToMenu() {
+          window.location.href = "../index.html";
+        }
+
+        // Realtime: chỉ nhận sự kiện của bàn mình (room TABLE_{idBan})
+        OrderSocket.connect({
+          join: { type: "JOIN_TABLE", idBan: table.idBan, token: table.token },
+          onEvent(data) {
+            if (data.type === "RECONNECTED") return checkOrder();
+            if (data.type === "NEW_ORDER") {
+              // Điện thoại khác cùng bàn vừa gửi thêm đơn -> hiện ngay trong danh sách
+              if (!orders.some((o) => o.id === data.orderId)) {
+                App.toast(`Bàn vừa gửi thêm đơn #DH-${data.idDonHang} (${data.soMon} món)`, "info", 4000);
+              }
+              return reload();
+            }
+            if (data.type !== "ORDER_STATUS_UPDATED") return;
+            if (data.status === 3) App.toast(`Đơn #DH-${data.idDonHang} đã hoàn tất. Chúc ngon miệng!`, "success");
+            if (data.status === 4 && data.nguoiHuy && !data.nguoiHuy.startsWith("Khách")) {
+              App.toast(`Quán đã huỷ đơn #DH-${data.idDonHang}${data.lyDoHuy ? ": " + data.lyDoHuy : ""}`, "error", 6000);
+            }
+            reload(); // tải lại cả danh sách đơn (trạng thái từng đơn + lý do huỷ)
+          },
+        });
+
+        checkOrder();
+        Object.assign(window, { requestService, rate, sendRating, goToMenu });
+      })();
+    </script>
+    <script src="../assets/js/customer-chat.js?v=20261028f"></script>
+  </body>
+</html>

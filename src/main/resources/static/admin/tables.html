@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <link rel="stylesheet" href="../assets/css/chat.css" />
+    <link rel="stylesheet" href="../assets/css/app.css" />
+    <title>Sơ đồ bàn - Tiệm Trà</title>
+    <style>
+      .table-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 16px; }
+      .table-item {
+        position: relative;
+        aspect-ratio: 1/1;
+        background: #fff;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        border: 2px solid transparent;
+        transition: transform 0.2s, border-color 0.2s, background 0.2s;
+      }
+      .table-item:hover { transform: translateY(-4px); }
+      .table-item.busy { background: #fff3e0; border-color: #ff9800; }
+      .table-item.selected { border-color: #2196f3; box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2); }
+      .table-info-box { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); position: sticky; top: 0; }
+      .filter .btn.active { background: var(--admin-accent); color: #fff; border-color: var(--admin-accent); }
+      /* Hộp thoại chọn bàn để reset */
+      .reset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+      .reset-item { display: flex; align-items: center; gap: 8px; border: 1px solid #e5e5e5; border-radius: 10px; padding: 8px 10px; cursor: pointer; margin: 0; }
+      .reset-item.busy { background: #fff3e0; border-color: #ffcc80; }
+      .reset-item:has(input:checked) { border-color: #dc3545; box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15); }
+      .reset-item .form-check-input { margin: 0; flex-shrink: 0; }
+      .reset-item small { display: block; color: #888; font-size: 0.72rem; }
+      /* Máy chờ nhân viên cho phép vào bàn */
+      .table-pending-indicator { position: absolute; top: 6px; left: 6px; background: #e65100; color: #fff; border-radius: 10px; padding: 0 7px; font-size: 0.72rem; font-weight: 700; animation: pending-pulse 1.4s ease-in-out infinite; }
+      @keyframes pending-pulse { 50% { opacity: 0.55; } }
+      .device-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 6px; }
+      .device-row.pending { background: #fff8e1; border-color: #ffcc80; }
+      /* Chú thích ký hiệu */
+      .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+      .legend > span { display: inline-flex; align-items: center; gap: 6px; }
+      .legend-box { width: 16px; height: 16px; border-radius: 4px; background: #fff; border: 2px solid #ddd; display: inline-block; }
+      .legend-box.busy { background: #fff3e0; border-color: #ff9800; }
+      .legend-pending, .legend-chat { color: #fff; border-radius: 10px; padding: 0 7px; font-size: 0.72rem; font-weight: 700; }
+      .legend-pending { background: #e65100; }
+      .legend-chat { background: #dc3545; }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar" id="adminSidebar" data-page="tables"></aside>
+
+    <main class="main-content">
+      <div class="admin-topbar" data-title="Sơ đồ bàn"></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h3 class="fw-bold m-0">Sơ Đồ Bàn</h3>
+          <div class="mt-2 d-flex gap-2 filter" id="filters">
+            <button class="btn btn-sm btn-outline-secondary active" data-filter="all">Tất cả</button>
+            <button class="btn btn-sm btn-outline-secondary" data-filter="0">Trống</button>
+            <button class="btn btn-sm btn-outline-warning" data-filter="1">Có khách</button>
+          </div>
+        </div>
+        <button class="btn btn-danger" id="btn-reset"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset bàn…</button>
+      </div>
+
+      <!-- Chú thích ký hiệu trên sơ đồ -->
+      <div class="legend small text-muted mb-3">
+        <span><span class="legend-box"></span> Trống</span>
+        <span><span class="legend-box busy"></span> Có khách</span>
+        <span><span class="legend-pending">⏳ 1</span> Máy chờ bạn cho phép vào bàn</span>
+        <span><span class="legend-chat"><i class="bi bi-chat-dots-fill"></i> 2</span> Tin nhắn chưa đọc</span>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-7 col-xl-8">
+          <div class="table-grid" id="table-container"></div>
+        </div>
+        <div class="col-lg-5 col-xl-4">
+          <div class="table-info-box" id="table-info">
+            <p class="fw-bold mb-2"><i class="bi bi-hand-index-thumb me-1"></i>Bấm vào một bàn bên trái để:</p>
+            <ul class="small text-muted mb-0 ps-3">
+              <li><b>Cho phép / Từ chối</b> điện thoại mới xin vào bàn (bàn có dấu ⏳)</li>
+              <li>Xem đơn gần nhất, <b>huỷ đơn</b> khi khách xin huỷ</li>
+              <li><b>Chat</b> với khách tại bàn</li>
+              <li>Bấm <b>Hoàn thành</b> để trả bàn bằng tay (bàn cũng tự trả khi khách nhận đủ món)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div id="ws-status" class="ws-status"></div>
+
+    <div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="resetTitle"><i class="bi bi-arrow-counterclockwise me-1"></i>Chọn bàn cần reset</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <p class="small text-muted">Bàn được chọn sẽ về <b>Trống</b> và xoá phiên chat. Đơn hàng và doanh thu <b>không</b> bị xoá.</p>
+            <div class="d-flex gap-2 mb-3 flex-wrap" id="reset-picks">
+              <button type="button" class="btn btn-sm btn-outline-warning" data-pick="busy">Chọn bàn có khách</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-pick="all">Chọn tất cả</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-pick="none">Bỏ chọn</button>
+            </div>
+            <div class="reset-grid" id="reset-list"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-danger" id="btn-reset-confirm" disabled>Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="../assets/js/app.js?v=20261028f"></script>
+    <script src="../assets/js/admin.js?v=20261028f"></script>
+    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script>
+      (function () {
+        "use strict";
+        if (!Admin.session) return;
+        const $ = (id) => document.getElementById(id);
+
+        let tables = [];
+        let filter = "all";
+        let selected = null;
+        const chats = new Map(); // idBan -> [msg]  (chỉ trong RAM)
+        // idBan -> số tin chưa đọc; lưu chung với admin.js để đi trang khác/quay lại vẫn còn
+        const unread = new Map(Object.entries(Admin.getUnread()).map(([k, v]) => [Number(k), Number(v) || 0]));
+        const saveUnread = () => Admin.setUnread(Object.fromEntries(unread));
+
+        let stomp = null;
+        let stompConnected = false;
+        let tableSub = null;
+        let retry = 0;
+
+        // ---------- Sơ đồ bàn ----------
+        async function loadTables() {
+          try {
+            tables = await App.api("/api/ban-an");
+            renderTables();
+          } catch (e) {
+            App.toast(e.message, "error");
+          }
+        }
+
+        const choDuyet = (b) => (b.thietBi || []).filter((t) => t.trangThai === "CHO_DUYET").length;
+
+        function renderTables() {
+          $("table-container").innerHTML = tables
+            .filter((b) => filter === "all" || String(b.trangThai) === filter)
+            .map((b) => {
+              const n = unread.get(b.idBan) || 0;
+              const cho = choDuyet(b);
+              return `
+              <div class="table-item ${b.trangThai === 1 ? "busy" : ""} ${b.idBan === selected ? "selected" : ""}" data-ban="${b.idBan}" role="button" tabindex="0">
+                <span class="table-chat-indicator ${n ? "" : "d-none"}"><i class="bi bi-chat-dots-fill"></i> ${n}</span>
+                <span class="table-pending-indicator ${cho ? "" : "d-none"}" title="Máy chờ nhân viên cho phép vào bàn">⏳ ${cho}</span>
+                <i class="bi bi-cup-hot fs-2 mb-1 ${b.trangThai === 1 ? "text-warning" : "text-secondary"}"></i>
+                <span class="fw-bold text-dark">${App.escapeHtml(b.tenBan)}</span>
+                <span class="small text-muted">${b.trangThai === 1 ? "Có khách" : "Trống"}</span>
+              </div>`;
+            })
+            .join("");
+          renderDevices();
+        }
+
+        // ---------- Điện thoại ở bàn: máy mới phải được nhân viên cho phép (chặn người lạ quét trộm QR) ----------
+        function renderDevices() {
+          const box = $("device-list");
+          if (!box || !selected) return;
+          const ban = tables.find((b) => b.idBan === selected);
+          const list = (ban && ban.thietBi) || [];
+          if (!list.length) {
+            box.innerHTML = '<div class="text-muted small">Chưa có điện thoại nào quét QR vào bàn này</div>';
+            return;
+          }
+          box.innerHTML = list
+            .map((t) => {
+              const cho = t.trangThai === "CHO_DUYET";
+              const id = App.escapeHtml(t.id);
+              return `
+              <div class="device-row ${cho ? "pending" : ""}">
+                <div>
+                  <span class="fw-semibold">${cho ? "⏳" : "📱"} ${App.escapeHtml(t.ten)}</span>
+                  <span class="text-muted">· ${cho ? "chờ cho phép" : t.laChu ? "chủ bàn" : "đã vào"} · ${App.formatTime(t.vaoLuc)}</span>
+                </div>
+                <div class="d-flex gap-1">
+                  ${cho
+                    ? `<button class="btn btn-success btn-sm py-0" data-duyet="${id}">Cho phép</button>
+                       <button class="btn btn-outline-danger btn-sm py-0" data-moira="${id}" data-ten="${App.escapeHtml(t.ten)}" data-cho="1">Từ chối</button>`
+                    : `<button class="btn btn-outline-secondary btn-sm py-0" data-moira="${id}" data-ten="${App.escapeHtml(t.ten)}">Mời ra</button>`}
+                </div>
+              </div>`;
+            })
+            .join("");
+        }
+
+        $("table-info").addEventListener("click", (e) => {
+          const duyet = e.target.closest("[data-duyet]");
+          const moiRa = e.target.closest("[data-moira]");
+          if (!duyet && !moiRa) return;
+          const idBan = selected;
+          const btn = duyet || moiRa;
+          if (moiRa && !moiRa.dataset.cho && !confirm(`Mời ${moiRa.dataset.ten} ra khỏi bàn ${idBan}? Máy đó sẽ không gọi món / chat được nữa.`)) return;
+          App.withBusy(btn, async () => {
+            try {
+              const path = `/api/ban-an/${idBan}/thiet-bi/${encodeURIComponent(btn.dataset.duyet || btn.dataset.moira)}`;
+              const res = duyet ? await App.api(path + "/duyet", { method: "POST" }) : await App.api(path, { method: "DELETE" });
+              App.toast(res.message, "success");
+            } catch (err) {
+              App.toast(err.message, "error");
+            }
+            await loadTables();
+          });
+        });
+
+        $("table-container").addEventListener("click", (e) => {
+          const el = e.target.closest("[data-ban]");
+          if (el) showTable(Number(el.dataset.ban));
+        });
+        $("filters").addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-filter]");
+          if (!btn) return;
+          filter = btn.dataset.filter;
+          document.querySelectorAll("#filters .btn").forEach((b) => b.classList.toggle("active", b === btn));
+          renderTables();
+        });
+
+        async function showTable(idBan) {
+          selected = idBan;
+          unread.delete(idBan);
+          saveUnread();
+          renderTables();
+          subscribeTable(idBan);
+          const ban = tables.find((b) => b.idBan === idBan);
+
+          $("table-info").innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="fw-bold mb-1" id="info-name"></h5>
+                <p class="mb-2 small">Trạng thái: <b>${ban && ban.trangThai === 1 ? "Có khách" : "Trống"}</b></p>
+              </div>
+              ${ban && ban.trangThai === 1 ? '<button class="btn btn-success btn-sm" id="btn-done"><i class="bi bi-check-circle me-1"></i>Hoàn thành</button>' : ""}
+            </div>
+            <hr class="my-2" />
+            <strong class="small text-uppercase">Điện thoại ở bàn</strong>
+            <div id="device-list" class="mt-2 mb-3 small"></div>
+            <strong class="small text-uppercase">Đơn gần nhất</strong>
+            <div id="order-list" class="mt-2 small text-muted">Đang tải...</div>
+            <div class="staff-chat-container">
+              <div class="staff-chat-header">
+                <strong class="small text-uppercase text-dark"><i class="bi bi-chat-dots-fill text-primary me-1"></i> Trò chuyện</strong>
+                <span class="badge bg-light text-muted border" id="staff-chat-status"></span>
+              </div>
+              <div class="staff-chat-messages" id="staff-chat-box"></div>
+              <form class="d-flex gap-2" id="staff-chat-form">
+                <input type="text" class="form-control form-control-sm rounded-pill" id="staff-chat-input" placeholder="Phản hồi khách..." maxlength="500" autocomplete="off" />
+                <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" type="submit">Gửi</button>
+              </form>
+            </div>`;
+          $("info-name").textContent = ban ? ban.tenBan : "Bàn " + idBan;
+          renderDevices();
+          updateChatStatus();
+          if ($("btn-done")) $("btn-done").addEventListener("click", (e) => App.withBusy(e.currentTarget, () => completeTable(idBan)));
+          $("staff-chat-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            sendChat();
+          });
+
+          renderChat(idBan);
+          loadChatHistory(idBan);
+          loadOrder(idBan);
+        }
+
+        async function loadOrder(idBan) {
+          try {
+            const order = await App.api(`/api/don-hang/ban/${idBan}`);
+            if (selected !== idBan) return;
+            const box = $("order-list");
+            if (!order) {
+              box.textContent = "Chưa có đơn nào";
+              return;
+            }
+            const st = App.TRANG_THAI_DON[order.trangThai] || App.TRANG_THAI_DON[0];
+            box.classList.remove("text-muted");
+            box.innerHTML = `
+              <div class="d-flex justify-content-between mb-1">
+                <span>#DH-${order.idDonHang} · ${App.formatTime(order.thoiGian)}</span>
+                <span class="badge bg-light text-dark border">${st.icon} ${st.text}</span>
+              </div>
+              ${order.trangThai === 4 ? '<div class="text-danger mb-1" id="order-cancel-info"></div>' : ""}
+              <ul class="order-items">${(order.items || [])
+                .map((i) => `<li><span><b>${i.soLuong}×</b> ${App.escapeHtml(i.tenMon)} <span class="opt">${App.escapeHtml(i.moTaTuyChon || "")}</span></span><span>${App.formatMoney(i.thanhTien)}</span></li>`)
+                .join("")}</ul>
+              <div class="d-flex justify-content-between fw-bold mt-1"><span>Tổng</span><span class="text-primary">${App.formatMoney(order.tongTien)}</span></div>
+              ${order.ghiChu ? '<div class="text-warning-emphasis mt-1" id="order-note"></div>' : ""}
+              ${order.trangThai < 3
+                ? `<button class="btn btn-outline-danger btn-sm w-100 mt-2" id="btn-cancel-order"><i class="bi bi-x-circle me-1"></i>Huỷ đơn này (khách xin huỷ)</button>`
+                : ""}`;
+            if (order.ghiChu) $("order-note").textContent = "📝 " + order.ghiChu;
+            if (order.trangThai === 4) {
+              $("order-cancel-info").textContent = `Huỷ bởi ${order.nguoiHuy || "?"}${order.lyDoHuy ? " – " + order.lyDoHuy : ""}`;
+            }
+            if ($("btn-cancel-order")) {
+              $("btn-cancel-order").addEventListener("click", (e) => App.withBusy(e.currentTarget, () => cancelOrder(order, idBan)));
+            }
+          } catch (e) {
+            if (selected === idBan) $("order-list").textContent = e.message;
+          }
+        }
+
+        async function cancelOrder(order, idBan) {
+          const lyDo = prompt(`Huỷ đơn #DH-${order.idDonHang} của bàn ${idBan}?\nLý do (có thể để trống):`, "Khách nhắn tin xin huỷ");
+          if (lyDo === null) return;
+          try {
+            await App.api(`/api/don-hang/${encodeURIComponent(order.id)}/huy`, { method: "POST", body: { lyDo } });
+            App.toast(`Đã huỷ đơn #DH-${order.idDonHang}`, "success");
+          } catch (e) {
+            App.toast(e.message, "error");
+          }
+          await loadTables();
+          if (selected === idBan) loadOrder(idBan);
+        }
+
+        async function completeTable(idBan) {
+          try {
+            await App.api(`/api/ban-an/${idBan}/trang-thai/0`, { method: "PUT" });
+            chats.delete(idBan);
+            unread.delete(idBan);
+            saveUnread();
+            App.toast("Đã hoàn thành bàn " + idBan, "success");
+            await loadTables();
+            showTable(idBan);
+          } catch (e) {
+            App.toast(e.message, "error");
+          }
+        }
+
+        // ---------- Reset bàn: chọn từng bàn trong hộp thoại ----------
+        const resetModal = bootstrap.Modal.getOrCreateInstance($("resetModal"));
+
+        function updateResetButton() {
+          const n = document.querySelectorAll("#reset-list input:checked").length;
+          const btn = $("btn-reset-confirm");
+          btn.disabled = n === 0;
+          btn.textContent = n ? `Reset ${n} bàn` : "Reset";
+        }
+
+        $("btn-reset").addEventListener("click", async () => {
+          await loadTables();
+          // Mặc định tick sẵn bàn đang mở bên phải (nếu có)
+          $("reset-list").innerHTML = tables
+            .map((b) => `
+              <label class="reset-item ${b.trangThai === 1 ? "busy" : ""}">
+                <input type="checkbox" class="form-check-input" value="${b.idBan}" ${b.idBan === selected ? "checked" : ""} />
+                <span><span class="fw-semibold">${App.escapeHtml(b.tenBan)}</span><small>${b.trangThai === 1 ? "Có khách" : "Trống"}</small></span>
+              </label>`)
+            .join("");
+          updateResetButton();
+          resetModal.show();
+        });
+
+        $("reset-list").addEventListener("change", updateResetButton);
+        $("reset-picks").addEventListener("click", (e) => {
+          const pick = e.target.closest("[data-pick]");
+          if (!pick) return;
+          document.querySelectorAll("#reset-list input").forEach((cb) => {
+            const busy = cb.closest(".reset-item").classList.contains("busy");
+            cb.checked = pick.dataset.pick === "all" || (pick.dataset.pick === "busy" && busy);
+          });
+          updateResetButton();
+        });
+
+        $("btn-reset-confirm").addEventListener("click", (e) => {
+          const ids = [...document.querySelectorAll("#reset-list input:checked")].map((cb) => Number(cb.value));
+          if (!ids.length) return;
+          App.withBusy(e.currentTarget, async () => {
+            try {
+              const res = await App.api("/api/ban-an/reset", { method: "PUT", body: { idBans: ids } });
+              ids.forEach((id) => { chats.delete(id); unread.delete(id); });
+              saveUnread();
+              resetModal.hide();
+              await loadTables();
+              if (selected && ids.includes(selected)) showTable(selected);
+              App.toast(`${res.message} (${ids.map((id) => "Bàn " + id).join(", ")})`, "success", 4000);
+            } catch (err) {
+              App.toast(err.message, "error");
+            }
+          });
+        });
+
+        // ---------- Chat nhân viên (STOMP /ws-chat) ----------
+        function updateChatStatus() {
+          const el = $("staff-chat-status");
+          if (el) el.textContent = stompConnected ? "🟢 Đã kết nối" : "🔴 Mất kết nối";
+        }
+
+        function renderChat(idBan) {
+          const box = $("staff-chat-box");
+          if (!box || selected !== idBan) return;
+          const list = chats.get(idBan) || [];
+          if (!list.length) {
+            box.innerHTML = '<div class="staff-chat-empty">Chưa có tin nhắn nào trong phiên này</div>';
+            return;
+          }
+          box.innerHTML = "";
+          const frag = document.createDocumentFragment();
+          list.forEach((m) => {
+            const row = document.createElement("div");
+            row.className = `chat-message-row ${m.role === "STAFF" ? "mine" : "theirs"}`;
+            const name = document.createElement("span");
+            name.className = "chat-sender-name";
+            name.textContent = m.role === "STAFF" ? m.sender || "Nhân viên" : m.sender || "Khách";
+            const bubble = document.createElement("div");
+            bubble.className = "chat-bubble";
+            bubble.style.fontSize = "0.83rem";
+            bubble.textContent = m.content; // textContent: chống XSS
+            const time = document.createElement("span");
+            time.className = "chat-time";
+            time.textContent = App.formatTime(m.timestamp);
+            row.append(name, bubble, time);
+            frag.appendChild(row);
+          });
+          box.appendChild(frag);
+          box.scrollTop = box.scrollHeight;
+        }
+
+        async function loadChatHistory(idBan) {
+          try {
+            const history = await App.api(`/api/chat/history/${idBan}`);
+            chats.set(idBan, history || []);
+            renderChat(idBan);
+          } catch (e) { /* ignore */ }
+        }
+
+        function connectChat() {
+          if (typeof Stomp === "undefined") return;
+          stomp = Stomp.over(new WebSocket(App.WS_BASE + "/ws-chat"));
+          stomp.debug = null;
+          stomp.heartbeat.outgoing = 10000;
+          stomp.heartbeat.incoming = 10000;
+          stomp.connect(
+            { role: "STAFF", adminToken: Admin.session.token },
+            () => {
+              stompConnected = true;
+              retry = 0;
+              updateChatStatus();
+              stomp.subscribe("/topic/chat/staff", (f) => onChat(JSON.parse(f.body)));
+              tableSub = null;
+              if (selected) subscribeTable(selected);
+            },
+            () => {
+              stompConnected = false;
+              updateChatStatus();
+              setTimeout(connectChat, Math.min(30000, 2000 * Math.pow(2, retry++)));
+            }
+          );
+        }
+
+        function subscribeTable(idBan) {
+          if (!stompConnected) return;
+          if (tableSub) {
+            try { tableSub.unsubscribe(); } catch (e) { /* ignore */ }
+          }
+          tableSub = stomp.subscribe(`/topic/chat/table/${idBan}`, (f) => onChat(JSON.parse(f.body)));
+        }
+
+        function onChat(msg) {
+          if (!msg) return;
+          if (msg.type === "CLEAR_CHAT") {
+            if (!msg.idBan) { chats.clear(); unread.clear(); }
+            else { chats.delete(msg.idBan); unread.delete(msg.idBan); }
+            saveUnread();
+            renderTables();
+            if (selected) renderChat(selected);
+            return;
+          }
+          if (!msg.idBan) return;
+          const list = chats.get(msg.idBan) || [];
+          // Tin của khách đến qua 2 kênh (bàn + staff) -> bỏ trùng
+          if (list.some((m) => m.timestamp === msg.timestamp && m.role === msg.role && m.content === msg.content)) return;
+          list.push(msg);
+          chats.set(msg.idBan, list);
+
+          if (msg.role === "CUSTOMER") Admin.sound("chat"); // khách nhắn -> âm tin nhắn (khác âm đơn mới)
+          if (msg.idBan === selected) {
+            renderChat(selected);
+          } else if (msg.role === "CUSTOMER") {
+            unread.set(msg.idBan, (unread.get(msg.idBan) || 0) + 1);
+            saveUnread();
+            renderTables();
+            const el = App.toast(`💬 Bàn ${msg.idBan}: ${msg.content}`, "info", 6000);
+            el.style.cursor = "pointer";
+            el.title = "Bấm để mở chat với bàn này";
+            el.addEventListener("click", () => showTable(msg.idBan));
+          }
+        }
+
+        function sendChat() {
+          const input = $("staff-chat-input");
+          const content = input.value.trim();
+          if (!content || !selected) return;
+          if (!stompConnected) return App.toast("Chat đang mất kết nối, đang thử lại...", "error");
+          stomp.send("/app/chat.send", {}, JSON.stringify({ idBan: selected, content, type: "CHAT" }));
+          input.value = "";
+          input.focus();
+        }
+
+        // ---------- Realtime đơn/bàn (Raw WS /ws) ----------
+        const refresh = App.debounce(() => {
+          loadTables();
+          if (selected) loadOrder(selected);
+        }, 400);
+        OrderSocket.connect({
+          join: { type: "JOIN_ROOM", room: "CASHIER", token: Admin.session.token },
+          onEvent(data) {
+            if (data.type === "TABLE_STATUS_UPDATED" && data.tuDong) {
+              App.toast(`Bàn ${data.idBan} đã nhận đủ món → tự chuyển về Trống`, "success", 5000);
+            }
+            refresh();
+          },
+        });
+
+        // Mở thẳng 1 bàn: tables.html?ban=3 (từ thông báo tin nhắn ở trang khác)
+        const banParam = parseInt(new URLSearchParams(location.search).get("ban"), 10);
+        loadTables().then(() => {
+          if (banParam > 0) showTable(banParam);
+        });
+        connectChat();
+        window.TablesPage = { show: (idBan) => loadTables().then(() => showTable(idBan)) };
+      })();
+    </script>
+  </body>
+</html>

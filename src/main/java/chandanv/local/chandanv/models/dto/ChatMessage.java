@@ -13,8 +13,8 @@ public class ChatMessage {
     private MessageType type = MessageType.CHAT;
     private int idBan;
     private String sender;
-    private String role; // "CUSTOMER" or "STAFF"
-    private String content;
+    private String role; // "CUSTOMER" | "STAFF" | "SYSTEM"
+    private String content; // văn bản thuần – client phải hiển thị bằng textContent
     private long timestamp;
 
     public ChatMessage() {
@@ -30,52 +30,27 @@ public class ChatMessage {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public MessageType getType() {
-        return type;
-    }
+    public MessageType getType() { return type; }
+    public void setType(MessageType type) { this.type = type; }
 
-    public void setType(MessageType type) {
-        this.type = type;
-    }
+    public int getIdBan() { return idBan; }
+    public void setIdBan(int idBan) { this.idBan = idBan; }
 
-    public int getIdBan() {
-        return idBan;
-    }
+    public String getSender() { return sender; }
+    public void setSender(String sender) { this.sender = sender; }
 
-    public void setIdBan(int idBan) {
-        this.idBan = idBan;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public String getSender() {
-        return sender;
-    }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
+    /** Mã ngẫu nhiên của điện thoại gửi (nhiều máy cùng bàn) – để mỗi máy biết tin nào là của mình. */
+    private String clientId;
 
-    public String getRole() {
-        return role;
-    }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
+    public long getTimestamp() { return timestamp; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 }
-
