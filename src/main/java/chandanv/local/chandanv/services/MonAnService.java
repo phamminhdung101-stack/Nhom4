@@ -1,10 +1,13 @@
 package chandanv.local.chandanv.services;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,10 +21,15 @@ import chandanv.local.chandanv.util.TextUtil;
 @Service
 public class MonAnService {
 
-    private final MonAnRepository repository;
+    /** Đuôi ảnh được dò khi đường dẫn trong DB không trỏ tới file có thật. */
+    private static final List<String> DUOI_ANH = List.of(".jpg", ".jpeg", ".png", ".webp");
 
-    public MonAnService(MonAnRepository repository) {
+    private final MonAnRepository repository;
+    private final Path thuMucAnh;
+
+    public MonAnService(MonAnRepository repository, @Value("${app.upload-dir:./uploads}") String uploadDir) {
         this.repository = repository;
+        this.thuMucAnh = Path.of(uploadDir).toAbsolutePath().normalize();
     }
 
     public List<MonAn> getAll() {
@@ -90,15 +98,38 @@ public class MonAnService {
         return line;
     }
 
-    /** Ảnh: dùng đường dẫn trong DB nếu có, nếu không thì quy ước /uploads/{idMon}.jpg (đường dẫn tương đối). */
+    /**
+     * Chọn ảnh cho món, theo thứ tự:
+     *  1. Ảnh trên mạng (http/https) trong DB -> giữ nguyên.
+     *  2. Đường dẫn trong DB trỏ tới file CÓ THẬT trong thư mục ảnh (app.upload-dir) -> dùng file đó.
+     *  3. Không thì dò file theo mã món: {idMon}.jpg / .jpeg / .png / .webp. Nhờ vậy dữ liệu gõ sai
+     *     (vd. "/uploads11.jpg/", "/uploads/53" thiếu đuôi) vẫn hiện đúng ảnh, chỉ cần đặt file đúng tên.
+     *  4. Không có file nào -> /uploads/{idMon}.jpg; trình duyệt tải lỗi sẽ tự hiện ảnh mặc định.
+     * Thêm / đổi ảnh: chép file vào thư mục ảnh rồi tải lại trang, không cần khởi động lại server.
+     */
     private MonAn chuanHoaAnh(MonAn monAn) {
-        String img = monAn.getImage();
-        if (img == null || img.isBlank()) {
-            monAn.setImage("/uploads/" + monAn.getIdMon() + ".jpg");
-        } else if (!img.startsWith("http") && !img.startsWith("/")) {
-            monAn.setImage("/" + img);
+        String img = monAn.getImage() == null ? "" : monAn.getImage().trim();
+        if (img.startsWith("http://") || img.startsWith("https://")) return monAn;
+
+        String tenFile = img.replaceFirst("^/?uploads/?", "").replaceAll("^/+|/+$", "");
+        if (!tenFile.isEmpty() && coFile(tenFile)) {
+            monAn.setImage("/uploads/" + tenFile);
+            return monAn;
         }
+        for (String duoi : DUOI_ANH) {
+            if (coFile(monAn.getIdMon() + duoi)) {
+                monAn.setImage("/uploads/" + monAn.getIdMon() + duoi);
+                return monAn;
+            }
+        }
+        monAn.setImage("/uploads/" + monAn.getIdMon() + ".jpg");
         return monAn;
+    }
+
+    /** File có trong thư mục ảnh (chặn tên kiểu "../" trỏ ra ngoài thư mục). */
+    private boolean coFile(String tenFile) {
+        Path p = thuMucAnh.resolve(tenFile).normalize();
+        return p.startsWith(thuMucAnh) && Files.isRegularFile(p);
     }
 
     private static ResponseStatusException badRequest(String msg) {

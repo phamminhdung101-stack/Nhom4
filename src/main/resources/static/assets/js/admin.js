@@ -84,7 +84,7 @@
     // Trang Sơ đồ bàn tự kết nối chat và tự báo tin mới; các trang khác dùng kết nối thông báo chung
     if (active !== "tables") loadScript(STOMP_SRC, () => typeof Stomp !== "undefined", connectChatNotifier);
     // Trang không tự mở WebSocket đơn hàng (vd. Mã QR) -> mở 1 kết nối chỉ để nhận âm báo đơn mới
-    loadScript("../assets/js/websocket.js?v=20261028f", () => typeof OrderSocket !== "undefined", () => {
+    loadScript("../assets/js/websocket.js?v=20261029a", () => typeof OrderSocket !== "undefined", () => {
       if (!(OrderSocket.count && OrderSocket.count())) OrderSocket.connect({ join: { type: "JOIN_ROOM", room: "CASHIER", token: session.token } });
     });
   }
@@ -210,7 +210,7 @@
       sound("order");
       // Bếp và POS tự hiện thông báo riêng; các trang khác hiện ở đây
       if (activePage !== "orders" && activePage !== "pos") {
-        const el = App.toast(`🛎️ Đơn mới #DH-${d.idDonHang} – ${d.tableId > 0 ? "Bàn " + d.tableId : "Tại quầy"} (${d.soMon} món, ${App.formatMoney(d.tongTien)})`, "success", 6000);
+        const el = App.toast(`Đơn mới #DH-${d.idDonHang} – ${d.tableId > 0 ? "Bàn " + d.tableId : "Tại quầy"} (${d.soMon} món, ${App.formatMoney(d.tongTien)})`, "success", 6000);
         el.style.cursor = "pointer";
         el.title = "Bấm để mở màn hình bếp";
         el.addEventListener("click", () => (global.location.href = "orders.html"));
@@ -218,7 +218,7 @@
     } else if (d.type === "DEVICE_PENDING") {
       // Điện thoại mới xin vào bàn đang có khách -> nhân viên ra xác nhận người đó đang ngồi ở bàn
       sound("device");
-      const el = App.toast(`📱 ${d.tenBan || "Bàn " + d.idBan}: ${d.may} xin vào bàn – bấm để cho phép / từ chối`, "info", 10000);
+      const el = App.toast(`${d.tenBan || "Bàn " + d.idBan}: ${d.may} xin vào bàn – bấm để cho phép / từ chối`, "info", 10000);
       el.style.cursor = "pointer";
       el.addEventListener("click", () => {
         if (activePage === "tables" && global.TablesPage) global.TablesPage.show(d.idBan);
@@ -227,7 +227,7 @@
     } else if (d.type === "ORDER_STATUS_UPDATED" && d.status === 4 && d.nguoiHuy !== session.username) {
       sound("cancel");
       if (activePage !== "orders") {
-        App.toast(`❌ Đơn #DH-${d.idDonHang} (${d.tableId > 0 ? "Bàn " + d.tableId : "Tại quầy"}) đã bị huỷ bởi ${d.nguoiHuy || "?"}`, "error", 6000);
+        App.toast(`Đơn #DH-${d.idDonHang} (${d.tableId > 0 ? "Bàn " + d.tableId : "Tại quầy"}) đã bị huỷ bởi ${d.nguoiHuy || "?"}`, "error", 6000);
       }
     }
   });
@@ -277,7 +277,7 @@
     u[msg.idBan] = (u[msg.idBan] || 0) + 1;
     setUnread(u);
     sound("chat");
-    const el = App.toast(`💬 Bàn ${msg.idBan}: ${msg.content}`, "info", 6000);
+    const el = App.toast(`Bàn ${msg.idBan}: ${msg.content}`, "info", 6000);
     el.style.cursor = "pointer";
     el.title = "Bấm để mở chat với bàn này";
     el.addEventListener("click", () => (global.location.href = "tables.html?ban=" + msg.idBan));

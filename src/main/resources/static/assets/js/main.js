@@ -324,7 +324,7 @@
       App.toast("Vui lòng quét mã QR trên bàn để gọi phục vụ.", "error");
       return;
     }
-    if (window.CustomerChat.send("🔔 " + text)) App.toast("Đã gửi yêu cầu: " + text, "success");
+    if (window.CustomerChat.send("Yêu cầu: " + text)) App.toast("Đã gửi yêu cầu: " + text, "success");
   }
 
   function handleMood(mood) {

@@ -51,6 +51,9 @@
       .legend-pending, .legend-chat { color: #fff; border-radius: 10px; padding: 0 7px; font-size: 0.72rem; font-weight: 700; }
       .legend-pending { background: #e65100; }
       .legend-chat { background: #dc3545; }
+      .legend-pending.zero, .legend-chat.zero { background: #adb5bd; }
+      .legend .legend-jump { cursor: pointer; }
+      .legend .legend-jump:hover { text-decoration: underline; }
     </style>
   </head>
   <body>
@@ -75,8 +78,9 @@
       <div class="legend small text-muted mb-3">
         <span><span class="legend-box"></span> Trống</span>
         <span><span class="legend-box busy"></span> Có khách</span>
-        <span><span class="legend-pending">⏳ 1</span> Máy chờ bạn cho phép vào bàn</span>
-        <span><span class="legend-chat"><i class="bi bi-chat-dots-fill"></i> 2</span> Tin nhắn chưa đọc</span>
+        <!-- Số là TỔNG THẬT trên tất cả các bàn (cập nhật trong renderTables), không phải số minh hoạ -->
+        <span id="legend-pending-wrap" title="Tổng trên tất cả các bàn"><span class="legend-pending zero" id="legend-pending">⏳ 0</span> máy chờ bạn cho phép vào bàn</span>
+        <span id="legend-chat-wrap" title="Tổng trên tất cả các bàn"><span class="legend-chat zero" id="legend-chat"><i class="bi bi-chat-dots-fill"></i> 0</span> tin nhắn chưa đọc</span>
       </div>
 
       <div class="row g-4">
@@ -85,7 +89,7 @@
         </div>
         <div class="col-lg-5 col-xl-4">
           <div class="table-info-box" id="table-info">
-            <p class="fw-bold mb-2"><i class="bi bi-hand-index-thumb me-1"></i>Bấm vào một bàn bên trái để:</p>
+            <p class="fw-bold mb-2">Bấm vào một bàn bên trái để:</p>
             <ul class="small text-muted mb-0 ps-3">
               <li><b>Cho phép / Từ chối</b> điện thoại mới xin vào bàn (bàn có dấu ⏳)</li>
               <li>Xem đơn gần nhất, <b>huỷ đơn</b> khi khách xin huỷ</li>
@@ -102,7 +106,7 @@
       <div class="modal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title fw-bold" id="resetTitle"><i class="bi bi-arrow-counterclockwise me-1"></i>Chọn bàn cần reset</h5>
+            <h5 class="modal-title fw-bold" id="resetTitle">Chọn bàn cần reset</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
           </div>
           <div class="modal-body">
@@ -124,9 +128,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script src="../assets/js/app.js?v=20261028f"></script>
-    <script src="../assets/js/admin.js?v=20261028f"></script>
-    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script src="../assets/js/app.js?v=20261029a"></script>
+    <script src="../assets/js/admin.js?v=20261029a"></script>
+    <script src="../assets/js/websocket.js?v=20261029a"></script>
     <script>
       (function () {
         "use strict";
@@ -150,6 +154,14 @@
         async function loadTables() {
           try {
             tables = await App.api("/api/ban-an");
+            // Số tin chưa đọc lưu trong trình duyệt: bàn đã Trống (server xoá chat khi trả bàn) hoặc bàn không còn tồn tại
+            // mà vẫn còn số là do lúc đó trang này đang đóng, không nhận được CLEAR_CHAT -> dọn đi, tránh số "kẹt" mãi.
+            let donDep = false;
+            for (const id of [...unread.keys()]) {
+              const b = tables.find((x) => x.idBan === id);
+              if (!b || b.trangThai === 0) { unread.delete(id); donDep = true; }
+            }
+            if (donDep) saveUnread();
             renderTables();
           } catch (e) {
             App.toast(e.message, "error");
@@ -174,8 +186,33 @@
               </div>`;
             })
             .join("");
+          renderLegend();
           renderDevices();
         }
+
+        /** Chú thích ký hiệu kiêm tổng số: máy chờ duyệt và tin chưa đọc trên TẤT CẢ các bàn (kể cả bàn đang bị lọc ẩn). */
+        function renderLegend() {
+          const tongCho = tables.reduce((s, b) => s + choDuyet(b), 0);
+          const tongTin = tables.reduce((s, b) => s + (unread.get(b.idBan) || 0), 0);
+          $("legend-pending").textContent = "⏳ " + tongCho;
+          $("legend-pending").classList.toggle("zero", !tongCho);
+          $("legend-chat").innerHTML = '<i class="bi bi-chat-dots-fill"></i> ' + tongTin;
+          $("legend-chat").classList.toggle("zero", !tongTin);
+          $("legend-pending-wrap").classList.toggle("legend-jump", tongCho > 0);
+          $("legend-chat-wrap").classList.toggle("legend-jump", tongTin > 0);
+          $("legend-pending-wrap").title = tongCho ? "Bấm để mở bàn có máy đang chờ" : "Tổng trên tất cả các bàn";
+          $("legend-chat-wrap").title = tongTin ? "Bấm để mở bàn có tin chưa đọc" : "Tổng trên tất cả các bàn";
+        }
+
+        // Bấm vào chú thích (khi số > 0) -> mở bàn đầu tiên cần xử lý
+        $("legend-pending-wrap").addEventListener("click", () => {
+          const ban = tables.find((b) => choDuyet(b) > 0);
+          if (ban) showTable(ban.idBan);
+        });
+        $("legend-chat-wrap").addEventListener("click", () => {
+          const ban = tables.find((b) => (unread.get(b.idBan) || 0) > 0);
+          if (ban) showTable(ban.idBan);
+        });
 
         // ---------- Điện thoại ở bàn: máy mới phải được nhân viên cho phép (chặn người lạ quét trộm QR) ----------
         function renderDevices() {
@@ -194,7 +231,7 @@
               return `
               <div class="device-row ${cho ? "pending" : ""}">
                 <div>
-                  <span class="fw-semibold">${cho ? "⏳" : "📱"} ${App.escapeHtml(t.ten)}</span>
+                  <span class="fw-semibold">${cho ? "⏳ " : ""}${App.escapeHtml(t.ten)}</span>
                   <span class="text-muted">· ${cho ? "chờ cho phép" : t.laChu ? "chủ bàn" : "đã vào"} · ${App.formatTime(t.vaoLuc)}</span>
                 </div>
                 <div class="d-flex gap-1">
@@ -262,7 +299,7 @@
             <div id="order-list" class="mt-2 small text-muted">Đang tải...</div>
             <div class="staff-chat-container">
               <div class="staff-chat-header">
-                <strong class="small text-uppercase text-dark"><i class="bi bi-chat-dots-fill text-primary me-1"></i> Trò chuyện</strong>
+                <strong class="small text-uppercase text-dark">Trò chuyện</strong>
                 <span class="badge bg-light text-muted border" id="staff-chat-status"></span>
               </div>
               <div class="staff-chat-messages" id="staff-chat-box"></div>
@@ -299,7 +336,7 @@
             box.innerHTML = `
               <div class="d-flex justify-content-between mb-1">
                 <span>#DH-${order.idDonHang} · ${App.formatTime(order.thoiGian)}</span>
-                <span class="badge bg-light text-dark border">${st.icon} ${st.text}</span>
+                <span class="badge bg-light text-dark border">${st.text}</span>
               </div>
               ${order.trangThai === 4 ? '<div class="text-danger mb-1" id="order-cancel-info"></div>' : ""}
               <ul class="order-items">${(order.items || [])
@@ -310,7 +347,7 @@
               ${order.trangThai < 3
                 ? `<button class="btn btn-outline-danger btn-sm w-100 mt-2" id="btn-cancel-order"><i class="bi bi-x-circle me-1"></i>Huỷ đơn này (khách xin huỷ)</button>`
                 : ""}`;
-            if (order.ghiChu) $("order-note").textContent = "📝 " + order.ghiChu;
+            if (order.ghiChu) $("order-note").textContent = "Ghi chú: " + order.ghiChu;
             if (order.trangThai === 4) {
               $("order-cancel-info").textContent = `Huỷ bởi ${order.nguoiHuy || "?"}${order.lyDoHuy ? " – " + order.lyDoHuy : ""}`;
             }
@@ -405,7 +442,12 @@
         // ---------- Chat nhân viên (STOMP /ws-chat) ----------
         function updateChatStatus() {
           const el = $("staff-chat-status");
-          if (el) el.textContent = stompConnected ? "🟢 Đã kết nối" : "🔴 Mất kết nối";
+          if (el) {
+            el.textContent = stompConnected ? "Đã kết nối" : "Mất kết nối";
+            el.classList.toggle("text-success", stompConnected);
+            el.classList.toggle("text-danger", !stompConnected);
+            el.classList.remove("text-muted");
+          }
         }
 
         function renderChat(idBan) {
@@ -502,7 +544,7 @@
             unread.set(msg.idBan, (unread.get(msg.idBan) || 0) + 1);
             saveUnread();
             renderTables();
-            const el = App.toast(`💬 Bàn ${msg.idBan}: ${msg.content}`, "info", 6000);
+            const el = App.toast(`Bàn ${msg.idBan}: ${msg.content}`, "info", 6000);
             el.style.cursor = "pointer";
             el.title = "Bấm để mở chat với bàn này";
             el.addEventListener("click", () => showTable(msg.idBan));

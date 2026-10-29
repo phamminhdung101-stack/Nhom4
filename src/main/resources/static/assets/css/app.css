@@ -3,6 +3,26 @@
 html { scroll-behavior: smooth; }
 body { -webkit-tap-highlight-color: transparent; }
 
+/* ---- Chữ: dùng chung mọi trang (file này nạp sau cùng nên ghi đè được Bootstrap) ----
+   Be Vietnam Pro: font thiết kế cho tiếng Việt, dấu đặt đúng chỗ, không bị dính / lệch như font hệ thống.
+   Mỗi trang tải đủ độ đậm 400/500/600/700; không có mạng (chạy LAN không Internet) thì rơi về font hệ thống bên dưới. */
+:root {
+  --bs-body-font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --bs-body-line-height: 1.55;
+}
+body {
+  font-family: var(--bs-body-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 { letter-spacing: -0.01em; line-height: 1.3; }
+.btn { font-weight: 500; letter-spacing: 0.005em; }
+.badge { font-weight: 600; letter-spacing: 0.01em; }
+small, .small { line-height: 1.5; }
+/* Số tiền, giờ, mã đơn trong bảng thẳng cột với nhau */
+table, .table, .price, .money, [data-money] { font-variant-numeric: tabular-nums; }
+
 :focus-visible { outline: 2px solid #8d6e63; outline-offset: 2px; }
 
 /* ---- Toast (thay alert) ---- */

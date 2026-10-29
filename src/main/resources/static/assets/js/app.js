@@ -35,11 +35,11 @@
     );
 
   const TRANG_THAI_DON = {
-    0: { text: "Chờ xác nhận", cls: "pending", icon: "⏳" },
-    1: { text: "Đang pha chế", cls: "cooking", icon: "🔥" },
-    2: { text: "Đang mang ra bàn", cls: "delivering", icon: "🛵" },
-    3: { text: "Hoàn thành", cls: "completed", icon: "✅" },
-    4: { text: "Đã huỷ", cls: "cancelled", icon: "❌" },
+    0: { text: "Chờ xác nhận", cls: "pending" },
+    1: { text: "Đang pha chế", cls: "cooking" },
+    2: { text: "Đang mang ra bàn", cls: "delivering" },
+    3: { text: "Hoàn thành", cls: "completed" },
+    4: { text: "Đã huỷ", cls: "cancelled" },
   };
 
   // ---------- localStorage không bao giờ ném lỗi ----------

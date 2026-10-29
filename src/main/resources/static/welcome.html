@@ -17,7 +17,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Be+Vietnam+Pro:wght@300;400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -411,7 +411,6 @@
     <div class="modal fade" id="joinModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="join-title" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
-          <div class="display-5 mb-2" id="join-icon">⏳</div>
           <h5 class="fw-bold mb-2" id="join-title"></h5>
           <p class="text-muted mb-3" id="join-text"></p>
           <div class="spinner-border text-secondary mx-auto mb-3" id="join-spinner" role="status" aria-label="Đang chờ"></div>
@@ -424,7 +423,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/app.js?v=20261028f"></script>
+    <script src="assets/js/app.js?v=20261029a"></script>
     <script>
       (function () {
         "use strict";
@@ -462,18 +461,17 @@
         function showJoin(state, info) {
           const ban = "Bàn " + (scan ? scan.idBan : "");
           const s = {
-            waiting: ["⏳", "Chờ nhân viên xác nhận",
+            waiting: ["Chờ nhân viên xác nhận",
               `${ban} đang có khách. Để tránh người lạ đặt món vào bàn của người khác, nhân viên sẽ xác nhận bạn đang ngồi ở bàn này` +
               `${info && info.ten ? ` (máy của bạn: ${info.ten})` : ""}. Vui lòng giơ tay hoặc báo nhân viên.`],
-            rejected: ["🚫", "Chưa được vào bàn",
+            rejected: ["Chưa được vào bàn",
               `Máy của bạn chưa được cho phép vào ${ban} hoặc phiên của bàn đã kết thúc. Nếu bạn đang ngồi ở bàn này, hãy báo nhân viên rồi bấm "Thử lại".`],
-            invalid: ["❌", "Mã QR không hợp lệ", "Mã QR đã cũ hoặc không đúng. Vui lòng quét lại mã QR dán trên bàn."],
-            ended: ["🔁", "Phiên của bàn đã kết thúc",
+            invalid: ["Mã QR không hợp lệ", "Mã QR đã cũ hoặc không đúng. Vui lòng quét lại mã QR dán trên bàn."],
+            ended: ["Phiên của bàn đã kết thúc",
               `${ban} đã trả bàn hoặc máy của bạn đã được mời ra. Nếu bạn vẫn đang ngồi ở ${ban} và muốn gọi thêm, bấm "Vào bàn lại".`],
           }[state];
-          $("join-icon").textContent = s[0];
-          $("join-title").textContent = s[1];
-          $("join-text").textContent = s[2];
+          $("join-title").textContent = s[0];
+          $("join-text").textContent = s[1];
           $("join-spinner").classList.toggle("d-none", state !== "waiting");
           $("join-retry").classList.toggle("d-none", state !== "rejected" && state !== "ended");
           $("join-retry").textContent = state === "ended" ? "Vào bàn lại" : "Thử lại";

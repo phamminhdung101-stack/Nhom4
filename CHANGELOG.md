@@ -1,5 +1,72 @@
 # Nhật ký thay đổi
 
+## Ảnh món đưa lên git (29/10/2026)
+- Bỏ `uploads/` khỏi `.gitignore`: 67 ảnh món (khoảng 2,5 MB) đi cùng code, clone về là có ảnh, không phải chép riêng.
+- README sửa mọi chỗ ghi "ảnh không có trên git". Thêm / đổi ảnh thì commit cả file ảnh.
+
+## README: bổ sung thông tin cần thiết (29/10/2026)
+- *Cần biết trước khi chạy*: thêm điểm 16 về ảnh món trong `uploads/` (tên = mã món).
+- Mục 2: địa chỉ repo thật để `git clone`.
+- Mục 5: dòng chú thích ở Sơ đồ bàn hiện tổng số và bấm được.
+- Mục 8:
+  - Số liệu dữ liệu mẫu (67 món mã 1–67, 1 nhân viên); nạp lại khi một collection bị xoá hết.
+  - Phân biệt `admin` (tài khoản đăng nhập) và `nhan_vien` (chưa dùng).
+  - Cách thêm / sửa món và ảnh.
+- Mục 9: *Làm việc nhóm với Git* (pull / commit / push, những gì không lên git, dữ liệu không đồng bộ qua git).
+- Mục 14: thư mục `uploads/`.
+- Mục 15: lỗi món không có ảnh, font khác khi không có Internet, số tin chưa đọc bị kẹt.
+
+## Giao diện: bớt icon thừa, chữ đẹp và đồng nhất hơn (29/10/2026)
+**Font**
+- Sửa các trang khai báo font mà không tải:
+  - Giỏ hàng (`cart.html`) không tải Be Vietnam Pro.
+  - Thực đơn dùng Playfair Display nhưng không tải.
+  - Đăng nhập và trang chào thiếu độ đậm 700 nên trình duyệt "giả đậm".
+- Nay mọi trang tải Be Vietnam Pro đủ 400/500/600/700; trang chào và thực đơn tải thêm Playfair Display cho tiêu đề. Bỏ các độ đậm 800 không có trong font; nhãn QR in ra dùng Be Vietnam Pro thay vì font serif mặc định.
+- `app.css` (nạp sau cùng ở mọi trang): đặt font chung cho Bootstrap, làm mượt chữ, giãn dòng 1.55, tiêu đề khít hơn, nút / nhãn đậm vừa phải, số tiền và giờ trong bảng thẳng cột (`tabular-nums`).
+
+**Icon**
+- Bỏ emoji trang trí:
+  - Nút lọc màn hình bếp, ô chọn trạng thái ở trang Doanh thu.
+  - Nhãn trạng thái đơn (bỏ trường `icon` trong `App.TRANG_THAI_DON`).
+  - Toast thông báo (đơn mới, huỷ đơn, máy xin vào bàn, tin nhắn).
+  - Menu *Gọi phục vụ* và nút hỗ trợ nhanh ở trang theo dõi đơn.
+  - Tin nhắn tự gửi (yêu cầu, xin huỷ, đánh giá) và tin hệ thống báo huỷ đơn.
+  - Biểu tượng lớn ở hộp *vào bàn* (trạng thái chờ đã có vòng xoay).
+- 📝 ghi chú đổi thành chữ "Ghi chú:"; 📱 tên máy đổi thành "· Máy 2"; 🟢/🔴 kết nối chat đổi thành chữ có màu.
+- Bỏ icon Bootstrap đứng cạnh chữ không thêm ý nghĩa (dòng hướng dẫn, tiêu đề hộp thoại, khung chat, dải số liệu).
+- Giữ icon có chức năng: menu, nút bấm, các bước theo dõi đơn, sao đánh giá, ⏳ (ký hiệu máy chờ duyệt ở Sơ đồ bàn), ảnh tâm trạng.
+- Đổi mã phiên bản file tĩnh `?v=20261029a`.
+
+## Sơ đồ bàn: chú thích hiện số thật, dọn số tin chưa đọc bị kẹt (29/10/2026)
+- Chú thích ký hiệu ghi cứng `⏳ 1` và `💬 2`, nhân viên tưởng đang thật sự có 1 máy chờ duyệt và 2 tin chưa đọc.
+  - Nay hiện **tổng thật** trên tất cả các bàn: "⏳ 0 máy chờ bạn cho phép vào bàn", "💬 0 tin nhắn chưa đọc".
+  - Bằng 0 thì chuyển màu xám.
+  - Lớn hơn 0 thì bấm vào là mở bàn đầu tiên cần xử lý.
+- Số tin chưa đọc lưu trong trình duyệt có thể **kẹt mãi** nếu bàn được trả trong lúc trang Sơ đồ bàn đang đóng (không nhận được thông báo xoá chat).
+  - Mỗi lần tải danh sách bàn, xoá số của bàn đã Trống hoặc bàn không còn tồn tại (bàn Trống thì server đã xoá chat).
+  - Số trên menu bên trái cũng được dọn theo.
+
+## Đồng bộ dữ liệu mẫu nhân viên (29/10/2026)
+- DB `tiemtra` đã xoá bớt nhân viên, chỉ còn *Phạm Minh Dũng* (idNV 3). `db_tiemtra/tiemtra.nhan_vien.json` sửa theo, chỉ giữ người này (bản ghi giống hệt trong DB), để máy khác chạy lần đầu cũng khớp.
+- Collection `nhan_vien` hiện chưa được code dùng ở đâu (chỉ nạp mẫu khi DB trống). Tài khoản đăng nhập nằm ở `admin` (ghann, lhao, mdung), không bị ảnh hưởng.
+
+## Đánh số lại mã món 1–67 (29/10/2026)
+- Mã món bị bỏ trống 36–40 (chạy 1–35 rồi nhảy 41–72). Đánh số lại liền mạch **1–67**: món 41–72 thành 36–67 (trừ 5), các món 1–35 giữ nguyên.
+- Đổi đồng thời 3 nơi để ảnh không gắn nhầm món:
+  - Tên file ảnh `uploads/41.jpg`…`72.jpg` → `36.jpg`…`67.jpg`. Đã so từng byte với bản cũ.
+  - `db_tiemtra/tiemtra.mon_an.json`: `idMon` và `image`.
+  - Collection `mon_an` trong DB `tiemtra`: 32 món đổi mã. Tiện sửa luôn đường dẫn ảnh sai của món 11 và 53.
+- Trước khi đổi đã kiểm tra: không đơn hàng / giỏ hàng nào chứa món mã ≥ 36, khuyến mãi không dùng mã món, code không ghi cứng mã món.
+- Đối chiếu tên món theo mã mới giữa DB thật, dữ liệu mẫu và bản cũ: khớp 67/67.
+
+## Ảnh món theo thư mục uploads (29/10/2026)
+- 2 món không hiện ảnh dù đã có file: *Hồng Trà* (mã 11) lưu đường dẫn `/uploads11.jpg/`, *Phô Mai Mặn* (mã 53) lưu `/uploads/53` thiếu đuôi.
+  - Sửa `db_tiemtra/tiemtra.mon_an.json` thành `/uploads/11.jpg` và `/uploads/53.jpg`.
+- `MonAnService.chuanHoaAnh`: chỉ dùng đường dẫn trong DB khi file **có thật** trong `uploads/`. Không có thì tự dò theo mã món (`{idMon}.jpg` / `.jpeg` / `.png` / `.webp`). Vì vậy DB đang chạy (vẫn lưu đường dẫn sai) cũng hiện đúng ảnh mà không cần sửa dữ liệu.
+  - Chặn tên file kiểu `../` trỏ ra ngoài thư mục ảnh.
+- Kiểm tra: ghi lại đúng 2 đường dẫn sai vào DB tạm → cả 67/67 món tải được ảnh thật.
+
 ## Gộp hướng dẫn chạy vào README (29/10/2026)
 - `HUONG_DAN_CHAY.md` gộp vào `README.md` rồi xoá, chỉ còn 1 tài liệu chính. Thứ tự: *Cần biết trước khi chạy* → mục lục → **Chạy project** (mục 1–9) → **Thiết kế hệ thống** (luồng nghiệp vụ, bảng bảo mật, API REST, giao thức WebSocket, cấu trúc mã: mục 10–14) → **Khi gặp sự cố** (mục 15–16). Phần trùng giữa 2 file giữ bản đầy đủ hơn.
 - Sửa nội dung cũ của README:

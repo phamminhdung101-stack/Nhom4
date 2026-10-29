@@ -229,7 +229,7 @@ header {
 
 .sidebar-link.active {
   color: var(--primary-color);
-  font-weight: 800;
+  font-weight: 700;
   border-left: 3px solid var(--primary-color);
   padding-left: 12px;
   border-bottom: none;

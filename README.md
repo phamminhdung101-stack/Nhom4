@@ -41,7 +41,8 @@ Khách quét QR trên bàn để gọi món bằng điện thoại. Nhân viên 
 **Khi sửa code**
 
 14. Sửa HTML/JS xong thì bấm **Ctrl + F5**. Sửa Java thì server tự khởi động lại (DevTools).
-15. **Không đưa lên git:** `ssl/*.p12` (khoá riêng của chứng chỉ), `logs/`, `uploads/`. Các thư mục này đã có trong `.gitignore`, và server tự tạo lại khi chạy.
+15. **Không đưa lên git:** `ssl/*.p12` (khoá riêng của chứng chỉ), `logs/`, `target/`. Đã có trong `.gitignore`, và server tự tạo lại khi chạy.
+16. **Ảnh món nằm trong `uploads/` và có trên git** (tên file = mã món: `1.jpg` … `67.jpg`). Thêm / đổi ảnh thì commit cả file ảnh để cả nhóm có. → [mục 5](#5-tài-khoản-và-các-trang)
 
 > Làm **lần lượt từ mục 1 đến mục 4** là chạy được và tự kiểm tra được máy mình chạy đúng. Các mục sau để tra cứu khi cần. Lịch sử thay đổi: `CHANGELOG.md`.
 
@@ -113,7 +114,7 @@ Không cần cài thêm `mongoimport` hay `keytool`, cũng không cần tạo ch
 
 ## 2. Chạy lần đầu
 
-**Bước 1 – Lấy project về:** giải nén file zip, hoặc chạy `git clone <địa chỉ repo>`.
+**Bước 1 – Lấy project về:** `git clone https://github.com/phamminhdung101-stack/Nhom4.git`, hoặc giải nén file zip. Ảnh món có sẵn trong thư mục `uploads/`.
 
 **Bước 2 – Mở terminal ở thư mục gốc project** (thư mục có file `pom.xml`). Trong VS Code: *Terminal → New Terminal*.
 
@@ -206,12 +207,12 @@ Tài khoản mẫu (trong `db_tiemtra/tiemtra.admin.json`; lần khởi động 
 | Doanh thu | `/admin/dashboard.html` | Báo cáo theo ngày/giờ/món/bàn, xuất CSV |
 | Bếp (KDS) | `/admin/orders.html` | Nhận đơn, chuyển trạng thái, huỷ đơn (chỉ hiện đơn **hôm nay** + đơn chưa xong 2 ngày gần nhất) |
 | Thu ngân (POS) | `/admin/pos.html` | Tạo đơn mua tại quầy, in hoá đơn |
-| Sơ đồ bàn + chat | `/admin/tables.html` | Xem bàn, **cho phép / từ chối máy xin vào bàn**, chat với khách, reset bàn |
+| Sơ đồ bàn + chat | `/admin/tables.html` | Xem bàn, **cho phép / từ chối máy xin vào bàn**, chat với khách, reset bàn. Dòng chú thích ở trên hiện **tổng** máy đang chờ duyệt và tin chưa đọc của mọi bàn; bấm vào để mở bàn cần xử lý |
 | Mã QR bàn | `/admin/qr_maker.html` | In / tải / đổi mã QR từng bàn, nút *Mở thử* |
 | Trang khách | `/welcome.html?idBan=1&t=<mã>` | Mở bằng cách **quét QR**, không gõ tay |
 
 `http://<IP>:8081/...` tự chuyển sang HTTPS, nên mã QR in trước đây vẫn dùng được.
-Ảnh món: đặt file `1.jpg`, `2.jpg`… (theo mã món) vào thư mục `uploads/` (đổi bằng `APP_UPLOAD_DIR`). Thiếu ảnh sẽ hiện ảnh mặc định.
+Ảnh món: đặt file `1.jpg`, `2.jpg`… (tên = mã món; nhận `.jpg`, `.jpeg`, `.png`, `.webp`) vào thư mục `uploads/` (đổi bằng `APP_UPLOAD_DIR`), rồi tải lại trang, không cần khởi động lại server. Đường dẫn ảnh lưu trong DB bị sai cũng không sao: server tự dò file theo mã món. Thiếu ảnh sẽ hiện ảnh mặc định. Ảnh trong `uploads/` được đưa lên git cùng code.
 
 ---
 
@@ -275,7 +276,7 @@ Các ngưỡng bảo mật (số lần đăng nhập sai, giới hạn request�
 
 | Việc | Chi tiết |
 |---|---|
-| **Nạp dữ liệu mẫu** (khi DB trống) | Từ `db_tiemtra/`: 3 tài khoản, 7 loại món, 67 món, khuyến mãi, nhân viên. **Không** nạp đơn hàng, nên sổ đơn và trang Doanh thu bắt đầu trống |
+| **Nạp dữ liệu mẫu** (từng collection, khi collection đó còn trống) | Từ `db_tiemtra/`: 3 tài khoản đăng nhập, 7 loại món, 67 món (mã 1–67), 15 khuyến mãi, 1 nhân viên. **Không** nạp đơn hàng, nên sổ đơn và trang Doanh thu bắt đầu trống. Xoá hết dữ liệu một collection (vd. `nhan_vien`) thì lần chạy sau server nạp lại bản mẫu |
 | **Tạo 10 bàn** (khi chưa có) | Mỗi bàn có mã QR ngẫu nhiên, riêng cho từng máy |
 | **Băm mật khẩu** | Mật khẩu mẫu dạng chữ thường được băm BCrypt |
 | **Tạo / làm mới chứng chỉ HTTPS** | `ssl/tiemtra.p12`, có `localhost`, `127.0.0.1`, IP Wi-Fi. Tạo lại khi đổi mạng hoặc sắp hết hạn |
@@ -285,6 +286,15 @@ Các ngưỡng bảo mật (số lần đăng nhập sai, giới hạn request�
 
 Muốn **làm lại dữ liệu từ đầu**: xoá database `tiemtra` trong Compass rồi chạy lại server.
 Vẫn có thể nạp dữ liệu mẫu bằng tay: `mongoimport --db tiemtra --collection <tên> --jsonArray --file db_tiemtra/tiemtra.<tên>.json`.
+
+**Phân biệt 2 loại "người dùng":**
+- Collection `admin`: **tài khoản đăng nhập** trang quản trị (`ghann`, `lhao`, `mdung`). Mật khẩu băm BCrypt.
+- Collection `nhan_vien`: chỉ là **danh sách nhân viên** (họ tên, chức vụ…). Hiện code **chưa dùng** ở đâu; thêm / xoá nhân viên không ảnh hưởng đăng nhập.
+
+**Thêm / sửa món:** trang quản trị chưa có chức năng này. Sửa trực tiếp collection `mon_an` bằng Compass:
+- Mỗi món cần `idMon` (không trùng; hiện dùng 1–67, món mới dùng 68 trở đi), `TenMon`, `idLoai`, `Gia`.
+- Ảnh: đặt file `uploads/<idMon>.jpg`. Không cần ghi `image`; server tự tìm theo mã món.
+- Muốn máy khác chạy lần đầu cũng có món đó thì sửa thêm `db_tiemtra/tiemtra.mon_an.json`.
 
 **Dữ liệu lưu ở đâu:**
 
@@ -310,10 +320,21 @@ Vẫn có thể nạp dữ liệu mẫu bằng tay: `mongoimport --db tiemtra --
 - Địa chỉ đổi thì trình duyệt coi là trang khác, nên phải **đăng nhập quản trị lại** một lần.
 
 **Mang project sang máy khác (copy thư mục / file zip):**
-- Nên dùng `git clone`, hoặc khi nén zip thì bỏ các thư mục `target/`, `logs/`, `ssl/*.p12`, `uploads/` (trừ ảnh món muốn giữ). Máy mới tự tạo lại những thứ này.
+- Nên dùng `git clone`, hoặc khi nén zip thì bỏ các thư mục `target/`, `logs/`, `ssl/*.p12` (giữ `uploads/` vì là ảnh món). Máy mới tự tạo lại những thứ đã bỏ.
 - Lỡ copy cả `logs/` thì vẫn chạy bình thường. Server lưu IP **kèm tên máy** ở `logs/ip-lan.txt`, nên máy mới **không** báo nhầm *"IP Wi-Fi đã đổi"*. Cảnh báo chỉ hiện khi **cùng một máy** đổi IP.
 - Dữ liệu (đơn, bàn, tài khoản) nằm trong MongoDB của từng máy, không đi theo thư mục project. Máy mới bắt đầu bằng dữ liệu mẫu. Muốn mang dữ liệu theo: `mongodump` / `mongorestore` (mục 8).
 - **Chữ tiếng Việt trong terminal:** console Windows trên nhiều máy để bảng mã cũ (437 / 1252), trước đây log hiện thành `Ti?m Trà ?? ch?y`. Nay server **tự chuyển console sang UTF-8** (`chcp 65001`) lúc khởi động, nên máy nào cũng hiện đúng. Cửa sổ terminal đó giữ UTF-8 sau khi tắt server; việc này vô hại.
+
+**Làm việc nhóm với Git** (repo: https://github.com/phamminhdung101-stack/Nhom4, nhánh `master`):
+```powershell
+git pull                          # lấy code mới nhất của nhóm (làm trước khi sửa)
+git add -A
+git commit -m "mô tả thay đổi"
+git push                          # đẩy lên; bị từ chối thì git pull rồi push lại
+```
+- Code frontend nằm ở `src/main/resources/static/`, **không** sửa các thư mục cũ ở gốc repo (đã bỏ).
+- **Ảnh món có lên git** (`uploads/`): thêm / đổi ảnh thì `git add` cả file ảnh. **Không lên git:** chứng chỉ (`ssl/*.p12`), log, `target/`.
+- **Dữ liệu (đơn, bàn…) không lên git:** mỗi máy có MongoDB riêng. Đổi dữ liệu mẫu thì sửa file trong `db_tiemtra/`; máy khác phải xoá database `tiemtra` rồi chạy lại mới nhận bản mẫu mới.
 
 ---
 
@@ -463,6 +484,7 @@ src/main/resources
 ├── application.properties     cấu hình (có chú thích)
 └── static/                    frontend – khách: welcome.html, index.html, pages/ ; quản trị: admin/
 db_tiemtra/                    dữ liệu mẫu (JSON) – tự nạp khi DB trống
+uploads/                       ảnh món, tên = mã món (1.jpg … 67.jpg) – có trên git
 ssl/                           chứng chỉ HTTPS (tự tạo, KHÔNG đưa lên git)
 ```
 
@@ -496,6 +518,9 @@ ssl/                           chứng chỉ HTTPS (tự tạo, KHÔNG đưa lê
 | File `.md` mở bằng Notepad cũ bị lỗi chữ (`Ä‘`, `á»`…) | File lưu UTF-8. Mở bằng VS Code, Notepad của Windows 10 (bản 1903 trở lên) / Windows 11, hoặc xem trên GitHub |
 | Màn hình bếp không thấy đơn hôm qua | Đúng thiết kế: bếp chỉ hiện đơn hôm nay + đơn chưa xong 2 ngày gần nhất. Đơn cũ xem ở trang *Doanh thu* |
 | Trang Doanh thu trống | Máy mới chưa có đơn nào. Làm thử mục 3 |
+| Món không có ảnh (hiện ảnh mặc định) | Kiểm tra `uploads/` có file của món đó không (chạy `git pull` để lấy ảnh mới nhất). Tên file phải đúng mã món (`12.jpg`; nhận `.jpg` `.jpeg` `.png` `.webp`). Chép xong bấm **Ctrl + F5**, không cần chạy lại server |
+| Chữ trên web trông khác máy khác (font mặc định) | Font Be Vietnam Pro tải từ Google: máy không có Internet sẽ dùng font hệ thống. Web vẫn chạy bình thường |
+| Bàn hiện số tin chưa đọc nhưng mở ra không có tin | Số lưu trong trình duyệt; mở lại trang *Sơ đồ bàn* là tự dọn số của bàn đã Trống. Bàn đang có khách thì bấm vào bàn đó để đánh dấu đã đọc |
 
 ---
 

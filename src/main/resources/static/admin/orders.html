@@ -60,18 +60,18 @@
       </div>
 
       <p class="small text-muted mb-3">
-        <i class="bi bi-info-circle me-1"></i>Bấm nút trên mỗi đơn để chuyển bước:
+        Bấm nút trên mỗi đơn để chuyển bước:
         <b>Nhận đơn → Pha chế → Mang ra → Hoàn thành</b>. Đơn chờ quá 15 phút hiện giờ màu đỏ.
         Khách xin huỷ: bấm <b>Huỷ</b> trên đơn. Bàn tự về <i>Trống</i> khi khách đã nhận đủ món.
         Màn hình này chỉ hiện <b>đơn hôm nay</b> và đơn ngày trước còn chưa xong – xem đơn cũ ở trang <a href="dashboard.html">Doanh thu</a>.
       </p>
       <div class="mb-4 d-flex flex-wrap gap-2" id="filters">
-        <button class="filter-btn active" data-filter="active">🔥 Đang xử lý <span class="count" data-count="active"></span></button>
-        <button class="filter-btn" data-filter="0">⏳ Chờ xác nhận <span class="count" data-count="0"></span></button>
-        <button class="filter-btn" data-filter="1">🧋 Đang pha chế <span class="count" data-count="1"></span></button>
-        <button class="filter-btn" data-filter="2">🛵 Đang mang ra <span class="count" data-count="2"></span></button>
-        <button class="filter-btn" data-filter="3">✅ Hoàn thành <span class="count" data-count="3"></span></button>
-        <button class="filter-btn" data-filter="4">❌ Đã huỷ <span class="count" data-count="4"></span></button>
+        <button class="filter-btn active" data-filter="active">Đang xử lý <span class="count" data-count="active"></span></button>
+        <button class="filter-btn" data-filter="0">Chờ xác nhận <span class="count" data-count="0"></span></button>
+        <button class="filter-btn" data-filter="1">Đang pha chế <span class="count" data-count="1"></span></button>
+        <button class="filter-btn" data-filter="2">Đang mang ra <span class="count" data-count="2"></span></button>
+        <button class="filter-btn" data-filter="3">Hoàn thành <span class="count" data-count="3"></span></button>
+        <button class="filter-btn" data-filter="4">Đã huỷ <span class="count" data-count="4"></span></button>
         <button class="filter-btn" data-filter="all">Tất cả hôm nay</button>
       </div>
 
@@ -82,9 +82,9 @@
     <div id="ws-status" class="ws-status"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/app.js?v=20261028f"></script>
-    <script src="../assets/js/admin.js?v=20261028f"></script>
-    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script src="../assets/js/app.js?v=20261029a"></script>
+    <script src="../assets/js/admin.js?v=20261029a"></script>
+    <script src="../assets/js/websocket.js?v=20261029a"></script>
     <script>
       (function () {
         "use strict";
@@ -141,7 +141,7 @@
                 .map(
                   (i) => `<li><div><b>${i.soLuong}×</b> ${App.escapeHtml(i.tenMon)}
                       <span class="opt">${App.escapeHtml(i.moTaTuyChon || "")}</span>
-                      ${i.ghiChu ? `<span class="note">📝 ${App.escapeHtml(i.ghiChu)}</span>` : ""}</div></li>`
+                      ${i.ghiChu ? `<span class="note">Ghi chú: ${App.escapeHtml(i.ghiChu)}</span>` : ""}</div></li>`
                 )
                 .join("");
               const ban = o.idBan > 0 ? "Bàn " + o.idBan : "Tại quầy";
@@ -152,14 +152,14 @@
                     <div>
                       <h5 class="fw-bold m-0 text-primary">#DH-${o.idDonHang ?? "?"}</h5>
                       <span class="fw-bold">${ban}</span>
-                      ${o.idBan > 0 && o.nguoiDat ? `<small class="text-muted ms-1">📱 ${App.escapeHtml(o.nguoiDat)}</small>` : ""}
+                      ${o.idBan > 0 && o.nguoiDat ? `<small class="text-muted ms-1">· ${App.escapeHtml(o.nguoiDat)}</small>` : ""}
                     </div>
                     <span class="age ${o.trangThai < 3 && minutes > 15 ? "late" : ""}" title="${App.escapeHtml(App.formatDateTime(o.thoiGian))}">
                       <i class="bi bi-clock"></i> ${ageText(o.thoiGian)}
                     </span>
                   </div>
                   ${items ? `<ul class="order-items mb-2">${items}</ul>` : '<p class="small text-muted">(Đơn cũ – không có chi tiết món)</p>'}
-                  ${o.ghiChu ? `<div class="alert alert-warning py-1 px-2 mb-2 small">📝 ${App.escapeHtml(o.ghiChu)}</div>` : ""}
+                  ${o.ghiChu ? `<div class="alert alert-warning py-1 px-2 mb-2 small"><b>Ghi chú:</b> ${App.escapeHtml(o.ghiChu)}</div>` : ""}
                   ${o.trangThai === 4
                     ? `<div class="cancel-reason mb-1">Huỷ bởi ${App.escapeHtml(o.nguoiHuy || "?")}${o.lyDoHuy ? " – " + App.escapeHtml(o.lyDoHuy) : ""}</div>`
                     : ""}
@@ -170,7 +170,7 @@
                            <button class="cancel-btn" data-cancel title="Huỷ đơn (vd. khách nhắn tin xin huỷ)"><i class="bi bi-x-circle"></i> Huỷ</button>
                            <button class="status-btn ${st.cls}" data-next="${o.trangThai + 1}">${NEXT_LABEL[o.trangThai]}</button>
                          </span>`
-                      : `<span class="status-btn ${st.cls}">${st.icon} ${st.text}</span>`}
+                      : `<span class="status-btn ${st.cls}">${st.text}</span>`}
                   </div>
                 </div>
               </div>`;
@@ -238,7 +238,7 @@
               reload();
             } else if (data.type === "ORDER_STATUS_UPDATED" && data.status === 4) {
               if (data.nguoiHuy !== Admin.session.username) { // mình vừa tự huỷ -> không báo lại
-                App.toast(`❌ Đơn #DH-${data.idDonHang} (${data.tableId > 0 ? "Bàn " + data.tableId : "Tại quầy"}) đã bị huỷ bởi ${data.nguoiHuy || "?"}`, "error", 7000);
+                App.toast(`Đơn #DH-${data.idDonHang} (${data.tableId > 0 ? "Bàn " + data.tableId : "Tại quầy"}) đã bị huỷ bởi ${data.nguoiHuy || "?"}`, "error", 7000);
               }
               reload();
             } else if (data.type === "ORDER_STATUS_UPDATED" || data.type === "RECONNECTED") {

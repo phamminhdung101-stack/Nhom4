@@ -254,7 +254,7 @@ public class DonHangService {
         AuditLog.info("ORDER_CANCELLED", "don=" + saved.getIdDonHang() + " ban=" + saved.getIdBan() + " boi=" + nguoiHuy);
         events.trangThaiDon(saved);
         if (saved.getIdBan() != null && saved.getIdBan() > 0) {
-            chatService.thongBao(saved.getIdBan(), "❌ Đơn #DH-" + saved.getIdDonHang() + " đã được huỷ bởi " + nguoiHuy
+            chatService.thongBao(saved.getIdBan(), "Đơn #DH-" + saved.getIdDonHang() + " đã được huỷ bởi " + nguoiHuy
                     + (lyDoSach != null ? ". Lý do: " + lyDoSach : ""));
             traBanNeuDaXong(saved);
         }

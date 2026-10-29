@@ -14,7 +14,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../assets/css/chat.css" />
@@ -287,19 +287,19 @@
       <p class="small fw-bold text-muted mb-2 ps-1">Bạn cần hỗ trợ thêm?</p>
       <div class="quick-actions">
         <button class="action-btn" onclick="requestService('thêm đá')">
-          🧊 Thêm đá
+          Thêm đá
         </button>
         <button class="action-btn" onclick="requestService('thêm đường')">
-          🍬 Thêm đường
+          Thêm đường
         </button>
         <button class="action-btn" onclick="requestService('gọi nhân viên')">
-          🛎️ Gọi nhân viên
+          Gọi nhân viên
         </button>
         <button
           class="action-btn text-danger border-danger"
           onclick="requestService('thanh toán')"
         >
-          💵 Gọi thanh toán
+          Gọi thanh toán
         </button>
       </div>
 
@@ -315,8 +315,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script src="../assets/js/app.js?v=20261028f"></script>
-    <script src="../assets/js/websocket.js?v=20261028f"></script>
+    <script src="../assets/js/app.js?v=20261029a"></script>
+    <script src="../assets/js/websocket.js?v=20261029a"></script>
     <script>
       (function () {
         "use strict";
@@ -363,14 +363,14 @@
           );
           $("order-list").innerHTML = orders
             .map((o) => {
-              const st = App.TRANG_THAI_DON[o.trangThai] || { text: "Không rõ", icon: "❔" };
+              const st = App.TRANG_THAI_DON[o.trangThai] || { text: "Không rõ" };
               const id = App.escapeHtml(o.id);
               const items = (o.items || [])
                 .map(
                   (i) => `<li>
                     <div><b>${i.soLuong}×</b> ${App.escapeHtml(i.tenMon)}
                       <span class="opt">${App.escapeHtml(i.moTaTuyChon || "")}</span>
-                      ${i.ghiChu ? `<span class="note">📝 ${App.escapeHtml(i.ghiChu)}</span>` : ""}
+                      ${i.ghiChu ? `<span class="note">Ghi chú: ${App.escapeHtml(i.ghiChu)}</span>` : ""}
                     </div>
                     <span class="text-nowrap">${App.formatMoney(i.thanhTien)}</span>
                   </li>`
@@ -387,7 +387,7 @@
                 <div class="order-block ${o === focus ? "focus" : ""} ${o.trangThai === 4 ? "cancelled" : ""}">
                   <div class="d-flex justify-content-between align-items-center mb-1">
                     <span><b class="order-code">#DH-${o.idDonHang}</b> <small class="text-muted">· ${App.formatTime(o.thoiGian)}</small></span>
-                    <span class="badge bg-light text-dark border">${st.icon} ${st.text}</span>
+                    <span class="badge bg-light text-dark border">${st.text}</span>
                   </div>
                   <ul class="order-items mb-1">${items}</ul>
                   ${o.ghiChu ? `<p class="small text-muted mb-1">Ghi chú: ${App.escapeHtml(o.ghiChu)}</p>` : ""}
@@ -453,7 +453,7 @@
         }
 
         function askCancel(order) {
-          if (window.CustomerChat && window.CustomerChat.send(`🙏 Cho mình xin huỷ đơn #DH-${order.idDonHang}`)) {
+          if (window.CustomerChat && window.CustomerChat.send(`Cho mình xin huỷ đơn #DH-${order.idDonHang}`)) {
             App.toast("Đã nhắn quán. Nhân viên sẽ xác nhận việc huỷ.", "success");
           }
         }
@@ -473,7 +473,7 @@
         }
 
         function requestService(serviceName) {
-          if (window.CustomerChat && window.CustomerChat.send("🔔 Yêu cầu: " + serviceName)) {
+          if (window.CustomerChat && window.CustomerChat.send("Yêu cầu: " + serviceName)) {
             App.toast(`Đã gửi yêu cầu "${serviceName}" tới nhân viên`, "success");
           }
         }
@@ -486,7 +486,7 @@
         function sendRating() {
           if (!rating) return App.toast("Bạn chọn số sao giúp quán nhé", "info");
           const note = $("rating-note").value.trim();
-          if (window.CustomerChat) window.CustomerChat.send(`⭐ Đánh giá ${rating}/5${note ? ": " + note : ""}`);
+          if (window.CustomerChat) window.CustomerChat.send(`Đánh giá ${rating}/5${note ? ": " + note : ""}`);
           App.toast("Cảm ơn đánh giá của bạn!", "success");
           $("rating-box").classList.add("d-none");
         }
@@ -520,6 +520,6 @@
         Object.assign(window, { requestService, rate, sendRating, goToMenu });
       })();
     </script>
-    <script src="../assets/js/customer-chat.js?v=20261028f"></script>
+    <script src="../assets/js/customer-chat.js?v=20261029a"></script>
   </body>
 </html>
