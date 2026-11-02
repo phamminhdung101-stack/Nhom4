@@ -534,3 +534,5 @@ ssl/                           chứng chỉ HTTPS (tự tạo, KHÔNG đưa lê
   ```
 - **Xoá dữ liệu để làm lại từ đầu:** xoá database `tiemtra` trong Compass, rồi chạy lại server (dữ liệu mẫu tự nạp lại).
 - **Gỡ chứng chỉ đã cho Windows tin** (nếu đã làm ở mục 6): `certutil -user -delstore Root "Tiem Tra"`
+set APP_HTTPS=false
+mvnw.cmd spring-boot:run
