@@ -6,7 +6,7 @@ Khách quét QR trên bàn để gọi món bằng điện thoại. Nhân viên 
 
 **Công nghệ:** Java 17+ · Spring Boot 3.5 · MongoDB · WebSocket (Raw + STOMP) · HTML/CSS/JS (Bootstrap 5) · Wireshark
 
-**Tóm tắt 30 giây:** cài **JDK 17+** và **MongoDB** → mở terminal ở thư mục project → `.\mvnw.cmd spring-boot:run` → trình duyệt tự mở trang quản trị → đăng nhập `ghann` / `88888`.
+**Tóm tắt 30 giây:** cài **JDK 17+** và **MongoDB** → mở terminal ở thư mục project → `.\mvnw.cmd spring-boot:run` → trình duyệt tự mở trang quản trị → đăng nhập bằng tài khoản server in ra terminal ở lần chạy đầu.
 
 ---
 
@@ -32,7 +32,7 @@ Khách quét QR trên bàn để gọi món bằng điện thoại. Nhân viên 
 
 **Khi thử với điện thoại**
 
-9. **Điện thoại phải cùng Wi-Fi** với máy chạy server, và Java phải được cho qua **Windows Firewall**. → [mục 4](#4-thử-với-điện-thoại)
+9. **Điện thoại phải cùng Wi-Fi** với máy chạy server, và Java phải được cho qua **Windows Firewall**. → [mục 4](#4-thử-với-điện-thoại) Máy đã cài `cloudflared` thì server tự bật tunnel, khác Wi-Fi / 4G cũng vào được. → [mục 9](#9-đổi-wi-fi--chuyển-sang-máy-khác)
 10. **Mở trang quản trị bằng IP, không bằng `localhost`**: mã QR lấy địa chỉ từ trang đang mở, mở bằng `localhost` thì điện thoại quét sẽ không vào được.
 11. **Mã QR chứa IP của máy chạy server.** Đổi Wi-Fi, đổi máy, hoặc router cấp IP khác thì **phải in lại mã QR**. → [mục 9](#9-đổi-wi-fi--chuyển-sang-máy-khác)
 12. **Máy thứ 2 trở đi quét cùng một bàn phải chờ nhân viên bấm "Cho phép"** ở *Sơ đồ bàn*. Đây là chống người lạ đặt món vào bàn người khác. Khi demo thì tắt bằng `APP_DUYET_MAY_MOI=false`.
@@ -44,7 +44,7 @@ Khách quét QR trên bàn để gọi món bằng điện thoại. Nhân viên 
 15. **Không đưa lên git:** `ssl/*.p12` (khoá riêng của chứng chỉ), `logs/`, `target/`. Đã có trong `.gitignore`, và server tự tạo lại khi chạy.
 16. **Ảnh món nằm trong `uploads/` và có trên git** (tên file = mã món: `1.jpg` … `67.jpg`). Thêm / đổi ảnh thì commit cả file ảnh để cả nhóm có. → [mục 5](#5-tài-khoản-và-các-trang)
 
-> Làm **lần lượt từ mục 1 đến mục 4** là chạy được và tự kiểm tra được máy mình chạy đúng. Các mục sau để tra cứu khi cần..
+> Làm **lần lượt từ mục 1 đến mục 4** là chạy được và tự kiểm tra được máy mình chạy đúng. Các mục sau để tra cứu khi cần.
 
 ---
 
@@ -84,6 +84,7 @@ Khách quét QR trên bàn để gọi món bằng điện thoại. Nhân viên 
 | **MongoDB Community Server** | ✅ | Bản 6, 7 hoặc 8 |
 | MongoDB Compass | tuỳ chọn | Giao diện xem / xoá dữ liệu |
 | Git | tuỳ chọn | Nếu lấy project bằng `git clone` |
+| cloudflared | tuỳ chọn | Để điện thoại khác Wi-Fi / 4G vào được: `winget install --id Cloudflare.cloudflared`. Có cài thì web tự lên Internet mỗi lần chạy server (mục 9) |
 | Maven | ❌ không cần | Project có sẵn `mvnw` (Maven Wrapper) |
 
 ### 1.1 Cài JDK
@@ -140,7 +141,7 @@ Tomcat started on ports 8443 (https), 8081 (http)
 ```
 Trình duyệt **tự mở** trang quản trị. Lần đầu sẽ có cảnh báo *"Kết nối không riêng tư"*: bấm **Nâng cao → Tiếp tục**. Đây là bình thường với chứng chỉ tự ký (xem mục 6).
 
-Đăng nhập **`ghann` / `88888`**.
+Lần chạy đầu, server tạo mật khẩu ngẫu nhiên và in ra terminal dòng `>>> Tài khoản admin mới: <tên> / <mật khẩu>`. Dùng dòng đó để đăng nhập và **lưu lại ngay**, vì nó chỉ hiện 1 lần.
 
 > Log ghi `Tomcat started on port 8081 (https)` (chỉ 1 cổng) là sai. Terminal đang có biến `PORT=8081`, xem mục 15.
 
@@ -193,13 +194,9 @@ Cả 6 bước đều chạy là máy đã sẵn sàng.
 
 ## 5. Tài khoản và các trang
 
-Tài khoản mẫu (trong `db_tiemtra/tiemtra.admin.json`; lần khởi động đầu server tự băm BCrypt các mật khẩu này):
+File `db_tiemtra/tiemtra.admin.json` chỉ có tên tài khoản, **không có mật khẩu**. Lần khởi động đầu, server tạo mật khẩu ngẫu nhiên cho từng tài khoản, lưu bản băm BCrypt vào MongoDB và in bản gốc ra terminal đúng 1 lần (không ghi vào `logs/app.log`).
 
-| Tài khoản | Mật khẩu |
-|---|---|
-| `ghann` | `88888` |
-| `lhao` | `12345` |
-| `mdung` | `11223` |
+Quên mật khẩu hoặc muốn đổi: xoá collection `admin` trong MongoDB Compass rồi chạy lại server, mật khẩu mới sẽ được in ra.
 
 | Trang | Đường dẫn (sau `https://<IP>:8443`) | Dùng để |
 |---|---|---|
@@ -260,6 +257,7 @@ APP_HTTPS=false ./mvnw spring-boot:run                           # Linux / macOS
 | `PORT` | `8443` (HTTP: `8081`) | Cổng chính. **Đừng đặt `PORT=8081` khi đang chạy HTTPS**: HTTPS sẽ chiếm 8081 và cổng chuyển hướng bị tắt, nên link / mã QR `http://<IP>:8081` cũ báo lỗi. Muốn đổi cổng thì đổi cả hai, vd. `PORT=8444`, `HTTP_PORT=8082` |
 | `HTTP_PORT` | `8081` | Cổng HTTP chỉ để chuyển hướng sang HTTPS. `0` = tắt |
 | `APP_OPEN_BROWSER` | `true` | `false` = không tự mở trình duyệt |
+| `APP_TUNNEL` | `true` | `false` = không tự bật Cloudflare Tunnel (chỉ có tác dụng khi máy đã cài `cloudflared`) |
 | `APP_DUYET_MAY_MOI` | `true` | `false` = máy thứ 2 vào bàn không cần nhân viên duyệt |
 | `APP_RATE_LIMIT` | `true` | `false` = tắt giới hạn số request (khi đo tải / test tự động) |
 | `APP_UPLOAD_DIR` | `./uploads` | Thư mục ảnh món |
@@ -288,7 +286,7 @@ Muốn **làm lại dữ liệu từ đầu**: xoá database `tiemtra` trong Com
 Vẫn có thể nạp dữ liệu mẫu bằng tay: `mongoimport --db tiemtra --collection <tên> --jsonArray --file db_tiemtra/tiemtra.<tên>.json`.
 
 **Phân biệt 2 loại "người dùng":**
-- Collection `admin`: **tài khoản đăng nhập** trang quản trị (`ghann`, `lhao`, `mdung`). Mật khẩu băm BCrypt.
+- Collection `admin`: **tài khoản đăng nhập** trang quản trị. Mật khẩu băm BCrypt.
 - Collection `nhan_vien`: chỉ là **danh sách nhân viên** (họ tên, chức vụ…). Hiện code **chưa dùng** ở đâu; thêm / xoá nhân viên không ảnh hưởng đăng nhập.
 
 **Thêm / sửa món:** trang quản trị chưa có chức năng này. Sửa trực tiếp collection `mon_an` bằng Compass:
@@ -324,6 +322,20 @@ Vẫn có thể nạp dữ liệu mẫu bằng tay: `mongoimport --db tiemtra --
 - Lỡ copy cả `logs/` thì vẫn chạy bình thường. Server lưu IP **kèm tên máy** ở `logs/ip-lan.txt`, nên máy mới **không** báo nhầm *"IP Wi-Fi đã đổi"*. Cảnh báo chỉ hiện khi **cùng một máy** đổi IP.
 - Dữ liệu (đơn, bàn, tài khoản) nằm trong MongoDB của từng máy, không đi theo thư mục project. Máy mới bắt đầu bằng dữ liệu mẫu. Muốn mang dữ liệu theo: `mongodump` / `mongorestore` (mục 8).
 - **Chữ tiếng Việt trong terminal:** console Windows trên nhiều máy để bảng mã cũ (437 / 1252), trước đây log hiện thành `Ti?m Trà ?? ch?y`. Nay server **tự chuyển console sang UTF-8** (`chcp 65001`) lúc khởi động, nên máy nào cũng hiện đúng. Cửa sổ terminal đó giữ UTF-8 sau khi tắt server; việc này vô hại.
+
+**Điện thoại khác Wi-Fi / dùng 4G vẫn quét QR được (Cloudflare Tunnel):**
+
+⚠️ Máy đã cài `cloudflared` thì **mỗi lần chạy server, web tự lộ ra Internet**. Không muốn bật tunnel: `$env:APP_TUNNEL="false"; .\mvnw.cmd spring-boot:run`.
+
+1. Cài 1 lần: `winget install --id Cloudflare.cloudflared`
+2. Chạy server như bình thường: `.\mvnw.cmd spring-boot:run`. Server tự bật tunnel, in địa chỉ `https://….trycloudflare.com` ra terminal và mở trình duyệt vào `<địa chỉ>/admin`.
+3. Đăng nhập, vào **Mã QR bàn** → **In tất cả**. Mã QR tự theo địa chỉ tunnel.
+
+- Chưa cài `cloudflared` thì server vẫn chạy bình thường, chỉ vào được khi chung Wi-Fi.
+- Tunnel chỉ bật ở HTTPS. Đặt `APP_HTTPS=false` thì không có tunnel, vì WebSocket qua tunnel sẽ bị 403.
+- Tắt server bằng `Ctrl+C` là tunnel tắt theo. Đóng terminal đột ngột thì `cloudflared` có thể còn sót, nhưng lần chạy server sau sẽ tự tắt nó.
+- Bản miễn phí **đổi địa chỉ mỗi lần chạy**, nên mỗi lần phải in lại QR. Muốn cố định thì cần tên miền riêng.
+- Qua tunnel, server lấy IP thật của khách từ header `CF-Connecting-IP` (`ClientIp.java`), nên mỗi khách có bộ đếm request và đăng nhập sai riêng.
 
 **Làm việc nhóm với Git** (repo: https://github.com/phamminhdung101-stack/Nhom4, nhánh `master`):
 ```powershell

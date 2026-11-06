@@ -4,7 +4,6 @@
   },
   "idAdmin": "Ad001",
   "username": "ghann",
-  "matKhau": "88888",
   "thoiGianDangNhap": null,
   "thoiGianDangXuat": null
 },
@@ -14,7 +13,6 @@
   },
   "idAdmin": "Ad002",
   "username": "lhao",
-  "matKhau": "12345",
   "thoiGianDangNhap": null,
   "thoiGianDangXuat": null
 },
@@ -24,7 +22,6 @@
   },
   "idAdmin": "Ad003",
   "username": "mdung",
-  "matKhau": "11223",
   "thoiGianDangNhap": null,
   "thoiGianDangXuat": null
 }]

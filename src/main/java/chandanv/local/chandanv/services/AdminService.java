@@ -69,10 +69,14 @@ public class AdminService {
         int count = 0;
         for (Admin a : repository.findAll()) {
             String pw = a.getMatKhau();
-            if (pw != null && !laBcrypt(pw)) {
+            boolean chuaCo = pw == null || pw.isBlank();
+            if (chuaCo) pw = TextUtil.randomToken(9);
+            if (!laBcrypt(pw)) {
                 a.setMatKhau(passwordEncoder.encode(pw));
                 repository.save(a);
                 count++;
+                // Repo công khai nên file mẫu không có mật khẩu. Dùng System.out để bản gốc không nằm lại trong logs/app.log.
+                if (chuaCo) System.out.println(">>> Tài khoản admin mới: " + a.getUsername() + " / " + pw + "  (chỉ hiện 1 lần, lưu lại ngay)");
             }
         }
         return count;

@@ -97,7 +97,7 @@ public class DataInitializer implements CommandLineRunner {
         if (banDaSua > 0) log.info("Đã cấp/sửa mã QR cho {} bàn", banDaSua);
 
         int daBam = adminService.bamMatKhauCu();
-        if (daBam > 0) log.info("Đã băm BCrypt mật khẩu cho {} tài khoản cũ", daBam);
+        if (daBam > 0) log.info("Đã băm BCrypt mật khẩu cho {} tài khoản", daBam);
 
         Query donCu = new Query(Criteria.where("idBan").exists(false).and("idGioHang").exists(true));
         int donDaChuyen = 0;

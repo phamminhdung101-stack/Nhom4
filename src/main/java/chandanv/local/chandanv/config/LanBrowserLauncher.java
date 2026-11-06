@@ -1,17 +1,21 @@
 package chandanv.local.chandanv.config;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +29,9 @@ import org.springframework.stereotype.Component;
  * Server chạy xong -> tự tìm IP Wi-Fi/LAN của máy, in đường dẫn ra log và mở trình duyệt
  * vào trang quản trị bằng IP đó (mã QR in ra sẽ trỏ đúng IP để điện thoại cùng Wi-Fi quét được).
  * Tắt tự mở trình duyệt: app.open-browser=false (biến môi trường APP_OPEN_BROWSER=false).
+ *
+ * Máy đã cài cloudflared thì tự bật thêm Cloudflare Tunnel và mở trình duyệt bằng địa chỉ tunnel, để điện thoại
+ * khác Wi-Fi / 4G quét QR được. Chưa cài thì chạy như cũ. Tắt: app.tunnel=false (biến môi trường APP_TUNNEL=false).
  */
 @Component
 public class LanBrowserLauncher {
@@ -42,12 +49,24 @@ public class LanBrowserLauncher {
 
     private static final List<String> CARD_WIFI = List.of("wi-fi", "wifi", "wlan", "wireless", "802.11");
 
+    /** Bắt buộc có dấu "-": dòng báo lỗi của cloudflared cũng có https://api.trycloudflare.com. */
+    private static final Pattern DIA_CHI_TUNNEL = Pattern.compile("https://[a-z0-9]+(-[a-z0-9]+)+\\.trycloudflare\\.com");
+
+    /** winget cài vào đây nhưng terminal đang mở chưa nhận PATH mới. */
+    private static final String CLOUDFLARED_WINDOWS = "C:\\Program Files (x86)\\cloudflared\\cloudflared.exe";
+
+    private static final Path FILE_PID_TUNNEL = Path.of("logs", "tunnel.pid");
+
     private final Environment env;
     private final boolean openBrowser;
+    private final boolean tunnel;
 
-    public LanBrowserLauncher(Environment env, @Value("${app.open-browser:true}") boolean openBrowser) {
+    public LanBrowserLauncher(Environment env,
+                              @Value("${app.open-browser:true}") boolean openBrowser,
+                              @Value("${app.tunnel:true}") boolean tunnel) {
         this.env = env;
         this.openBrowser = openBrowser;
+        this.tunnel = tunnel;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -85,9 +104,94 @@ public class LanBrowserLauncher {
         }
         canhBaoDoiIp(ip.orElse(null), base);
 
-        if (!openBrowser || System.getProperty(OPENED_FLAG) != null) return;
+        // DevTools khởi động lại: tunnel và tab vẫn còn từ lần đầu, bật lại thì địa chỉ tunnel sẽ đổi.
+        if (System.getProperty(OPENED_FLAG) != null) return;
         System.setProperty(OPENED_FLAG, "1");
-        moTrinhDuyet(base + "/admin");
+
+        if (tunnel && !https) log.info("Không bật tunnel: chế độ HTTP làm WebSocket qua tunnel bị 403.");
+        if (tunnel && https && batTunnel(port, base + "/admin")) return; // tab mở sau khi tunnel có địa chỉ
+        if (openBrowser) moTrinhDuyet(base + "/admin");
+    }
+
+    /** Trả về false nếu máy chưa có cloudflared. Lỗi tunnel không được làm hỏng server. */
+    private boolean batTunnel(String port, String adminLan) {
+        tatTunnelCu();
+        Process p = chayCloudflared(port);
+        if (p == null) {
+            log.info("Chưa cài cloudflared nên chỉ vào được khi chung Wi-Fi. Cài: winget install --id Cloudflare.cloudflared");
+            return false;
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(p::destroyForcibly)); // tắt server thì web phải rời Internet
+        try {
+            Files.createDirectories(FILE_PID_TUNNEL.getParent());
+            Files.writeString(FILE_PID_TUNNEL, String.valueOf(p.pid()));
+        } catch (IOException e) {
+            log.warn("Không ghi được {}: {}", FILE_PID_TUNNEL, e.getMessage());
+        }
+        Thread doc = new Thread(() -> docTunnel(p, adminLan), "tunnel");
+        doc.setDaemon(true);
+        doc.start();
+        return true;
+    }
+
+    /**
+     * Đóng terminal đột ngột thì shutdown hook có thể không kịp chạy: cloudflared cũ còn sống và sẽ trỏ vào server
+     * mới. Kiểm tra tên tiến trình trước khi tắt, vì Windows có thể cấp lại PID đó cho chương trình khác.
+     */
+    private static void tatTunnelCu() {
+        try {
+            ProcessHandle.of(Long.parseLong(Files.readString(FILE_PID_TUNNEL).trim()))
+                    .filter(h -> h.info().command().orElse("").toLowerCase(Locale.ROOT).contains("cloudflared"))
+                    .ifPresent(ProcessHandle::destroyForcibly);
+        } catch (IOException | NumberFormatException e) {
+            // chưa có file hoặc file hỏng: không có gì để tắt
+        }
+    }
+
+    private static Process chayCloudflared(String port) {
+        for (String exe : List.of("cloudflared", CLOUDFLARED_WINDOWS)) {
+            try {
+                return new ProcessBuilder(exe, "tunnel", "--no-autoupdate",
+                        "--url", "https://localhost:" + port, "--no-tls-verify")
+                        .redirectErrorStream(true).start();
+            } catch (IOException e) {
+                // không có ở chỗ này: thử chỗ tiếp theo
+            }
+        }
+        return null;
+    }
+
+    /** Đọc log cloudflared đến khi nó thoát. Phải đọc hết, không thì bộ đệm đầy làm cloudflared bị treo. */
+    private void docTunnel(Process p, String adminLan) {
+        String diaChi = null;
+        boolean daKetNoi = false;
+        try (BufferedReader r = p.inputReader(StandardCharsets.UTF_8)) {
+            String dong;
+            while ((dong = r.readLine()) != null) {
+                Matcher m = DIA_CHI_TUNNEL.matcher(dong);
+                if (diaChi == null && m.find()) diaChi = m.group();
+                if (diaChi != null && !daKetNoi && dong.contains("Registered tunnel connection")) {
+                    daKetNoi = true;
+                    log.info("""
+
+                            ============================================================
+                             Tunnel đã bật: điện thoại khác Wi-Fi / 4G vào được.
+                             Quản trị   : {}/admin
+                             Mã QR bàn  : {}/admin/qr_maker.html
+                             Địa chỉ đổi mỗi lần chạy server nên phải in lại mã QR.
+                            ============================================================""", diaChi, diaChi);
+                    if (openBrowser) moTrinhDuyet(diaChi + "/admin");
+                }
+            }
+        } catch (IOException e) {
+            // cloudflared đã bị tắt: xử lý chung ở dưới
+        }
+        if (daKetNoi) {
+            log.warn("Tunnel đã tắt, khách khác Wi-Fi không vào được nữa.");
+        } else {
+            log.warn("Không bật được tunnel (máy có Internet không?). Vẫn dùng được trong cùng Wi-Fi.");
+            if (openBrowser) moTrinhDuyet(adminLan);
+        }
     }
 
     /**
